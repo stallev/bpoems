@@ -31,19 +31,21 @@
 ## Visual Design
 
 ### Color Palette
-- **Primary Colors:** Warm, inviting colors suitable for Christian content
-  - Primary: Deep blue (#1e40af) - Trust, stability
-  - Secondary: Warm gold (#f59e0b) - Inspiration, creativity
-  - Accent: Soft green (#10b981) - Growth, hope
+- **Primary Colors:** Modern, spiritual colors suitable for Christian content
+  - Primary: Purple (#805AD5) - Spirituality, wisdom, devotion
+  - Secondary: Blue (#3182CE) - Faith, trust, heaven
+  - Accent: Green (#38A169) - Growth, hope, renewal
 - **Neutral Colors:**
-  - Background: Off-white (#fafafa) - Clean, readable
-  - Text: Dark gray (#1f2937) - High contrast, accessible
-  - Borders: Light gray (#e5e7eb) - Subtle separation
+  - Background (Light): Clean white (#FAFAFA) - Purity, clarity
+  - Background (Dark): Deep black (#121212) - Depth, contemplation
+  - Text (Light): Almost black (#1A202C) - Readability, authority
+  - Text (Dark): Almost white (#F7FAFC) - Clarity, accessibility
+  - Borders: Light gray (#E5E7EB) - Subtle separation
 - **Semantic Colors:**
-  - Success: Green (#10b981)
-  - Warning: Orange (#f59e0b)
-  - Error: Red (#ef4444)
-  - Info: Blue (#3b82f6)
+  - Success: Green (#38A169) - Accomplishment, growth
+  - Warning: Orange (#DD6B20) - Caution, attention
+  - Error: Red (#E53E3E) - Alert, correction
+  - Info: Blue (#3182CE) - Knowledge, information
 
 ### Typography
 - **Primary Font:** Serif font for poetry content (e.g., Georgia, Merriweather)
@@ -191,11 +193,23 @@
 - **Templates:** Page layouts and structures
 
 ### Design Tokens
-- **Colors:** Semantic color variables
+- **Colors:** CSS variables for colors in HSL format (hue, saturation, lightness)
 - **Typography:** Font families, sizes, weights
 - **Spacing:** Consistent spacing scale
 - **Shadows:** Elevation and depth system
 - **Border Radius:** Consistent corner rounding
+
+### CSS Variables and Tailwind
+- **Variable Structure:** Definition in src/shared/styles/theme.css
+- **Tailwind Integration:** Binding CSS variables through tailwind.config.mjs
+- **Semantic Names:** Using clear names (primary, secondary, accent)
+- **Theming:** Support for light and dark themes via .dark class and prefers-color-scheme
+
+### Styling Rules
+- **CSS Variables Usage:** All colors through CSS variables
+- **Tailwind Classes Application:** Utility classes for styling
+- **Avoiding Inline Styles:** Don't use inline styles
+- **Semantic Classes:** Use bg-primary instead of specific colors
 
 ### Documentation
 - **Component Catalog:** Interactive component library

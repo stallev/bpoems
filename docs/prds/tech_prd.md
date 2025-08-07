@@ -203,6 +203,70 @@
 - User behavior analytics
 - Performance metrics dashboard
 
+## CSS Structure and Organization
+
+### CSS Variables Approach
+
+#### Design Token Principles
+- **Abstract Tokens**: Base values for colors, sizes, and other properties
+- **Semantic Tokens**: Connect abstract tokens to specific interface elements
+- **Component Tokens**: Component-specific variables
+
+#### CSS Variables Structure
+- **Organization in theme.css**: All CSS variables defined in `src/shared/styles/theme.css`
+- **Tailwind Layers**: Variables declared in `@layer base` for proper Tailwind integration
+- **Theme Selectors**: Using `:root` for light theme and `.dark` for dark theme
+- **prefers-color-scheme Support**: Automatic switching based on system preferences
+
+#### Variable Categories
+- **Primary Colors**: Primary, secondary, accent with shade gradations
+- **Neutral Colors**: Background, text, borders
+- **Component Colors**: Cards, popovers, muted elements
+- **Semantic Colors**: Success, warning, error, info
+- **Typography**: Fonts, sizes, line heights
+- **Dimensions**: Spacing, border radius, shadows
+
+### Tailwind CSS Integration
+
+#### Tailwind Configuration
+- **CSS Variables in tailwind.config.mjs**: Binding CSS variables with Tailwind color system
+- **Theme Extension**: Using `theme.extend.colors` to add custom colors
+- **Semantic Names**: Using clear names for colors (primary, secondary, accent)
+- **Shade Gradations**: Support for standard gradations (50-950) for primary colors
+
+#### Usage Rules
+- **Preference for Semantic Classes**: Use `bg-primary` instead of `bg-purple-600`
+- **Avoid Hardcoding Colors**: Don't use specific colors in components
+- **Consistency**: Follow a unified approach across all components
+- **Documentation**: All colors and their usage should be documented
+
+### Custom Component Styling
+
+#### Styling Rules
+- **CSS Variables Usage**: All colors and other properties should use CSS variables
+- **Tailwind Classes Application**: Use Tailwind utility classes for styling
+- **Avoiding Inline Styles**: Don't use inline styles with hardcoded values
+- **Following the "Design Tokens" Principle**: Abstract styles from specific values
+
+#### Implementation Recommendations
+- **Component Approach**: Create reusable components with consistent styles
+- **Modifiers**: Use modifiers for component variations
+- **Adaptivity**: Ensure correct display on all devices
+- **Accessibility**: Follow accessibility standards (contrast, focus, alternative text)
+
+### Theme Management
+
+#### Theme Switching Implementation
+- **ThemeProvider**: Using the `ThemeProvider` component from next-themes
+- **data-theme Attribute**: Managing theme through the `data-theme` attribute
+- **ThemeToggle**: Component for switching between light and dark themes
+- **prefers-color-scheme Support**: Automatic detection of user's preferred theme
+
+#### Preference Storage
+- **localStorage**: Saving the selected theme in localStorage
+- **Server Rendering**: Preventing flicker during page load
+- **Switching Without Reload**: Instant application of new theme without page reload
+
 ## Technical Success Metrics
 
 ### Performance Metrics
