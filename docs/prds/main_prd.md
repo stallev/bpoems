@@ -36,22 +36,23 @@ This document outlines the requirements for a Christian poetry platform that ser
 - As a user, I want to edit my profile bio using a WYSIWYG editor so that I can create rich, formatted descriptions
 - As a user, I want to provide my profile information in multiple languages so that international readers can understand me better
 
-**For Readers:**
+**For Readers (Unauthenticated):**
 - As a reader, I want to browse Christian poetry by categories and tags so that I can find content I enjoy
 - As a reader, I want to search for specific poems or authors with full-text search so that I can discover new content
 - As a reader, I want to read poems in a clean, distraction-free format so that I can focus on the content
-- As a reader, I want to leave comments on poems so that I can engage with the community
 - As a reader, I want to view author profiles so that I can learn more about the authors
-- As a subscriber, I want to receive notifications about new posts from my followed authors
 - As a reader, I want to use the platform in my preferred language so that I can navigate comfortably
 
-**For Subscribers:**
+**For Subscribers (Authenticated):**
 - As a subscriber, I want to browse and read all published poems so that I can enjoy Christian poetry
 - As a subscriber, I want to leave comments on poems so that I can engage with the community
 - As a subscriber, I want to view author profiles so that I can learn more about the authors
 - As a subscriber, I want to request an author role upgrade from my profile page so that I can publish my own poetry
 - As a subscriber, I want to receive notifications about new posts from authors I follow so that I can stay updated
 - As a subscriber, I want to use the platform in my preferred language so that I can navigate comfortably
+- As a subscriber, I want to follow favorite authors so that I can stay updated on their new work
+- As a subscriber, I want to rate and review poems so that I can provide feedback to authors
+- As a subscriber, I want to create reading lists so that I can save poems for later
 
 ### Advanced User Stories
 
@@ -60,12 +61,6 @@ This document outlines the requirements for a Christian poetry platform that ser
 - As an author, I want to see analytics about my poems' performance so that I can understand reader engagement
 - As an author, I want to moderate comments on my poems so that I can maintain a positive environment
 - As an author, I want to create collections of my poems so that I can organize my work
-
-**For Readers:**
-- As a reader, I want to rate and review poems so that I can provide feedback to authors
-- As a reader, I want to follow favorite authors so that I can stay updated on their new work
-- As a reader, I want to create reading lists so that I can save poems for later
-- As a reader, I want to receive recommendations based on my reading history
 
 **For Moderators:**
 - As a moderator, I want to approve or reject author role requests from subscribers so that I can control who can publish content
@@ -97,6 +92,7 @@ This document outlines the requirements for a Christian poetry platform that ser
 7. The system must require moderator approval for author role assignment
 8. The system must automatically publish content from users with author role (approval status = 'approved')
 9. The system must allow subscribers to request author role upgrade from their profile page
+10. Authentication Providers (MVP and future): For MVP, the platform will support Google as the only authentication provider via NextAuth (sessions). Future releases will add Apple and Facebook providers.
 
 #### Poetry Publishing
 10. The system must allow only users with author role or higher to create new poems
@@ -118,7 +114,7 @@ This document outlines the requirements for a Christian poetry platform that ser
 24. The system must show related poems based on category and tags
 
 #### Community Features
-25. The system must allow authenticated users to leave comments on poems
+25. The system must allow only authenticated users (Subscriber role and above) to leave comments on poems
 26. The system must allow poets to respond to comments on their poems
 27. The system must display user profiles with their published poems
 28. The system must show recent activity and poem counts on profiles
@@ -130,10 +126,10 @@ This document outlines the requirements for a Christian poetry platform that ser
 ### Advanced Requirements
 
 #### Enhanced User Experience
-31. The system must implement a rating system (1-5 stars) for poems
-32. The system must allow users to write detailed reviews for poems
-33. The system must provide a following system for users to follow poets
-34. The system must allow users to create and manage reading lists
+31. The system must implement a rating system (1-5 stars) for authenticated users only
+32. The system must allow only authenticated users to write detailed reviews for poems
+33. The system must provide a following system for authenticated users to follow poets
+34. The system must allow authenticated users to create and manage reading lists
 35. The system must implement a recommendation algorithm based on user preferences
 36. The system must allow subscribers to receive notifications about new posts from followed authors
 
@@ -200,12 +196,20 @@ For detailed design requirements, specifications, and guidelines, please refer t
 ### Role Hierarchy
 The platform implements a hierarchical role-based access control system with the following roles (from lowest to highest privileges):
 
-1. **Subscriber** (Base Role)
+0. **Reader** (Unauthenticated)
    - Read access to all published content
+   - Browse poems by categories and tags
+   - View author profiles
+   - Use search functionality
+   - Select interface language
+
+1. **Subscriber** (Base Authenticated Role)
+   - All Reader privileges
    - Leave comments on poems
    - Follow authors and receive notifications
    - Create reading lists
    - Rate and review poems
+   - Request author role upgrade
 
 2. **Author** (Includes all Subscriber privileges)
    - Submit poems for publication
@@ -388,7 +392,7 @@ For detailed technical success metrics and performance indicators, please refer 
 ## Implementation Phases
 
 ### Phase 1: MVP (Weeks 1-8)
-- Basic authentication and user management
+- Basic authentication and user management (NextAuth v5, sessions; Google provider only for MVP)
 - Poetry publishing and display
 - Simple search and categorization
 - Basic community features
@@ -409,6 +413,7 @@ For detailed technical success metrics and performance indicators, please refer 
 - Role-based access control system
 - Content approval workflow
 - Advanced category management with multilingual support
+- Authentication providers expansion: add Apple and Facebook (in addition to Google)
 - Automated testing and QA pipeline
 
 ### Phase 3: Advanced Features (Weeks 17-24)

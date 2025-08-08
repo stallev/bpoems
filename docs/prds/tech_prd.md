@@ -183,6 +183,72 @@
 - Moderation workflow
 - User reporting system
 
+## Authentication Implementation (Detailed)
+
+### Strategy
+- Library: next-auth 5.0.0-beta (Auth.js v5)
+- Session strategy: Sessions (database-backed via Prisma Adapter)
+- MVP Providers: Google OAuth (only). Future: Apple, Facebook
+- Roles: unauthenticated = Reader; authenticated base = Subscriber (assigned on first login)
+
+### Packages (versions)
+- next-auth@5.0.0-beta
+- @auth/prisma-adapter@2.10.0
+
+### Environment variables
+- `AUTH_GOOGLE_ID` – Google OAuth Client ID
+- `AUTH_GOOGLE_SECRET` – Google OAuth Client Secret
+- `AUTH_SECRET` – Used to sign/encrypt cookies/tokens (generate securely)
+- `NEXTAUTH_URL` – Public site URL (e.g. https://example.com)
+
+### Database (Prisma)
+- Models already present: `User`, `Account`, `Session`, `VerificationToken`
+- Adapter: `PrismaAdapter` (points to Prisma Client)
+- On first sign-in, if `user.role` is empty – set to `SUBSCRIBER`
+
+### High-level flow
+1. User clicks Sign in with Google → `/api/auth/signin`
+2. OAuth callback handled by Auth.js → user + account rows created/linked
+3. Session created in `Session` table; secure cookies issued
+4. `session` callback includes `user.id`, `role`, `email` for RBAC checks
+5. Protected server routes/components check `auth()` or session
+
+### File structure (FSD-friendly)
+- `src/shared/api/auth/auth.ts` – centralized NextAuth config (server-only)
+- `src/app/api/auth/[...nextauth]/route.ts` – re-export handlers
+- `src/features/auth/ui/LoginButton.tsx` – UI entry point
+- `src/features/auth/model/guards.ts` – role guards (e.g., `requireRole`)
+- `src/features/auth/api/index.ts` – client helpers (signIn/signOut wrappers)
+- `src/middleware.ts` – optional RBAC redirects for protected routes
+
+### NextAuth config (essentials)
+- Providers: Google only for MVP
+- Adapter: PrismaAdapter
+- Session strategy: database
+- Callbacks:
+  - `session` → attach `user.id` and `user.role`
+  - `signIn` → allowlist provider check
+  - `authorized` (Route Handlers) where needed
+- Events:
+  - `linkAccount` / `createUser` → ensure default role `SUBSCRIBER`
+
+### Routing
+- Auth endpoints: `/api/auth/*` (handled by Auth.js)
+- Client helpers: `signIn('google')`, `signOut()` from NextAuth v5 exported helpers
+
+### RBAC rules (enforced)
+- Reader (unauthenticated): view content, search, view author profiles only
+- Subscriber (authenticated): comments, ratings/reviews, follow authors, reading lists, notifications
+- Author+: publishing capabilities per main PRD
+
+### Security best practices
+- `AUTH_SECRET` required in all envs; cookies `secure`, `httpOnly`, `sameSite=lax`
+- HTTPS everywhere; CSRF protected by Auth.js; verify origin on custom forms
+- Do not expose secrets to client; server-only config modules
+
+### Observability
+- Log auth events; track sign-in failures; integrate with Vercel/analytics
+
 ## Performance Optimization
 
 ### Frontend Optimization

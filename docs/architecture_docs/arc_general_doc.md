@@ -327,6 +327,50 @@ USER_ROLES.ts           # Constants
 - **Tight Coupling:** Keep slices loosely coupled
 - **Inconsistent Naming:** Follow established conventions
 
+## Feature: Authentication (NextAuth v5)
+
+### Purpose
+Обеспечить вход/выход пользователей, хранение сессий и предоставление роли `SUBSCRIBER` после первой аутентификации. Поддержка провайдера Google на MVP, с возможностью расширения до Apple/Facebook.
+
+### Layer placement
+- `shared/api/auth/auth.ts` – серверная конфигурация NextAuth (server-only), адаптер, провайдеры, callbacks
+- `features/auth/ui/` – UI-компоненты входа/выхода, индикаторы состояния
+- `features/auth/model/` – guards/селекторы роли, хелперы для проверки прав
+- `features/auth/api/` – клиентские обёртки над `signIn/signOut`
+- `entities/user/` – типы и публичный API пользователя
+- `app/api/auth/[...nextauth]/route.ts` – хендлеры Auth.js (реэкспорт конфигурации из shared)
+- `middleware.ts` – опциональные редиректы/защита маршрутов (RBAC)
+
+### Public API examples
+```ts
+// features/auth/ui/index.ts
+export { LoginButton } from './LoginButton'
+export { LogoutButton } from './LogoutButton'
+
+// features/auth/model/index.ts
+export { requireRole, isAuthorized } from './guards'
+export type { UserRole } from '@/entities/user/model/types'
+
+// shared/api/auth/index.ts
+export { auth } from './auth' // server-only
+```
+
+### Import rules
+- В `widgets` можно использовать только публичный API `features/auth`
+- `shared` не импортирует `features`/`entities`
+- Конфигурация NextAuth должна быть изолирована в `shared/api/auth` и не содержать UI-логики
+
+### Callbacks & Roles
+- `session` callback добавляет `user.id` и `role`
+- `events.createUser`/`linkAccount` присваивают роль `SUBSCRIBER` по умолчанию
+- Guards (`requireRole`) используются в серверных действий/роут-хендлерах
+
+### Middleware (optional)
+- Для защищённых маршрутов (e.g., `/app/profile`, `/app/restricted/*`) выполняется проверка сессии и роли; неуспешная – редирект на страницу входа
+
+### Testing
+- Мок конфигурации провайдера; контрактные тесты guards; smoke-тесты на страницы входа/выхода
+
 ---
 
 **Document Version:** 1.0  

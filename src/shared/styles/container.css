@@ -1,0 +1,5 @@
+@layer components {
+  .container-section {
+    @apply p-4 sm:p-6 md:p-8 max-w-5xl mx-auto;
+  }
+}
