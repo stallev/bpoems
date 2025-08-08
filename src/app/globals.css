@@ -1,72 +1,195 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+/* ========================================
+   SHADCN/UI SYSTEM VARIABLES
+   ======================================== 
+   These variables are managed by shadcn/ui
+   and are used by shadcn components
+*/
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Light theme colors */
-  --background: #FAFAFA;
-  --foreground: #1A202C;
-  --card: #FFFFFF;
-  --card-foreground: #1A202C;
-  --popover: #FFFFFF;
-  --popover-foreground: #1A202C;
-  --muted: #F7FAFC;
-  --muted-foreground: #4A5568;
-  --accent: #F7FAFC;
-  --accent-foreground: #1A202C;
-  --destructive: #E53E3E;
-  --destructive-foreground: #FFFFFF;
-  --border: #E5E7EB;
-  --input: #E5E7EB;
-  --ring: #805AD5;
-  --radius: 0.5rem;
+  /* ========== SHADCN/UI CORE SYSTEM ========== */
+  --radius: 0.625rem;
   
-  /* Text colors */
-  --text-main: #1A202C;
-  --text-secondary: #4A5568;
-  --text-light-gray: #A0AEC0;
-  --dark-gray: #2D3748;
-  --fill-main: #2D3748;
+  /* ========== SHADCN/UI LIGHT THEME ========== */
+  /* Base colors */
+  --background: oklch(0.98 0.003 220); /* Very light blue-tinted white */
+  --foreground: oklch(0.15 0.02 240); /* Deep navy blue text */
   
-  /* Success, Warning, Error, Info */
-  --success: #38A169;
-  --warning: #DD6B20;
-  --error: #E53E3E;
-  --info: #3182CE;
+  /* Card colors */
+  --card: oklch(1 0 0); /* Pure white for cards */
+  --card-foreground: oklch(0.15 0.02 240); /* Deep navy blue text on cards */
+  
+  /* Popover colors */
+  --popover: oklch(1 0 0); /* Pure white for popovers */
+  --popover-foreground: oklch(0.15 0.02 240); /* Deep navy blue text in popovers */
+  
+  /* Primary colors - Deep Ocean Blue */
+  --primary: oklch(0.35 0.08 240); /* Deep ocean blue - #1e3a8a equivalent */
+  --primary-foreground: oklch(0.98 0.003 220); /* Light text on primary */
+  
+  /* Secondary colors - Cyan */
+  --secondary: oklch(0.55 0.12 200); /* Cyan blue - #0891b2 equivalent */
+  --secondary-foreground: oklch(0.98 0.003 220); /* Light text on secondary */
+  
+  /* Muted colors */
+  --muted: oklch(0.96 0.005 220); /* Very light blue-tinted background */
+  --muted-foreground: oklch(0.45 0.03 240); /* Muted blue-gray text */
+  
+  /* Accent colors */
+  --accent: oklch(0.96 0.005 220); /* Very light blue-tinted accent background */
+  --accent-foreground: oklch(0.25 0.04 240); /* Dark blue accent text */
+  
+  /* Destructive colors */
+  --destructive: oklch(0.577 0.245 27.325); /* Red for errors */
+  --destructive-foreground: oklch(0.98 0.003 220); /* Light text on destructive */
+  
+  /* Border and input colors */
+  --border: oklch(0.88 0.01 220); /* Light blue-tinted borders */
+  --input: oklch(0.88 0.01 220); /* Light blue-tinted input backgrounds */
+  --ring: oklch(0.35 0.08 240); /* Deep blue focus rings */
+  
+  /* Chart colors - Ocean theme */
+  --chart-1: oklch(0.35 0.08 240); /* Deep blue */
+  --chart-2: oklch(0.55 0.12 200); /* Cyan */
+  --chart-3: oklch(0.45 0.15 160); /* Emerald */
+  --chart-4: oklch(0.25 0.06 260); /* Navy */
+  --chart-5: oklch(0.65 0.1 180); /* Light blue */
+  
+  /* Sidebar colors */
+  --sidebar: oklch(0.97 0.005 220); /* Light blue-tinted sidebar */
+  --sidebar-foreground: oklch(0.15 0.02 240); /* Dark blue sidebar text */
+  --sidebar-primary: oklch(0.35 0.08 240); /* Deep blue sidebar primary */
+  --sidebar-primary-foreground: oklch(0.98 0.003 220); /* Light text on sidebar primary */
+  --sidebar-accent: oklch(0.94 0.01 220); /* Sidebar accent background */
+  --sidebar-accent-foreground: oklch(0.25 0.04 240); /* Dark blue sidebar accent text */
+  --sidebar-border: oklch(0.88 0.01 220); /* Light blue-tinted sidebar borders */
+  --sidebar-ring: oklch(0.35 0.08 240); /* Deep blue sidebar focus rings */
 }
 
 .dark {
-  /* Dark theme colors */
-  --background: #121212;
-  --foreground: #F7FAFC;
-  --card: #1A1A1A;
-  --card-foreground: #F7FAFC;
-  --popover: #1A1A1A;
-  --popover-foreground: #F7FAFC;
-  --muted: #2D3748;
-  --muted-foreground: #A0AEC0;
-  --accent: #2D3748;
-  --accent-foreground: #F7FAFC;
-  --destructive: #E53E3E;
-  --destructive-foreground: #FFFFFF;
-  --border: #2D3748;
-  --input: #2D3748;
-  --ring: #8B5CF6;
+  /* ========== SHADCN/UI DARK THEME ========== */
+  /* Base colors */
+  --background: oklch(0.08 0.005 240); /* Very dark blue-black */
+  --foreground: oklch(0.95 0.005 220); /* Light blue-white text */
   
-  /* Text colors for dark theme */
-  --text-main: #F7FAFC;
-  --text-secondary: #A0AEC0;
-  --text-light-gray: #4A5568;
-  --dark-gray: #F7FAFC;
-  --fill-main: #F7FAFC;
+  /* Card colors */
+  --card: oklch(0.12 0.01 240); /* Dark blue card background */
+  --card-foreground: oklch(0.95 0.005 220); /* Light text on cards */
+  
+  /* Popover colors */
+  --popover: oklch(0.12 0.01 240); /* Dark blue popover background */
+  --popover-foreground: oklch(0.95 0.005 220); /* Light text in popovers */
+  
+  /* Primary colors - Brighter blue for dark mode */
+  --primary: oklch(0.7 0.15 220); /* Bright ocean blue */
+  --primary-foreground: oklch(0.08 0.005 240); /* Dark text on bright primary */
+  
+  /* Secondary colors - Brighter cyan */
+  --secondary: oklch(0.65 0.18 200); /* Bright cyan */
+  --secondary-foreground: oklch(0.08 0.005 240); /* Dark text on bright secondary */
+  
+  /* Muted colors */
+  --muted: oklch(0.18 0.02 240); /* Dark blue-gray muted background */
+  --muted-foreground: oklch(0.65 0.05 220); /* Light blue-gray muted text */
+  
+  /* Accent colors */
+  --accent: oklch(0.18 0.02 240); /* Dark blue-gray accent background */
+  --accent-foreground: oklch(0.9 0.01 220); /* Light accent text */
+  
+  /* Destructive colors */
+  --destructive: oklch(0.704 0.191 22.216); /* Bright red for dark mode errors */
+  --destructive-foreground: oklch(0.95 0.005 220); /* Light text on destructive */
+  
+  /* Border and input colors */
+  --border: oklch(1 0 0 / 15%); /* Semi-transparent white borders */
+  --input: oklch(1 0 0 / 20%); /* Semi-transparent white input backgrounds */
+  --ring: oklch(0.7 0.15 220); /* Bright blue focus rings */
+  
+  /* Chart colors - Bright ocean theme for dark mode */
+  --chart-1: oklch(0.6 0.2 240); /* Bright deep blue */
+  --chart-2: oklch(0.7 0.18 200); /* Bright cyan */
+  --chart-3: oklch(0.65 0.2 160); /* Bright emerald */
+  --chart-4: oklch(0.5 0.15 260); /* Bright navy */
+  --chart-5: oklch(0.75 0.12 180); /* Bright light blue */
+  
+  /* Sidebar colors */
+  --sidebar: oklch(0.12 0.01 240); /* Dark blue sidebar */
+  --sidebar-foreground: oklch(0.95 0.005 220); /* Light sidebar text */
+  --sidebar-primary: oklch(0.6 0.2 240); /* Bright blue sidebar primary */
+  --sidebar-primary-foreground: oklch(0.08 0.005 240); /* Dark text on bright sidebar primary */
+  --sidebar-accent: oklch(0.18 0.02 240); /* Dark sidebar accent background */
+  --sidebar-accent-foreground: oklch(0.9 0.01 220); /* Light sidebar accent text */
+  --sidebar-border: oklch(1 0 0 / 15%); /* Semi-transparent sidebar borders */
+  --sidebar-ring: oklch(0.7 0.15 220); /* Bright blue sidebar focus rings */
 }
 
+/* ========================================
+   CUSTOM DESIGN SYSTEM VARIABLES
+   ======================================== 
+   These are custom variables for our 
+   Christian Poetry Platform design system
+*/
+
+:root {
+  /* ========== CUSTOM SEMANTIC COLORS ========== */
+  /* Success, Warning, Error, Info */
+  --success: oklch(0.45 0.15 160); /* Emerald green - #059669 equivalent */
+  --warning: oklch(0.65 0.15 60); /* Orange warning */
+  --error: oklch(0.55 0.22 25); /* Red error */
+  --info: oklch(0.55 0.12 200); /* Cyan info - matches secondary */
+  
+  /* ========== CUSTOM TEXT COLORS ========== */
+  --text-main: oklch(0.15 0.02 240); /* Deep navy blue - main text */
+  --text-secondary: oklch(0.35 0.03 240); /* Medium blue - secondary text */
+  --text-light-gray: oklch(0.55 0.02 220); /* Light blue-gray - muted text */
+  --dark-gray: oklch(0.25 0.04 240); /* Dark blue-gray - emphasized text */
+  --fill-main: oklch(0.25 0.04 240); /* Dark blue-gray - for icons and fills */
+}
+
+.dark {
+  /* ========== CUSTOM SEMANTIC COLORS - DARK THEME ========== */
+  --success: oklch(0.65 0.2 160); /* Brighter emerald for dark mode */
+  --warning: oklch(0.75 0.18 60); /* Brighter orange for dark mode */
+  --error: oklch(0.65 0.25 25); /* Brighter red for dark mode */
+  --info: oklch(0.65 0.18 200); /* Brighter cyan info for dark mode */
+  
+  /* ========== CUSTOM TEXT COLORS - DARK THEME ========== */
+  --text-main: oklch(0.95 0.005 220); /* Light blue-white - main text */
+  --text-secondary: oklch(0.75 0.03 220); /* Medium light blue - secondary text */
+  --text-light-gray: oklch(0.55 0.02 220); /* Medium blue-gray - muted text */
+  --dark-gray: oklch(0.85 0.02 220); /* Light blue-gray - emphasized text */
+  --fill-main: oklch(0.85 0.02 220); /* Light blue-gray - for icons and fills */
+}
+
+/* ========================================
+   TAILWIND CSS THEME INTEGRATION
+   ======================================== 
+   These bind our variables to Tailwind's 
+   theme system
+*/
+
 @theme inline {
-  /* Base colors */
+  /* ========== SHADCN/UI SYSTEM INTEGRATION ========== */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  
+  /* Base shadcn/ui colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
@@ -77,133 +200,168 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   
-  /* Text colors */
+  /* Chart colors */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  
+  /* Sidebar colors */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  
+  /* ========== CUSTOM SEMANTIC COLORS ========== */
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-info: var(--info);
+  
+  /* ========== CUSTOM TEXT COLORS ========== */
   --color-text-main: var(--text-main);
   --color-text-secondary: var(--text-secondary);
   --color-text-light-gray: var(--text-light-gray);
   --color-dark-gray: var(--dark-gray);
   --color-fill-main: var(--fill-main);
   
-  /* Semantic colors */
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-error: var(--error);
-  --color-info: var(--info);
+  /* ========== OCEAN SERENITY COLOR PALETTE ========== */
+  /* Deep Blue (Primary) - символ глубины веры */
+  --color-ocean-deep-50: oklch(0.96 0.01 240);
+  --color-ocean-deep-100: oklch(0.92 0.02 240);
+  --color-ocean-deep-200: oklch(0.85 0.03 240);
+  --color-ocean-deep-300: oklch(0.75 0.05 240);
+  --color-ocean-deep-400: oklch(0.6 0.07 240);
+  --color-ocean-deep-500: oklch(0.45 0.08 240);
+  --color-ocean-deep-600: oklch(0.35 0.08 240);
+  --color-ocean-deep-700: oklch(0.28 0.07 240);
+  --color-ocean-deep-800: oklch(0.22 0.06 240);
+  --color-ocean-deep-900: oklch(0.18 0.05 240);
+  --color-ocean-deep-950: oklch(0.12 0.03 240);
+  --color-ocean-deep: oklch(0.35 0.08 240);
+  --color-ocean-deep-foreground: oklch(0.98 0.003 220);
   
-  /* Primary colors (Purple) */
-  --color-primary-50: #F5F3FF;
-  --color-primary-100: #EDE9FE;
-  --color-primary-200: #DDD6FE;
-  --color-primary-300: #C4B5FD;
-  --color-primary-400: #A78BFA;
-  --color-primary-500: #8B5CF6;
-  --color-primary-600: #7C3AED;
-  --color-primary-700: #6D28D9;
-  --color-primary-800: #5B21B6;
-  --color-primary-900: #4C1D95;
-  --color-primary-950: #2E1065;
-  --color-primary: #805AD5;
-  --color-primary-foreground: #FFFFFF;
+  /* Cyan (Secondary) - символ ясности и чистоты */
+  --color-ocean-cyan-50: oklch(0.95 0.02 200);
+  --color-ocean-cyan-100: oklch(0.9 0.05 200);
+  --color-ocean-cyan-200: oklch(0.82 0.08 200);
+  --color-ocean-cyan-300: oklch(0.72 0.12 200);
+  --color-ocean-cyan-400: oklch(0.62 0.14 200);
+  --color-ocean-cyan-500: oklch(0.55 0.12 200);
+  --color-ocean-cyan-600: oklch(0.48 0.11 200);
+  --color-ocean-cyan-700: oklch(0.42 0.1 200);
+  --color-ocean-cyan-800: oklch(0.35 0.08 200);
+  --color-ocean-cyan-900: oklch(0.28 0.06 200);
+  --color-ocean-cyan-950: oklch(0.18 0.04 200);
+  --color-ocean-cyan: oklch(0.55 0.12 200);
+  --color-ocean-cyan-foreground: oklch(0.98 0.003 220);
   
-  /* Secondary colors (Blue) */
-  --color-secondary-50: #EFF6FF;
-  --color-secondary-100: #DBEAFE;
-  --color-secondary-200: #BFDBFE;
-  --color-secondary-300: #93C5FD;
-  --color-secondary-400: #60A5FA;
-  --color-secondary-500: #3B82F6;
-  --color-secondary-600: #2563EB;
-  --color-secondary-700: #1D4ED8;
-  --color-secondary-800: #1E40AF;
-  --color-secondary-900: #1E3A8A;
-  --color-secondary-950: #172554;
-  --color-secondary: #3182CE;
-  --color-secondary-foreground: #FFFFFF;
+  /* Emerald (Accent) - символ исцеления и роста */
+  --color-ocean-emerald-50: oklch(0.94 0.03 160);
+  --color-ocean-emerald-100: oklch(0.88 0.06 160);
+  --color-ocean-emerald-200: oklch(0.78 0.1 160);
+  --color-ocean-emerald-300: oklch(0.68 0.13 160);
+  --color-ocean-emerald-400: oklch(0.58 0.16 160);
+  --color-ocean-emerald-500: oklch(0.52 0.15 160);
+  --color-ocean-emerald-600: oklch(0.45 0.15 160);
+  --color-ocean-emerald-700: oklch(0.38 0.14 160);
+  --color-ocean-emerald-800: oklch(0.32 0.12 160);
+  --color-ocean-emerald-900: oklch(0.26 0.1 160);
+  --color-ocean-emerald-950: oklch(0.16 0.06 160);
+  --color-ocean-emerald: oklch(0.45 0.15 160);
+  --color-ocean-emerald-foreground: oklch(0.98 0.003 220);
   
-  /* Accent colors (Green) */
-  --color-accent-green-50: #F0FDF4;
-  --color-accent-green-100: #DCFCE7;
-  --color-accent-green-200: #BBF7D0;
-  --color-accent-green-300: #86EFAC;
-  --color-accent-green-400: #4ADE80;
-  --color-accent-green-500: #22C55E;
-  --color-accent-green-600: #16A34A;
-  --color-accent-green-700: #15803D;
-  --color-accent-green-800: #166534;
-  --color-accent-green-900: #14532D;
-  --color-accent-green-950: #052E16;
-  --color-accent-green: #38A169;
-  --color-accent-green-foreground: #FFFFFF;
-  
-  /* Fonts */
+  /* ========== TYPOGRAPHY ========== */
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   --font-serif: 'Merriweather', serif;
   --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  --font-poetry: 'Merriweather', serif;
   
-  /* Spacing */
+  /* ========== SPACING ========== */
   --spacing-xs: 0.25rem; /* 4px */
   --spacing-sm: 0.5rem;  /* 8px */
   --spacing-md: 1rem;    /* 16px */
   --spacing-lg: 1.5rem;  /* 24px */
   --spacing-xl: 2rem;    /* 32px */
   
-  /* Border radius */
-  --radius-sm: 0.25rem;  /* 4px */
-  --radius-md: 0.5rem;   /* 8px */
-  --radius-lg: 1rem;     /* 16px */
-  --radius-full: 9999px;
+  /* ========== SHADOWS ========== */
+  --shadow-sm: 0 1px 3px oklch(0.15 0.02 240 / 0.1);
+  --shadow-md: 0 4px 6px oklch(0.15 0.02 240 / 0.1);
+  --shadow-lg: 0 10px 15px oklch(0.15 0.02 240 / 0.1);
   
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  
-  /* Transitions */
+  /* ========== TRANSITIONS ========== */
   --transition-fast: 150ms ease-in-out;
   --transition-standard: 300ms ease-in-out;
   --transition-slow: 500ms ease-in-out;
 }
 
-/* Base styles */
-* {
-  border-color: var(--border);
+/* ========================================
+   BASE STYLES
+   ========================================
+   Global base styles and resets
+*/
+
+/* Shadcn/ui base layer */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
+/* Global base styles */
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
   font-family: var(--font-sans);
   font-feature-settings: "rlig" 1, "calt" 1;
   line-height: 1.5;
+  color: var(--text-main);
 }
 
-/* Typography styles */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  line-height: 1.2;
-  color: var(--foreground);
-}
+/* ========================================
+   TYPOGRAPHY STYLES
+   ========================================
+   Typography hierarchy and text styles
+*/
 
-h1 { font-size: 2.5rem; }    /* 40px */
-h2 { font-size: 2rem; }      /* 32px */
-h3 { font-size: 1.5rem; }    /* 24px */
-h4 { font-size: 1.25rem; }   /* 20px */
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold leading-[1.2] text-foreground;
+  }
+  h1 { font-size: 2.5rem; }    /* 40px */
+  h2 { font-size: 2rem; }      /* 32px */
+  h3 { font-size: 1.5rem; }    /* 24px */
+  h4 { font-size: 1.25rem; }   /* 20px */
+}
 
 p {
   line-height: 1.5;
   color: var(--text-main);
 }
 
-/* Poetry specific styles */
+/* Poetry-specific typography */
 .poetry-content {
   font-family: var(--font-serif);
   line-height: 1.8;
   font-size: 1.125rem;
+  color: var(--text-main);
 }
+
+/* ========================================
+   INTERACTIVE ELEMENTS
+   ========================================
+   Focus, scrollbars, and interactive states
+*/
 
 /* Focus styles */
 *:focus-visible {
@@ -211,7 +369,7 @@ p {
   outline-offset: 2px;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - Ocean theme */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -226,10 +384,15 @@ p {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--foreground);
+  background: var(--ocean-deep);
 }
 
-/* Animations */
+/* ========================================
+   ANIMATIONS
+   ========================================
+   Custom animations and keyframes
+*/
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -241,19 +404,69 @@ p {
   }
 }
 
+@keyframes oceanWave {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 .fade-in {
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Print styles */
+.ocean-wave {
+  animation: oceanWave 2s ease-in-out infinite;
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ========================================
+   Custom utility classes
+*/
+
+.content-width {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.text-width {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.poetry-spacing {
+  line-height: 1.8;
+  font-size: 1.125rem;
+  font-family: var(--font-serif);
+}
+
+/* ========================================
+   PRINT STYLES
+   ========================================
+   Styles for printing
+*/
+
 @media print {
   body {
-    background: white;
-    color: black;
+    background: white !important;
+    color: black !important;
   }
   
   .poetry-content {
     font-size: 12pt;
     line-height: 1.6;
+    color: black !important;
+  }
+  
+  /* Hide interactive elements when printing */
+  button, .sidebar, .navigation {
+    display: none !important;
   }
 }
