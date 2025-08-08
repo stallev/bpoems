@@ -470,3 +470,5 @@ p {
     display: none !important;
   }
 }
+
+@import '../shared/styles/container.css';
