@@ -187,67 +187,73 @@
 
 ### Strategy
 - Library: next-auth 5.0.0-beta (Auth.js v5)
-- Session strategy: Sessions (database-backed via Prisma Adapter)
-- MVP Providers: Google OAuth (only). Future: Apple, Facebook
+- Token strategy: JWT tokens (stateless) managed by NextAuth; no database sessions
+- MVP Providers: Email/Password (Credentials) and Google OAuth. Future: Apple, Facebook
 - Roles: unauthenticated = Reader; authenticated base = Subscriber (assigned on first login)
 
 ### Packages (versions)
 - next-auth@5.0.0-beta
-- @auth/prisma-adapter@2.10.0
+- @auth/prisma-adapter@2.10.0 (still used to persist users/accounts; sessions table not required when using JWT)
+- bcrypt (for password hashing) or argon2 (preferred in high-security contexts)
+- nodemailer (for password reset emails) – optional in MVP if reset is included
 
 ### Environment variables
 - `AUTH_GOOGLE_ID` – Google OAuth Client ID
 - `AUTH_GOOGLE_SECRET` – Google OAuth Client Secret
-- `AUTH_SECRET` – Used to sign/encrypt cookies/tokens (generate securely)
+- `AUTH_SECRET` – Used to sign/encrypt JWTs and cookies (generate securely)
 - `NEXTAUTH_URL` – Public site URL (e.g. https://example.com)
+- `JWT_EXPIRES_IN` – Optional custom expiration (e.g., `7d`)
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` – for password reset emails (optional MVP scope)
 
 ### Database (Prisma)
-- Models already present: `User`, `Account`, `Session`, `VerificationToken`
-- Adapter: `PrismaAdapter` (points to Prisma Client)
-- On first sign-in, if `user.role` is empty – set to `SUBSCRIBER`
+- Models used: `User`, `Account`, `VerificationToken` (no `Session` required for JWT)
+- Notes:
+  - `User.password` optional; present for credentials flow
+  - Unique index on `User.email`
+  - `VerificationToken` used for password reset links
+- Adapter: `PrismaAdapter` for persisting `User`/`Account`
+- On first login, if `user.role` is empty – set to `SUBSCRIBER`
 
-### High-level flow
-1. User clicks Sign in with Google → `/api/auth/signin`
-2. OAuth callback handled by Auth.js → user + account rows created/linked
-3. Session created in `Session` table; secure cookies issued
-4. `session` callback includes `user.id`, `role`, `email` for RBAC checks
-5. Protected server routes/components check `auth()` or session
+### Flows
+1. Google Sign-in (OAuth): as previously described → user/account persisted → JWT issued to client
+2. Email/Password (Credentials):
+   - Register: POST form → hash password (bcrypt/argon2) → save `User` (email, password, role=SUBSCRIBER)
+   - Login: verify email and password → issue JWT (httpOnly cookie, signed by `AUTH_SECRET`)
+   - Logout: clear auth cookie
+3. Password Reset (optional MVP):
+   - Request reset: create token in `VerificationToken` → email link
+   - Confirm reset: verify token → set new hashed password → invalidate token(s)
 
 ### File structure (FSD-friendly)
-- `src/shared/api/auth/auth.ts` – centralized NextAuth config (server-only)
+- `src/shared/api/auth/auth.ts` – NextAuth config (JWT strategy, providers, callbacks) – server-only
+- `src/features/auth/ui/LoginButton.tsx` – Google entry; `LoginForm.tsx` – Credentials form
+- `src/features/auth/ui/RegisterForm.tsx` – Credentials registration
+- `src/features/auth/ui/ResetRequestForm.tsx`, `ResetPasswordForm.tsx` – optional
+- `src/features/auth/model/guards.ts` – role guards; helpers to read server-side token (`auth()`)
+- `src/features/auth/api/index.ts` – thin wrappers (`signIn`, `signOut`)
 - `src/app/api/auth/[...nextauth]/route.ts` – re-export handlers
-- `src/features/auth/ui/LoginButton.tsx` – UI entry point
-- `src/features/auth/model/guards.ts` – role guards (e.g., `requireRole`)
-- `src/features/auth/api/index.ts` – client helpers (signIn/signOut wrappers)
-- `src/middleware.ts` – optional RBAC redirects for protected routes
 
 ### NextAuth config (essentials)
-- Providers: Google only for MVP
-- Adapter: PrismaAdapter
-- Session strategy: database
+- `session: { strategy: 'jwt' }`
+- Providers:
+  - `GoogleProvider`
+  - `CredentialsProvider` with `authorize`
 - Callbacks:
-  - `session` → attach `user.id` and `user.role`
-  - `signIn` → allowlist provider check
-  - `authorized` (Route Handlers) where needed
+  - `jwt` → embed `user.id` and `role` on sign-in; refresh logic if needed
+  - `session` → expose `id` and `role` from JWT on client
+  - `signIn` → provider allowlist
 - Events:
-  - `linkAccount` / `createUser` → ensure default role `SUBSCRIBER`
+  - `createUser`/`linkAccount` → ensure default role `SUBSCRIBER`
 
-### Routing
-- Auth endpoints: `/api/auth/*` (handled by Auth.js)
-- Client helpers: `signIn('google')`, `signOut()` from NextAuth v5 exported helpers
-
-### RBAC rules (enforced)
-- Reader (unauthenticated): view content, search, view author profiles only
-- Subscriber (authenticated): comments, ratings/reviews, follow authors, reading lists, notifications
-- Author+: publishing capabilities per main PRD
-
-### Security best practices
-- `AUTH_SECRET` required in all envs; cookies `secure`, `httpOnly`, `sameSite=lax`
-- HTTPS everywhere; CSRF protected by Auth.js; verify origin on custom forms
-- Do not expose secrets to client; server-only config modules
+### Security best practices (JWT)
+- Use `httpOnly`, `secure`, `sameSite=lax` cookies to store the JWT
+- Short-lived access token + optional rolling strategy via `jwt` callback
+- Never put sensitive PII into the token payload
+- Rate limit credentials login; generic error messages
+- Strong password hashing (bcrypt ≥ 12 rounds or argon2id)
 
 ### Observability
-- Log auth events; track sign-in failures; integrate with Vercel/analytics
+- Log auth events; monitor token issuance/failure; provider health
 
 ## Performance Optimization
 

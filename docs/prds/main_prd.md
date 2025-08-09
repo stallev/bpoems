@@ -92,7 +92,7 @@ This document outlines the requirements for a Christian poetry platform that ser
 7. The system must require moderator approval for author role assignment
 8. The system must automatically publish content from users with author role (approval status = 'approved')
 9. The system must allow subscribers to request author role upgrade from their profile page
-10. Authentication Providers (MVP and future): For MVP, the platform will support Google as the only authentication provider via NextAuth (sessions). Future releases will add Apple and Facebook providers.
+10. Authentication Providers (MVP and future): For MVP, the platform will support Email/Password (Credentials) and Google via NextAuth v5 using JWT tokens (stateless). Future releases will add Apple and Facebook providers.
 
 #### Poetry Publishing
 10. The system must allow only users with author role or higher to create new poems
@@ -392,7 +392,7 @@ For detailed technical success metrics and performance indicators, please refer 
 ## Implementation Phases
 
 ### Phase 1: MVP (Weeks 1-8)
-- Basic authentication and user management (NextAuth v5, sessions; Google provider only for MVP)
+- Basic authentication and user management (NextAuth v5, JWT tokens; Email/Password and Google providers)
 - Poetry publishing and display
 - Simple search and categorization
 - Basic community features
@@ -413,7 +413,7 @@ For detailed technical success metrics and performance indicators, please refer 
 - Role-based access control system
 - Content approval workflow
 - Advanced category management with multilingual support
-- Authentication providers expansion: add Apple and Facebook (in addition to Google)
+- Authentication providers expansion: add Apple and Facebook (in addition to Email/Password and Google); JWT token strategy remains in place
 - Automated testing and QA pipeline
 
 ### Phase 3: Advanced Features (Weeks 17-24)
