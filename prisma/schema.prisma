@@ -123,7 +123,7 @@ model Category {
   updatedAt DateTime  @updatedAt
 
   // Relations
-  poems     Poem[]
+  poems     Poem[]    @relation("PoemCategory")
 
   @@index([isActive, order]) // Index for efficient listing of active categories
 }
@@ -152,9 +152,8 @@ model Poem {
   authorId        String
   author          User                 @relation(fields: [authorId], references: [id])
   status          ContentApprovalStatus @default(APPROVED) // Authors: APPROVED; Others: PENDING
-
-  // Categorization
-  categories      Category[]           // Many-to-many relation via implicit join table
+  categoryId      String?
+  category        Category?            @relation("PoemCategory", fields: [categoryId], references: [id])
   tags            Tag[]                // Many-to-many relation via implicit join table
 
   // Timestamps
