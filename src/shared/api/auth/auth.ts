@@ -29,7 +29,6 @@ export const authConfig = {
     Google({
       clientId: process.env.AUTH_GOOGLE_ID,
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
-      // profile: (profile) => { ... } // Можно кастомизировать, если нужно изменить маппинг данных профиля
     }),
     Credentials({
       async authorize(credentials) {
@@ -77,15 +76,86 @@ export const authConfig = {
     }),
     // Другие провайдеры (Apple, Facebook) будут добавлены позже
   ],
-  // Настройка кастомных страниц
-  pages: {
-    signIn: '/auth/signin',
-    verifyRequest: '/auth/verify-request',
-    newUser: '/auth/register',
-    error: '/auth/error',
-  },
   // 4. Коллбэки (Callbacks)
   callbacks: {
+    async signIn(params: {
+      user: any;
+      account?: any;
+      profile?: any;
+      email?: { verificationRequest?: boolean };
+      credentials?: Record<string, unknown>;
+    }) {
+      const { user, account, profile } = params;
+      console.log('SignIn callback:', { user, account, profile });
+
+      try {
+        // Проверяем, существует ли пользователь в базе данных
+        const existingUser = await prisma.user.findUnique({
+          where: { email: profile?.email },
+        });
+
+        if (!existingUser) {
+          // Создаем нового пользователя
+          const newUser = await prisma.user.create({
+            data: {
+              name: profile?.name,
+              email: profile?.email,
+              image: profile?.picture,
+            },
+          });
+          console.log('New user created:', newUser);
+          // Сохраняем ID в user объект, который будет доступен в jwt callback
+          user.id = newUser.id;
+        } else {
+          // Обновляем существующего пользователя
+          const updatedUser = await prisma.user.update({
+            where: { id: existingUser.id },
+            data: {
+              name: profile?.name,
+              email: profile?.email,
+              image: profile?.picture,
+            },
+          });
+          console.log('User updated:', updatedUser);
+          // Обновляем ID в user объекте
+          user.id = existingUser.id;
+
+          const existingAccount = await prisma.account.findUnique({
+            where: {
+              provider_providerAccountId: {
+                provider: account?.provider,
+                providerAccountId: account?.providerAccountId,
+              },
+            },
+          });
+          if (!existingAccount && account) {
+            // Создаем аккаунт для пользователя
+            try {
+              await prisma.account.create({
+                data: {
+                  userId: existingUser.id,
+                  type: account.type,
+                  provider: account.provider,
+                  providerAccountId: account.providerAccountId,
+                  access_token: account.access_token,
+                  expires_at: account.expires_at,
+                  token_type: account.token_type,
+                },
+              });
+              console.log('Account created:', account.providerAccountId);
+            } catch (error) {
+              console.error('Error creating account:', error);
+              return false;
+            }
+          }
+        }
+
+        return true;
+      } catch (error) {
+        console.error('Error in signIn callback:', error);
+        return false;
+      }
+    },
     // Коллбэк jwt вызывается при каждом запросе JWT (если он активен) и при входе
     async jwt({ token, user, trigger }) {
       if (user) {
@@ -112,20 +182,13 @@ export const authConfig = {
         // Передаем id и role из токена в объект сессии, доступный на клиенте
         session.user.id = token.id as string;
         session.user.role = token.role as UserRole; // Теперь типы совпадают
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
+        session.user.image = token.picture as string;
         // session.user.image = token.picture as string | null; // если нужно
       }
       return session;
     },
-    // Коллбэк signIn вызывается перед входом пользователя
-    async signIn({ account }) {
-      const allowedProviders = ['google', 'credentials'];
-      if (account && !allowedProviders.includes(account.provider)) {
-        return false;
-      }
-      return true;
-    },
-    // Коллбэк redirect (опционально) - можно кастомизировать редиректы
-    // async redirect({ url, baseUrl }) { ... }
   },
   // 5. События (Events)
   events: {
@@ -186,10 +249,6 @@ export const authConfig = {
   // cookies: { ... }, // Кастомизация cookies (обычно не требуется)
 } satisfies NextAuthConfig;
 
-// Экспортируем тип для удобства использования в других частях приложения
-// Типы теперь импортируются из types.ts
-
-// Инициализация NextAuth с конфигурацией (этот экспорт будет использоваться в route handler)
 export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);
 
 // Функция для создания токена сброса пароля
