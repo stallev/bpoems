@@ -29,35 +29,34 @@ export default function AuthPage() {
       return;
     }
 
-    try {
-      let result;
-      if (mode === 'register') {
-        result = await registerAction({ name, email, password });
-      } else {
-        result = await loginValidateAction({ email, password });
-      }
-
-      if (result.success) {
-        console.log('SignIn attempt with email:', result.email, 'password:', password);
-        const signInRes = await signIn('credentials', {
-          redirect: false,
-          email: result.email,
-          password,
-        });
-
-        if (signInRes?.error) {
-          console.error('SignIn error:', signInRes.error);
-          throw new Error('Ошибка создания сессии: ' + signInRes.error);
-        }
-
-        router.push('/profile');
-      }
-    } catch (err: any) {
-      console.error('HandleSubmit error:', err);
-      setError(err.message || 'Внутренняя ошибка');
-    } finally {
-      setLoading(false);
+    let result;
+    if (mode === 'register') {
+      result = await registerAction({ name, email, password });
+    } else {
+      result = await loginValidateAction({ email, password });
     }
+
+    if (!result.success) {
+      setError(result.error || 'Неизвестная ошибка');
+      setLoading(false);
+      return;
+    }
+
+    // Вызов signIn на клиенте для создания сессии
+    const signInRes = await signIn('credentials', {
+      redirect: false,
+      email: result.email,
+      password,
+    });
+
+    if (signInRes?.error) {
+      setError('Ошибка создания сессии');
+      setLoading(false);
+      return;
+    }
+
+    router.push('/profile');
+    setLoading(false);
   };
 
   return (
@@ -66,7 +65,7 @@ export default function AuthPage() {
         <h1 className="text-2xl font-bold mb-6 text-center text-foreground">
           {mode === 'login' ? 'Вход' : 'Регистрация'}
         </h1>
-        {error && <p className="text-error mb-4">{error}</p>}
+        {error && <p className="text-red-500 mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
           {mode === 'register' && (
             <div className="mb-4">
@@ -85,6 +84,7 @@ export default function AuthPage() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
+              className={error.includes('Email') ? 'border-red-500' : ''}
             />
           </div>
           <div className="mb-4">
@@ -94,6 +94,7 @@ export default function AuthPage() {
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
+              className={error.includes('Пароль') ? 'border-red-500' : ''}
             />
           </div>
           {mode === 'register' && (
@@ -104,6 +105,7 @@ export default function AuthPage() {
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
                 required
+                className={error.includes('Пароли не совпадают') ? 'border-red-500' : ''}
               />
             </div>
           )}

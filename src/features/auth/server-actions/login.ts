@@ -1,4 +1,4 @@
-'use server';
+'use server'; // Обозначает server action
 
 import * as bcrypt from 'bcrypt';
 import { prisma } from '@/shared/api/database/prisma';
@@ -8,25 +8,31 @@ type LoginData = {
   password: string;
 };
 
-export async function loginValidateAction(data: LoginData) {
+type LoginResult = { success: true; email: string } | { success: false; error: string };
+
+export async function loginValidateAction(data: LoginData): Promise<LoginResult> {
   const { email, password } = data;
 
   // Валидация
   if (!email || !password) {
-    throw new Error('Email и пароль обязательны');
+    return { success: false, error: 'Email и пароль обязательны' };
   }
 
   // Проверка пользователя
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user || !user.password) {
-    throw new Error('Неверный email или пароль');
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user || !user.password) {
+      return { success: false, error: 'Неверный email или пароль' };
+    }
+    // Проверка пароля
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return { success: false, error: 'Неверный email или пароль' };
+    }
+  } catch (error) {
+    console.error('Unexpected error in loginValidateAction:', error);
+    return { success: false, error: 'Внутренняя ошибка сервера' };
   }
 
-  // Проверка пароля
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    throw new Error('Неверный email или пароль');
-  }
-
-  return { success: true, email }; // Возвращаем email для signIn на клиенте
+  return { success: true, email };
 }
