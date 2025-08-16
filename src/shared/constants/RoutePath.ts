@@ -42,8 +42,14 @@ export const RoutePath = {
     role: 'all',
   },
   POEM_CREATE: {
-    path: '/poems/create',
+    path: '/poems/new-poem',
     name: 'poemCreate',
+    type: 'private',
+    role: 'author',
+  },
+  POEM_EDIT: {
+    path: '/poems/edit-poem',
+    name: 'poemEdit',
     type: 'private',
     role: 'author',
   },
