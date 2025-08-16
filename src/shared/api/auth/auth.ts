@@ -76,6 +76,10 @@ export const authConfig = {
     }),
     // Другие провайдеры (Apple, Facebook) будут добавлены позже
   ],
+  pages: {
+    signIn: '/auth',
+    error: '/auth?error=Error',
+  },
   // 4. Коллбэки (Callbacks)
   callbacks: {
     async signIn(params: {
@@ -91,17 +95,22 @@ export const authConfig = {
       try {
         // Проверяем, существует ли пользователь в базе данных
         const existingUser = await prisma.user.findUnique({
-          where: { email: profile?.email },
+          where: { email: profile?.email || user?.email },
         });
+
+        const userData = !!profile?.email
+          ? {
+              name: profile?.name,
+              email: profile?.email,
+              image: profile?.picture,
+              role: 'SUBSCRIBER',
+            }
+          : { ...user, role: 'SUBSCRIBER' };
 
         if (!existingUser) {
           // Создаем нового пользователя
           const newUser = await prisma.user.create({
-            data: {
-              name: profile?.name,
-              email: profile?.email,
-              image: profile?.picture,
-            },
+            data: userData,
           });
           console.log('New user created:', newUser);
           // Сохраняем ID в user объект, который будет доступен в jwt callback
@@ -110,11 +119,7 @@ export const authConfig = {
           // Обновляем существующего пользователя
           const updatedUser = await prisma.user.update({
             where: { id: existingUser.id },
-            data: {
-              name: profile?.name,
-              email: profile?.email,
-              image: profile?.picture,
-            },
+            data: userData,
           });
           console.log('User updated:', updatedUser);
           // Обновляем ID в user объекте
