@@ -1,4 +1,4 @@
-'use server'; // Обозначает server action
+'use server'; // Indicates server action
 
 import * as bcrypt from 'bcrypt';
 import { prisma } from '@/shared/api/database/prisma';
@@ -15,7 +15,7 @@ type RegisterResult = { success: true; email: string } | { success: false; error
 export async function registerAction(data: RegisterData): Promise<RegisterResult> {
   const { name, email, password } = data;
 
-  // Валидация
+  // Validation
   if (!email || !password) {
     return { success: false, error: AuthErrors.EMAIL_AND_PASSWORD_REQUIRED };
   }
@@ -23,17 +23,17 @@ export async function registerAction(data: RegisterData): Promise<RegisterResult
     return { success: false, error: AuthErrors.PASSWORD_MUST_BE_AT_LEAST_8_CHARACTERS };
   }
 
-  // Проверка существования пользователя
+  // Check if user already exists
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
     return { success: false, error: AuthErrors.EMAIL_ALREADY_REGISTERED };
   }
 
   try {
-    // Хэширование пароля
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Создание пользователя
+    // Create user
     await prisma.user.create({
       data: {
         name,

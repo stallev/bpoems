@@ -1,4 +1,4 @@
-'use server'; // Обозначает server action
+'use server'; // Indicates server action
 
 import * as bcrypt from 'bcrypt';
 import { prisma } from '@/shared/api/database/prisma';
@@ -14,18 +14,18 @@ type LoginResult = { success: true; email: string } | { success: false; error: s
 export async function loginValidateAction(data: LoginData): Promise<LoginResult> {
   const { email, password } = data;
 
-  // Валидация
+  // Validation
   if (!email || !password) {
     return { success: false, error: AuthErrors.EMAIL_AND_PASSWORD_REQUIRED };
   }
 
-  // Проверка пользователя
+  // Check user
   try {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user || !user.password) {
       return { success: false, error: AuthErrors.INVALID_EMAIL_OR_PASSWORD };
     }
-    // Проверка пароля
+    // Check password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return { success: false, error: AuthErrors.INVALID_EMAIL_OR_PASSWORD };
