@@ -2,9 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { loginValidateAction } from '@/features/auth/server-actions/login'; // Импорт server action
 import { registerAction } from '@/features/auth/server-actions/register'; // Импорт server action
+import { AuthErrors } from '@/shared/constants/Errors';
 import { Button } from '@/shared/ui/shadcnComponents/button';
 import { Input } from '@/shared/ui/shadcnComponents/input';
 
@@ -59,13 +60,19 @@ export default function AuthPage() {
     setLoading(false);
   };
 
+  useEffect(() => {
+    if (error) {
+      console.log('Error:', error);
+    }
+  }, [error]);
+
   return (
     <div className="py-24 flex items-center justify-center bg-muted">
       <div className="bg-background p-8 rounded-lg shadow-md w-full max-w-96 border border-border">
         <h1 className="text-2xl font-bold mb-6 text-center text-foreground">
           {mode === 'login' ? 'Вход' : 'Регистрация'}
         </h1>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {error && <span className="text-destructive mb-4 block">{error}</span>}
         <form onSubmit={handleSubmit}>
           {mode === 'register' && (
             <div className="mb-4">
@@ -84,7 +91,15 @@ export default function AuthPage() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
-              className={error.includes('Email') ? 'border-red-500' : ''}
+              className={
+                [
+                  AuthErrors.EMAIL_ALREADY_REGISTERED,
+                  AuthErrors.EMAIL_AND_PASSWORD_REQUIRED,
+                  AuthErrors.INVALID_EMAIL_OR_PASSWORD,
+                ].includes(error)
+                  ? 'border-destructive'
+                  : ''
+              }
             />
           </div>
           <div className="mb-4">
@@ -94,7 +109,15 @@ export default function AuthPage() {
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
-              className={error.includes('Пароль') ? 'border-red-500' : ''}
+              className={
+                [
+                  AuthErrors.EMAIL_AND_PASSWORD_REQUIRED,
+                  AuthErrors.INVALID_EMAIL_OR_PASSWORD,
+                  AuthErrors.PASSWORD_MUST_BE_AT_LEAST_8_CHARACTERS,
+                ].includes(error)
+                  ? 'border-destructive'
+                  : ''
+              }
             />
           </div>
           {mode === 'register' && (
@@ -105,7 +128,14 @@ export default function AuthPage() {
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
                 required
-                className={error.includes('Пароли не совпадают') ? 'border-red-500' : ''}
+                className={
+                  [
+                    AuthErrors.PASSWORD_MUST_BE_AT_LEAST_8_CHARACTERS,
+                    AuthErrors.PASSWORDS_DO_NOT_MATCH,
+                  ].includes(error)
+                    ? 'border-destructive'
+                    : ''
+                }
               />
             </div>
           )}
