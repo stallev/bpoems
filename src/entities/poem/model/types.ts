@@ -19,7 +19,7 @@ export interface PoemWithRelations extends PrismaPoem {
     id: string;
     name: Record<string, string>;
   } | null;
-  tags: Tag[]; // Изменено: массив объектов Tag вместо { tag: { id, name } }
+  tags: Tag[]; // Changed: array of Tag objects instead of { tag: { id, name } }
   comments?: {
     id: string;
     content: string;
