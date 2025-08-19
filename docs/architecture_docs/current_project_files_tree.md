@@ -79,6 +79,19 @@ bpoems/
 │   │   ├── layout.tsx
 │   │   └── page.tsx
 │   ├── entities/                      # ✅ Entities Layer
+│   │   ├── category/
+│   │   │   ├── api/
+│   │   │   │   ├── index.ts
+│   │   │   │   └── categoryRepository.ts
+│   │   │   ├── constants/
+│   │   │   │   ├── index.ts
+│   │   │   │   └── CategoryConstants.ts
+│   │   │   ├── examples/
+│   │   │   │   └── usage-example.ts
+│   │   │   ├── index.ts
+│   │   │   └── model/
+│   │   │       ├── index.ts
+│   │   │       └── types.ts
 │   │   ├── poem/
 │   │   │   ├── api/
 │   │   │   │   ├── index.ts

@@ -1,0 +1,1 @@
+export { categoryRepository } from './categoryRepository';
