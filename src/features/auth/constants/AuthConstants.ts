@@ -1,7 +1,7 @@
-export const AuthFormTypes = {
-  LOGIN: 'login',
-  REGISTER: 'register',
-};
+import { FORM_MODES } from '../model/types';
+
+// Реэкспортируем типы форм из model/types.ts для обратной совместимости
+export const AuthFormTypes = FORM_MODES;
 
 export const AuthFormPlaceholders = {
   LOGIN: {
