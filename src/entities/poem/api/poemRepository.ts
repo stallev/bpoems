@@ -16,8 +16,8 @@ export const poemRepository = {
       where: { id },
       include: {
         author: true,
-        category: true,
-        tags: true,
+        category: { include: { translatedName: true } },
+        tags: { include: { translatedName: true } },
       },
     }) as Promise<PoemWithRelations | null>;
   },
@@ -37,8 +37,8 @@ export const poemRepository = {
       where,
       include: {
         author: true,
-        category: true,
-        tags: true,
+        category: { include: { translatedName: true } },
+        tags: { include: { translatedName: true } },
       },
     }) as unknown as Promise<PoemWithRelations[]>;
   },
@@ -82,8 +82,8 @@ export const poemRepository = {
       take,
       include: {
         author: true,
-        category: true,
-        tags: true,
+        category: { include: { translatedName: true } },
+        tags: { include: { translatedName: true } },
       },
     }) as unknown as Promise<PoemWithRelations[]>;
   },
@@ -110,8 +110,8 @@ export const poemRepository = {
       take,
       include: {
         author: true,
-        category: true,
-        tags: true,
+        category: { include: { translatedName: true } },
+        tags: { include: { translatedName: true } },
       },
     }) as unknown as Promise<PoemWithRelations[]>;
   },

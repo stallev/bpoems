@@ -14,7 +14,7 @@ export interface PoemWithRelations extends PrismaPoem {
     id: string;
     name: string | null;
     image: string | null;
-  };
+  } | null;
   category: {
     id: string;
     name: Record<string, string>;
