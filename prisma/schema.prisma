@@ -4,6 +4,8 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// prisma/schema.prisma
+
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -11,151 +13,285 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("NEXT_PUBLIC_DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
-// Модель пользователя
+// === Enums ===
+
+// Role-Based Access Control System
+// Roles are hierarchical: READER < SUBSCRIBER < AUTHOR < MODERATOR < ADMIN
+enum Role {
+  READER     // Unauthenticated user privileges
+  SUBSCRIBER // Base authenticated role
+  AUTHOR     // Can publish poems immediately
+  MODERATOR  // Can manage categories, moderate content, approve author requests
+  ADMIN      // Full system access
+}
+
+// Status for user-generated content that requires moderation
+enum ContentApprovalStatus {
+  PENDING  // Awaiting moderator review (for non-authors)
+  APPROVED // Approved and published (default for Authors)
+  REJECTED // Rejected by moderator
+}
+
+// Status for user accounts managed by moderators/admins
+enum UserAccountStatus {
+  ACTIVE
+  SUSPENDED // Temporary ban
+  BANNED    // Permanent ban
+}
+
+// === Core Models for Authentication (Auth.js / NextAuth) ===
+
+// User model for authentication and profile information
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
   emailVerified DateTime?
-  image         String?
-  password      String?
-  role          Role      @default(SUBSCRIBER)
-  bio           Json?     // Для хранения форматированного текста (WYSIWYG)
+  image         String?   // URL to avatar
+  password      String?   // Hashed password for Credentials provider (optional)
+  role          Role      @default(SUBSCRIBER) // Default role assigned on first login
+  status        UserAccountStatus @default(ACTIVE) // Account status for moderation
+
+  // Multilingual profile bio
+  // Using separate fields for simplicity in MVP. Can be extended to a separate model later.
+  bio           String?   // Bio in default language (EN)
+  bioRu         String?   // Bio in Russian
+  bioUa         String?   // Bio in Ukrainian
+
+  // Timestamps
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  
-  // Отношения
+
+  // Relations
+  accounts      Account[]
   poems         Poem[]
   comments      Comment[]
-  accounts      Account[]
-  sessions      Session[]
+  ratings       Rating[]
+  reviews       Review[]
+  readingLists  ReadingList[]
+  authorRequests AuthorRoleRequest[] @relation("AuthorRequests") // Requests made by this user
+  authorRequestApprovals AuthorRoleRequest[] @relation("AuthorRequestApprovals") // Requests approved/rejected by this user (if Moderator/Admin)
+  // Add other relations as features are implemented (e.g., notifications)
 }
 
-// Модель аккаунта (для Auth.js)
+// Account model for storing linked OAuth accounts and Credentials info
 model Account {
   id                String  @id @default(cuid())
   userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
+  type              String  // "oauth", "email", "credentials"
+  provider          String  // "google", "credentials"
+  providerAccountId String  // Unique ID from the provider
+  refresh_token     String? // OAuth refresh token
+  access_token      String? // OAuth access token
+  expires_at        Int?    // OAuth token expiration timestamp
+  token_type        String? // OAuth token type
+  scope             String? // OAuth scopes
+  id_token          String? // OAuth ID token
+  session_state     String? // OAuth session state
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
-// Модель сессии (для Auth.js)
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-// Модель для верификации (для Auth.js)
+// Verification tokens for password reset, email verification, etc.
 model VerificationToken {
   identifier String
-  token      String   @unique
+  token      String   @id
   expires    DateTime
 
   @@unique([identifier, token])
 }
 
-// Модель стихотворения
-model Poem {
-  id          String   @id @default(cuid())
-  title       String
-  content     Json     // Для хранения форматированного текста (WYSIWYG)
-  published   Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  authorId    String
-  
-  // Отношения
-  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  categories  CategoryOnPoem[]
-  tags        TagOnPoem[]
-  comments    Comment[]
-}
+// === Core Models for Poetry Platform ===
 
-// Модель категории
+// Model for poem categories, supporting multilingual names
 model Category {
-  id          String   @id @default(cuid())
-  name        Json     // Для мультиязычности (объект с переводами)
-  description Json?    // Для мультиязычности (объект с переводами)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Отношения
-  poems       CategoryOnPoem[]
+  id        String    @id @default(cuid())
+  // Multilingual names
+  name      String    // Name in default language (EN)
+  nameRu    String    // Name in Russian
+  nameUa    String    // Name in Ukrainian
+  isActive  Boolean   @default(true) // Allows deactivating categories
+  order     Int       @default(0)    // For ordering categories
+
+  // Timestamps
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  poems     Poem[]    @relation("PoemCategory")
+
+  @@index([isActive, order]) // Index for efficient listing of active categories
 }
 
-// Связующая таблица между стихотворениями и категориями
-model CategoryOnPoem {
-  poemId      String
-  categoryId  String
-  assignedAt  DateTime @default(now())
-  
-  // Отношения
-  poem        Poem     @relation(fields: [poemId], references: [id], onDelete: Cascade)
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  
-  @@id([poemId, categoryId])
-}
-
-// Модель тега
+// Model for poem tags
 model Tag {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  // Отношения
-  poems     TagOnPoem[]
+  id        String    @id @default(cuid())
+  name      String    @unique // Tag name should be unique
+
+  // Timestamps
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  poems     Poem[]
+
+  @@index([name]) // Index for efficient tag lookup
 }
 
-// Связующая таблица между стихотворениями и тегами
-model TagOnPoem {
-  poemId    String
-  tagId     String
-  assignedAt DateTime @default(now())
-  
-  // Отношения
-  poem      Poem     @relation(fields: [poemId], references: [id], onDelete: Cascade)
-  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
-  
-  @@id([poemId, tagId])
+// Main model for poems
+model Poem {
+  id              String               @id @default(cuid())
+  title           String
+  content         Json                 // Rich text content from WYSIWYG editor as JSON
+  description     String?              // Optional short description
+  authorId        String
+  author          User                 @relation(fields: [authorId], references: [id])
+  status          ContentApprovalStatus @default(APPROVED) // Authors: APPROVED; Others: PENDING
+  categoryId      String?
+  category        Category?            @relation("PoemCategory", fields: [categoryId], references: [id])
+  tags            Tag[]                // Many-to-many relation via implicit join table
+
+  // Timestamps
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  publishedAt     DateTime?            // When the poem was first published
+
+  // Relations
+  comments        Comment[]
+  ratings         Rating[]
+  reviews         Review[]
+  // Add relation for collections/anthologies when implemented
+
+  @@index([authorId])           // Index for finding poems by author
+  @@index([status])             // Index for filtering by approval status
+  @@index([createdAt])          // Index for sorting by creation date
+  @@index([publishedAt])        // Index for sorting by publication date
+  // Consider adding full-text search index on title and content
+  // Full-text search index for PostgreSQL (if supported by Prisma and Neon)
+  // @@fulltext([title, content]) // Requires enabling full-text index in Prisma
+  ReadingListItem ReadingListItem[]
 }
 
-// Модель комментария
+// Model for user comments on poems
 model Comment {
-  id        String   @id @default(cuid())
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String    @id @default(cuid())
+  content   String    // The comment text
   poemId    String
+  poem      Poem      @relation(fields: [poemId], references: [id])
   authorId  String
-  
-  // Отношения
-  poem      Poem     @relation(fields: [poemId], references: [id], onDelete: Cascade)
-  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id])
+
+  // Moderation fields
+  isApproved Boolean   @default(true) // Simple moderation flag for MVP
+  // reportedBy User[] @relation("CommentReports") // Extend for detailed reporting
+
+  // Timestamps
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  // replies   Comment[] @relation("CommentReplies")
+  // parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  // parentId  String?
+
+  @@index([poemId])      // Index for finding comments on a poem
+  @@index([authorId])    // Index for finding comments by a user
+  @@index([createdAt])   // Index for sorting comments
+  @@index([isApproved])  // Index for filtering approved comments
 }
 
-// Перечисление ролей пользователей
-enum Role {
-  SUBSCRIBER
-  AUTHOR
-  MODERATOR
-  ADMIN
+// Model for poem ratings (1-5 stars)
+model Rating {
+  id        String    @id @default(cuid())
+  value     Int       // Rating value (1-5)
+  poemId    String
+  poem      Poem      @relation(fields: [poemId], references: [id])
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userId, poemId]) // A user can only rate a poem once
+  @@index([poemId])          // Index for calculating average rating for a poem
+  @@index([value])           // Index for filtering by rating value
+}
+
+// Model for detailed poem reviews
+model Review {
+  id        String    @id @default(cuid())
+  title     String?   // Optional title for the review
+  content   String    // The review text
+  poemId    String
+  poem      Poem      @relation(fields: [poemId], references: [id])
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userId, poemId]) // A user can only review a poem once
+  @@index([poemId])          // Index for finding reviews for a poem
+  @@index([userId])          // Index for finding reviews by a user
+}
+
+// Model for user reading lists/collections
+model ReadingList {
+  id          String    @id @default(cuid())
+  name        String    // Name of the list
+  description String?   // Optional description
+  ownerId     String
+  owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade) // Delete list if owner is deleted
+
+  // Timestamps
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  items       ReadingListItem[]
+
+  @@index([ownerId])     // Index for finding lists by owner
+  @@index([createdAt])   // Index for sorting lists
+}
+
+// Join model for items in a reading list
+model ReadingListItem {
+  id            String   @id @default(cuid())
+  readingListId String
+  readingList   ReadingList @relation(fields: [readingListId], references: [id], onDelete: Cascade) // Delete item if list is deleted
+  poemId        String
+  poem          Poem     @relation(fields: [poemId], references: [id])
+
+  // Allows ordering items within a list
+  order         Int      @default(0)
+
+  createdAt     DateTime @default(now())
+
+  @@unique([readingListId, poemId]) // A poem can only be added once to a specific list
+  @@index([readingListId, order])   // Index for efficient retrieval and ordering of list items
+}
+
+// Model for subscribers requesting author role
+model AuthorRoleRequest {
+  id          String    @id @default(cuid())
+  requesterId String    // The user requesting the role
+  requester   User      @relation("AuthorRequests", fields: [requesterId], references: [id], onDelete: Cascade)
+  // The user (Moderator/Admin) who approved or rejected the request
+  reviewerId  String?
+  reviewer    User?     @relation("AuthorRequestApprovals", fields: [reviewerId], references: [id])
+  status      String    // e.g., "PENDING", "APPROVED", "REJECTED"
+  message     String?   // Optional message from requester
+  response    String?   // Optional response/reason from reviewer
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([requesterId]) // Index for finding requests by user
+  @@index([status])      // Index for filtering requests by status
+  @@index([createdAt])   // Index for sorting requests
 }

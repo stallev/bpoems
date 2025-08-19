@@ -1,0 +1,98 @@
+export const RoutePath = {
+  HOME: {
+    path: '/',
+    name: 'Главная',
+    type: 'public',
+    role: 'all',
+  },
+  ABOUT: {
+    path: '/about',
+    name: 'about',
+    type: 'public',
+    role: 'all',
+  },
+  DASHBOARD: {
+    path: '/dashboard',
+    name: 'dashboard',
+    type: 'private',
+    role: 'admin',
+  },
+  LOGIN: {
+    path: '/api/auth/signin',
+    name: 'Войти',
+    type: 'public',
+    role: 'all',
+  },
+  REGISTER: {
+    path: '/api/auth/register',
+    name: 'Регистрация',
+    type: 'public',
+    role: 'all',
+  },
+  POEMS_LIST: {
+    path: '/poems',
+    name: 'Стихи',
+    type: 'public',
+    role: 'all',
+  },
+  POEM_DETAIL: {
+    path: '/poems/[id]',
+    name: 'poemDetail',
+    type: 'public',
+    role: 'all',
+  },
+  POEM_CREATE: {
+    path: '/poems/new-poem',
+    name: 'poemCreate',
+    type: 'private',
+    role: 'author',
+  },
+  POEM_EDIT: {
+    path: '/poems/edit-poem',
+    name: 'poemEdit',
+    type: 'private',
+    role: 'author',
+  },
+  PROFILE: {
+    path: '/profile',
+    name: 'Профиль',
+    type: 'private',
+    role: 'subscriber',
+  },
+  PROFILE_SETTINGS: {
+    path: '/profile/settings',
+    name: 'profileSettings',
+    type: 'private',
+    role: 'subscriber',
+  },
+  CATEGORY: {
+    path: '/categories/[slug]',
+    name: 'category',
+    type: 'public',
+    role: 'all',
+  },
+  TAG: {
+    path: '/tags/[slug]',
+    name: 'tag',
+    type: 'public',
+    role: 'all',
+  },
+  SEARCH: {
+    path: '/search',
+    name: 'search',
+    type: 'public',
+    role: 'all',
+  },
+  ADMIN_CATEGORIES: {
+    path: '/admin/categories',
+    name: 'adminCategories',
+    type: 'private',
+    role: 'moderator',
+  },
+  ADMIN_USERS: {
+    path: '/admin/users',
+    name: 'adminUsers',
+    type: 'private',
+    role: 'admin',
+  },
+};

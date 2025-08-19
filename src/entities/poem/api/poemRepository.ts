@@ -16,16 +16,8 @@ export const poemRepository = {
       where: { id },
       include: {
         author: true,
-        categories: {
-          include: {
-            category: true,
-          },
-        },
-        tags: {
-          include: {
-            tag: true,
-          },
-        },
+        category: true,
+        tags: true,
       },
     }) as Promise<PoemWithRelations | null>;
   },
@@ -45,18 +37,10 @@ export const poemRepository = {
       where,
       include: {
         author: true,
-        categories: {
-          include: {
-            category: true,
-          },
-        },
-        tags: {
-          include: {
-            tag: true,
-          },
-        },
+        category: true,
+        tags: true,
       },
-    }) as Promise<PoemWithRelations[]>;
+    }) as unknown as Promise<PoemWithRelations[]>;
   },
 
   create: async (data: SimplePoemCreateInput | PoemCreateInput): Promise<Poem> => {
@@ -90,28 +74,18 @@ export const poemRepository = {
 
     return prisma.poem.findMany({
       where: {
-        categories: {
-          some: {
-            categoryId,
-          },
+        category: {
+          id: categoryId,
         },
       },
       skip,
       take,
       include: {
         author: true,
-        categories: {
-          include: {
-            category: true,
-          },
-        },
-        tags: {
-          include: {
-            tag: true,
-          },
-        },
+        category: true,
+        tags: true,
       },
-    }) as Promise<PoemWithRelations[]>;
+    }) as unknown as Promise<PoemWithRelations[]>;
   },
 
   // Methods for working with tags
@@ -128,7 +102,7 @@ export const poemRepository = {
       where: {
         tags: {
           some: {
-            tagId,
+            id: tagId,
           },
         },
       },
@@ -136,17 +110,9 @@ export const poemRepository = {
       take,
       include: {
         author: true,
-        categories: {
-          include: {
-            category: true,
-          },
-        },
-        tags: {
-          include: {
-            tag: true,
-          },
-        },
+        category: true,
+        tags: true,
       },
-    }) as Promise<PoemWithRelations[]>;
+    }) as unknown as Promise<PoemWithRelations[]>;
   },
 };

@@ -1,5 +1,5 @@
 // Import types from generated Prisma Client
-import type { Poem as PrismaPoem, Prisma } from '@/generated/prisma';
+import type { Poem as PrismaPoem, Prisma, Tag } from '@/generated/prisma';
 
 // Re-export base types from Prisma
 export type Poem = PrismaPoem;
@@ -15,18 +15,11 @@ export interface PoemWithRelations extends PrismaPoem {
     name: string | null;
     image: string | null;
   };
-  categories: {
-    category: {
-      id: string;
-      name: Record<string, string>; // JSON with translations
-    };
-  }[];
-  tags: {
-    tag: {
-      id: string;
-      name: string;
-    };
-  }[];
+  category: {
+    id: string;
+    name: Record<string, string>;
+  } | null;
+  tags: Tag[]; // Изменено: массив объектов Tag вместо { tag: { id, name } }
   comments?: {
     id: string;
     content: string;
@@ -38,10 +31,9 @@ export interface PoemWithRelations extends PrismaPoem {
 }
 
 // Simplified types for more convenient use in the application
-export type SimplePoemCreateInput = Omit<Prisma.PoemUncheckedCreateInput, 'categories' | 'tags'> & {
-  categories?: {
-    create?: { categoryId: string }[];
-    connect?: { categoryId: string }[];
+export type SimplePoemCreateInput = Omit<Prisma.PoemUncheckedCreateInput, 'category' | 'tags'> & {
+  category?: {
+    connect?: { id: string };
   };
   tags?: {
     create?: { tagId: string }[];
@@ -49,15 +41,14 @@ export type SimplePoemCreateInput = Omit<Prisma.PoemUncheckedCreateInput, 'categ
   };
 };
 
-export type SimplePoemUpdateInput = Omit<Prisma.PoemUncheckedUpdateInput, 'categories' | 'tags'> & {
-  categories?: {
-    create?: { categoryId: string }[];
-    connect?: { categoryId: string }[];
-    disconnect?: { categoryId: string }[];
+export type SimplePoemUpdateInput = Omit<Prisma.PoemUncheckedUpdateInput, 'category' | 'tags'> & {
+  category?: {
+    connect?: { id: string };
+    disconnect?: boolean;
   };
   tags?: {
     create?: { tagId: string }[];
     connect?: { tagId: string }[];
-    disconnect?: { categoryId: string }[];
+    disconnect?: { tagId: string }[];
   };
 };
