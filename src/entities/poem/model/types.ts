@@ -1,5 +1,5 @@
 // Import types from generated Prisma Client
-import type { Poem as PrismaPoem, Prisma, Tag } from '@/generated/prisma';
+import type { Poem as PrismaPoem, Prisma, Tag, Statistics } from '@/generated/prisma';
 
 // Re-export base types from Prisma
 export type Poem = PrismaPoem;
@@ -28,10 +28,14 @@ export interface PoemWithRelations extends PrismaPoem {
       name: string | null;
     };
   }[];
+  statistics?: Statistics | null;
 }
 
 // Simplified types for more convenient use in the application
-export type SimplePoemCreateInput = Omit<Prisma.PoemUncheckedCreateInput, 'category' | 'tags'> & {
+export type SimplePoemCreateInput = Omit<
+  Prisma.PoemUncheckedCreateInput,
+  'category' | 'tags' | 'statistics'
+> & {
   category?: {
     connect?: { id: string };
   };
@@ -39,9 +43,15 @@ export type SimplePoemCreateInput = Omit<Prisma.PoemUncheckedCreateInput, 'categ
     create?: { tagId: string }[];
     connect?: { tagId: string }[];
   };
+  statistics?: {
+    create?: { views: number; edits: number; likes: number; shares: number };
+  };
 };
 
-export type SimplePoemUpdateInput = Omit<Prisma.PoemUncheckedUpdateInput, 'category' | 'tags'> & {
+export type SimplePoemUpdateInput = Omit<
+  Prisma.PoemUncheckedUpdateInput,
+  'category' | 'tags' | 'statistics'
+> & {
   category?: {
     connect?: { id: string };
     disconnect?: boolean;
@@ -50,5 +60,8 @@ export type SimplePoemUpdateInput = Omit<Prisma.PoemUncheckedUpdateInput, 'categ
     create?: { tagId: string }[];
     connect?: { tagId: string }[];
     disconnect?: { tagId: string }[];
+  };
+  statistics?: {
+    update?: { views?: number; edits?: number; likes?: number; shares?: number };
   };
 };

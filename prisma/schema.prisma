@@ -129,8 +129,23 @@ model TranslatedItem {
   createdAt DateTime            @default(now())
   updatedAt DateTime            @updatedAt
   category  Category?           @relation("CategoryToTranslatedName") // Обратная связь для Category
-  tag       Tag?                @relation("TagToTranslatedName")     // Обратная связь для Tag
   @@index([type])               // Индекс для быстрого поиска по типу
+}
+
+model Statistics {
+  id        String @id @default(cuid())
+  poemId    String @unique
+  poem      Poem   @relation("PoemStatistics", fields: [poemId], references: [id], onDelete: Cascade)
+  views     Int    @default(0)
+  edits     Int    @default(0)
+  likes     Int    @default(0)
+  shares    Int    @default(0)
+
+  @@index([views])
+  @@index([edits])
+  @@index([likes])
+  @@index([shares])
+  @@index([poemId]) // Index for faster search by poemId
 }
 
 model Category {
@@ -146,13 +161,15 @@ model Category {
 }
 
 model Tag {
-  id             String         @id @default(cuid())
-  nameId         String         @unique // Ссылка на TranslatedItem.id
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  translatedName TranslatedItem @relation("TagToTranslatedName", fields: [nameId], references: [id], onDelete: Cascade)
-  poems          Poem[]
-  @@index([nameId])
+  id            String    @id @default(cuid())
+  nameId        String    @unique // Tag name should be unique
+  name          String    @unique // Tag name should be unique
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  // Relations
+  poems         Poem[]
+  @@index([name]) // Index for efficient tag lookup
 }
 
 // Main model for poems
@@ -165,8 +182,9 @@ model Poem {
   author      User                  @relation(fields: [authorId], references: [id])
   status      ContentApprovalStatus @default(APPROVED) // Authors: APPROVED; Others: PENDING
   categoryId  String?
-  category    Category?             @relation("PoemCategory", fields: [categoryId], references: [id])
+  category    Category?             @relation("PoemCategory", fields: [categoryId], references: [id], onDelete: Cascade)
   tags        Tag[] // Many-to-many relation via implicit join table
+  statistics  Statistics?           @relation("PoemStatistics")
 
   // Timestamps
   createdAt   DateTime  @default(now())
@@ -194,7 +212,7 @@ model Comment {
   id       String @id @default(cuid())
   content  String // The comment text
   poemId   String
-  poem     Poem   @relation(fields: [poemId], references: [id])
+  poem     Poem   @relation(fields: [poemId], references: [id], onDelete: Cascade)
   authorId String
   author   User   @relation(fields: [authorId], references: [id])
 
@@ -222,7 +240,7 @@ model Rating {
   id     String @id @default(cuid())
   value  Int // Rating value (1-5)
   poemId String
-  poem   Poem   @relation(fields: [poemId], references: [id])
+  poem   Poem   @relation(fields: [poemId], references: [id], onDelete: Cascade)
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
@@ -277,7 +295,7 @@ model ReadingListItem {
   readingListId String
   readingList   ReadingList @relation(fields: [readingListId], references: [id], onDelete: Cascade) // Delete item if list is deleted
   poemId        String
-  poem          Poem        @relation(fields: [poemId], references: [id])
+  poem          Poem        @relation(fields: [poemId], references: [id], onDelete: Cascade)
 
   // Allows ordering items within a list
   order Int @default(0)

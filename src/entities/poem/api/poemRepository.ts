@@ -17,7 +17,8 @@ export const poemRepository = {
       include: {
         author: true,
         category: { include: { translatedName: true } },
-        tags: { include: { translatedName: true } },
+        tags: true,
+        statistics: true,
       },
     }) as Promise<PoemWithRelations | null>;
   },
@@ -38,12 +39,24 @@ export const poemRepository = {
       include: {
         author: true,
         category: { include: { translatedName: true } },
-        tags: { include: { translatedName: true } },
+        tags: true,
+        statistics: true,
       },
     }) as unknown as Promise<PoemWithRelations[]>;
   },
 
   create: async (data: SimplePoemCreateInput | PoemCreateInput): Promise<Poem> => {
+    if (!data.statistics) {
+      data.statistics = {
+        create: {
+          views: 0,
+          edits: 0,
+          likes: 0,
+          shares: 0,
+        },
+      };
+    }
+
     return prisma.poem.create({
       data: data as PoemCreateInput,
     });
@@ -60,6 +73,51 @@ export const poemRepository = {
     return prisma.poem.delete({
       where: { id },
     });
+  },
+
+  incrementViews: async (poemId: string): Promise<void> => {
+    const stats = await prisma.statistics.findFirst({ where: { poem: { id: poemId } } });
+    if (!stats) {
+      // If statistics don't exist, create them
+      await prisma.statistics.create({
+        data: { poem: { connect: { id: poemId } }, views: 1, edits: 0, likes: 0, shares: 0 },
+      });
+    } else {
+      await prisma.statistics.update({
+        where: { id: stats.id },
+        data: { views: { increment: 1 } },
+      });
+    }
+  },
+
+  incrementEdits: async (poemId: string): Promise<void> => {
+    const stats = await prisma.statistics.findFirst({ where: { poem: { id: poemId } } });
+    if (stats) {
+      await prisma.statistics.update({
+        where: { id: stats.id },
+        data: { edits: { increment: 1 } },
+      });
+    }
+  },
+
+  incrementLikes: async (poemId: string): Promise<void> => {
+    const stats = await prisma.statistics.findFirst({ where: { poem: { id: poemId } } });
+    if (stats) {
+      await prisma.statistics.update({
+        where: { id: stats.id },
+        data: { likes: { increment: 1 } },
+      });
+    }
+  },
+
+  incrementShares: async (poemId: string): Promise<void> => {
+    const stats = await prisma.statistics.findFirst({ where: { poem: { id: poemId } } });
+    if (stats) {
+      await prisma.statistics.update({
+        where: { id: stats.id },
+        data: { shares: { increment: 1 } },
+      });
+    }
   },
 
   // Methods for working with categories
@@ -83,7 +141,8 @@ export const poemRepository = {
       include: {
         author: true,
         category: { include: { translatedName: true } },
-        tags: { include: { translatedName: true } },
+        tags: true,
+        statistics: true,
       },
     }) as unknown as Promise<PoemWithRelations[]>;
   },
@@ -111,7 +170,8 @@ export const poemRepository = {
       include: {
         author: true,
         category: { include: { translatedName: true } },
-        tags: { include: { translatedName: true } },
+        tags: true,
+        statistics: true,
       },
     }) as unknown as Promise<PoemWithRelations[]>;
   },
