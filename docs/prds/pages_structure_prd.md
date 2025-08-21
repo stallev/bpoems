@@ -6,49 +6,68 @@
 
 ```
 src/app/
-├── layout.tsx                    # Root layout
-├── page.tsx                      # Home page (/)
+├── layout.tsx                    # Root layout (fonts, SessionProvider, metadata)
 ├── globals.css                   # Global styles
 ├── favicon.ico                   # Favicon
-├── auth/
-│   └── page.tsx                  # Authentication page (/auth)
-├── poems/
-│   ├── page.tsx                  # Poems list page (/poems)
-│   ├── [slug]/
-│   │   └── page.tsx              # Individual poem page (/poems/[slug])
-│   ├── edit-poem/
-│   │   └── page.tsx              # Edit poem page (/poems/edit-poem)
-│   └── new-poem/
-│       └── page.tsx              # Create new poem page (/poems/new-poem)
-├── profile/
-│   └── page.tsx                  # User profile page (/profile)
-├── users/
-│   └── page.tsx                  # Users list page (/users)
+├── (noadmin)/                    # Public routes with Header/Footer
+│   ├── layout.tsx                # Public layout (Header, Footer)
+│   ├── page.tsx                  # Home page (/)
+│   ├── auth/
+│   │   └── page.tsx              # Authentication page (/auth)
+│   ├── poems/
+│   │   ├── page.tsx              # Poems list page (/poems)
+│   │   ├── [slug]/
+│   │   │   └── page.tsx          # Individual poem page (/poems/[slug])
+│   │   ├── edit-poem/
+│   │   │   └── page.tsx          # Edit poem page (/poems/edit-poem)
+│   │   └── new-poem/
+│   │       └── page.tsx          # Create new poem page (/poems/new-poem)
+│   ├── profile/
+│   │   └── page.tsx              # User profile page (/profile)
+│   └── users/
+│       └── page.tsx              # Users list page (/users)
 ├── dashboard/                    # Dashboard pages (ADMIN only)
-│   ├── layout.tsx                # Dashboard layout with auth check
+│   ├── layout.tsx                # Dashboard layout with ADMIN auth check
 │   └── page.tsx                  # Dashboard overview page (/dashboard)
 └── api/                          # API routes
     └── auth/
         ├── [...nextauth]/
         │   └── route.ts          # NextAuth.js API route
         ├── login/
-        │   └── route.ts          # Login API route
+        │   │   └── route.ts      # Login API route
         └── register/
             └── route.ts          # Register API route
+```
+
+### Layout Hierarchy
+
+```
+Root Layout (src/app/layout.tsx)
+├── Fonts (Geist, Geist_Mono)
+├── SessionProvider
+├── Global CSS
+└── Children
+    ├── Public Layout (src/app/(noadmin)/layout.tsx)
+    │   ├── Header
+    │   ├── Children (public pages)
+    │   └── Footer
+    └── Dashboard Layout (src/app/dashboard/layout.tsx)
+        ├── Auth check (ADMIN role)
+        └── Children (dashboard pages)
 ```
 
 ### Current Route Mapping
 
 | Route | File Path | Access | Description |
 |-------|-----------|--------|-------------|
-| `/` | `src/app/page.tsx` | Public | Home page |
-| `/auth` | `src/app/auth/page.tsx` | Public | Authentication (login/register) |
-| `/poems` | `src/app/poems/page.tsx` | Public | Poems listing |
-| `/poems/[slug]` | `src/app/poems/[slug]/page.tsx` | Public | Individual poem view |
-| `/poems/edit-poem` | `src/app/poems/edit-poem/page.tsx` | Private | Edit poem (AUTHOR+) |
-| `/poems/new-poem` | `src/app/poems/new-poem/page.tsx` | Private | Create poem (AUTHOR+) |
-| `/profile` | `src/app/profile/page.tsx` | Private | User profile (SUBSCRIBER+) |
-| `/users` | `src/app/users/page.tsx` | Public | Users listing |
+| `/` | `src/app/(noadmin)/page.tsx` | Public | Home page |
+| `/auth` | `src/app/(noadmin)/auth/page.tsx` | Public | Authentication (login/register) |
+| `/poems` | `src/app/(noadmin)/poems/page.tsx` | Public | Poems listing |
+| `/poems/[slug]` | `src/app/(noadmin)/poems/[slug]/page.tsx` | Public | Individual poem view |
+| `/poems/edit-poem` | `src/app/(noadmin)/poems/edit-poem/page.tsx` | Private | Edit poem (AUTHOR+) |
+| `/poems/new-poem` | `src/app/(noadmin)/poems/new-poem/page.tsx` | Private | Create poem (AUTHOR+) |
+| `/profile` | `src/app/(noadmin)/profile/page.tsx` | Private | User profile (SUBSCRIBER+) |
+| `/users` | `src/app/(noadmin)/users/page.tsx` | Public | Users listing |
 | `/dashboard` | `src/app/dashboard/page.tsx` | Private | Admin dashboard (ADMIN only) |
 
 ## Proposed Profile Pages Structure
@@ -56,8 +75,7 @@ src/app/
 ### Based on RoutePath.ts Analysis
 
 ```
-src/app/profile/
-├── layout.tsx                    # Profile layout with auth check
+src/app/(noadmin)/profile/
 ├── page.tsx                      # Profile overview (/profile)
 ├── settings/
 │   └── page.tsx                  # Profile settings (/profile/settings)
@@ -79,14 +97,14 @@ src/app/profile/
 
 | Route | File Path | Access | Description |
 |-------|-----------|--------|-------------|
-| `/profile` | `src/app/profile/page.tsx` | SUBSCRIBER+ | Profile overview |
-| `/profile/settings` | `src/app/profile/settings/page.tsx` | SUBSCRIBER+ | Profile settings |
-| `/profile/my-poems` | `src/app/profile/my-poems/page.tsx` | AUTHOR+ | User's poems list |
-| `/profile/my-poems/[id]` | `src/app/profile/my-poems/[id]/page.tsx` | AUTHOR+ | Edit specific poem |
-| `/profile/my-poems/new` | `src/app/profile/my-poems/new/page.tsx` | AUTHOR+ | Create new poem |
-| `/profile/add-poem` | `src/app/profile/add-poem/page.tsx` | AUTHOR+ | Add poem form |
-| `/profile/edit-poem` | `src/app/profile/edit-poem/page.tsx` | AUTHOR+ | Edit poem form |
-| `/profile/requests` | `src/app/profile/requests/page.tsx` | SUBSCRIBER+ | Author role requests |
+| `/profile` | `src/app/(noadmin)/profile/page.tsx` | SUBSCRIBER+ | Profile overview |
+| `/profile/settings` | `src/app/(noadmin)/profile/settings/page.tsx` | SUBSCRIBER+ | Profile settings |
+| `/profile/my-poems` | `src/app/(noadmin)/profile/my-poems/page.tsx` | AUTHOR+ | User's poems list |
+| `/profile/my-poems/[id]` | `src/app/(noadmin)/profile/my-poems/[id]/page.tsx` | AUTHOR+ | Edit specific poem |
+| `/profile/my-poems/new` | `src/app/(noadmin)/profile/my-poems/new/page.tsx` | AUTHOR+ | Create new poem |
+| `/profile/add-poem` | `src/app/(noadmin)/profile/add-poem/page.tsx` | AUTHOR+ | Add poem form |
+| `/profile/edit-poem` | `src/app/(noadmin)/profile/edit-poem/page.tsx` | AUTHOR+ | Edit poem form |
+| `/profile/requests` | `src/app/(noadmin)/profile/requests/page.tsx` | SUBSCRIBER+ | Author role requests |
 
 ## Proposed Dashboard Pages Structure
 
@@ -160,6 +178,60 @@ src/app/dashboard/
 | `/dashboard/settings/system` | `src/app/dashboard/settings/system/page.tsx` | ADMIN | System settings |
 | `/dashboard/settings/security` | `src/app/dashboard/settings/security/page.tsx` | ADMIN | Security settings |
 | `/dashboard/settings/content` | `src/app/dashboard/settings/content/page.tsx` | ADMIN | Content settings |
+
+## Layout Architecture
+
+### Root Layout (src/app/layout.tsx)
+```typescript
+// Глобальные настройки для всего приложения
+- Fonts (Geist, Geist_Mono)
+- SessionProvider
+- Global CSS
+- Metadata
+```
+
+### Public Layout (src/app/(noadmin)/layout.tsx)
+```typescript
+// Layout для публичной части приложения
+- Header
+- Children (public pages)
+- Footer
+```
+
+### Dashboard Layout (src/app/dashboard/layout.tsx)
+```typescript
+// Layout для административной части
+- Auth check (ADMIN role verification)
+- Dashboard sidebar (будущая реализация)
+- Children (dashboard pages)
+```
+
+## Benefits of New Structure
+
+### 1. **Clear Separation of Concerns**
+- ✅ Публичная часть изолирована в `(noadmin)`
+- ✅ Административная часть изолирована в `dashboard`
+- ✅ Глобальные настройки в корневом layout
+
+### 2. **Performance Optimization**
+- ✅ Code splitting по функциональности
+- ✅ Ленивая загрузка административных компонентов
+- ✅ Оптимизация бандлов
+
+### 3. **Security**
+- ✅ Административные страницы защищены на уровне layout
+- ✅ Четкое разделение доступа
+- ✅ Изоляция административного интерфейса
+
+### 4. **Maintainability**
+- ✅ Четкая структура файлов
+- ✅ Легко добавлять новые разделы
+- ✅ Простое тестирование
+
+### 5. **FSD Compliance**
+- ✅ Соответствие принципам Feature-Sliced Design
+- ✅ Четкое разделение слоев
+- ✅ Правильная организация импортов
 
 ## Dashboard Architecture Decision
 
