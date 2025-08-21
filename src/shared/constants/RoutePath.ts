@@ -18,14 +18,8 @@ export const RoutePath = {
     role: 'admin',
   },
   LOGIN: {
-    path: '/api/auth/signin',
+    path: '/auth',
     name: 'Войти',
-    type: 'public',
-    role: 'all',
-  },
-  REGISTER: {
-    path: '/api/auth/register',
-    name: 'Регистрация',
     type: 'public',
     role: 'all',
   },
@@ -41,18 +35,6 @@ export const RoutePath = {
     type: 'public',
     role: 'all',
   },
-  POEM_CREATE: {
-    path: '/poems/new-poem',
-    name: 'poemCreate',
-    type: 'private',
-    role: 'author',
-  },
-  POEM_EDIT: {
-    path: '/poems/edit-poem',
-    name: 'poemEdit',
-    type: 'private',
-    role: 'author',
-  },
   PROFILE: {
     path: '/profile',
     name: 'Профиль',
@@ -60,13 +42,31 @@ export const RoutePath = {
     role: 'subscriber',
   },
   PROFILE_SETTINGS: {
-    path: '/profile/settings',
+    path: '/profile',
     name: 'profileSettings',
     type: 'private',
     role: 'subscriber',
   },
+  PROFILE_MY_POEMS: {
+    path: '/profile/my-poems',
+    name: 'profileMyPoems',
+    type: 'private',
+    role: 'author',
+  },
+  PROFILE_ADD_POEM: {
+    path: '/profile/add-poem',
+    name: 'profileAddPoem',
+    type: 'private',
+    role: 'author',
+  },
+  PROFILE_EDIT_POEM: {
+    path: '/profile/edit-poem',
+    name: 'profileEditPoem',
+    type: 'private',
+    role: 'author',
+  },
   CATEGORY: {
-    path: '/categories/[slug]',
+    path: '/poems/category/[slug]',
     name: 'category',
     type: 'public',
     role: 'all',

@@ -122,16 +122,6 @@ model VerificationToken {
 // === Core Models for Poetry Platform ===
 
 // Model for poem categories, supporting multilingual names
-model TranslatedItem {
-  id        String              @id @default(cuid())
-  type      TranslationItemType
-  values    Json                // { "EN": "value", "RU": "value", "UA": "value" }
-  createdAt DateTime            @default(now())
-  updatedAt DateTime            @updatedAt
-  category  Category?           @relation("CategoryToTranslatedName") // Обратная связь для Category
-  @@index([type])               // Индекс для быстрого поиска по типу
-}
-
 model Statistics {
   id        String @id @default(cuid())
   poemId    String @unique
@@ -150,14 +140,24 @@ model Statistics {
 
 model Category {
   id             String         @id @default(cuid())
-  nameId         String         @unique // Ссылка на TranslatedItem.id
+  slug           String         @unique // Ссылка на TranslatedItem.id
   isActive       Boolean        @default(true)
   order          Int            @default(0)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
-  translatedName TranslatedItem @relation("CategoryToTranslatedName", fields: [nameId], references: [id], onDelete: Cascade)
+  translatedName TranslatedItem @relation("CategoryToTranslatedName", fields: [slug], references: [id])
   poems          Poem[]         @relation("PoemCategory")
   @@index([isActive, order])
+}
+
+model TranslatedItem {
+  id        String              @id @default(cuid())
+  type      TranslationItemType
+  values    Json                // { "EN": "value", "RU": "value", "UA": "value" }
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  category  Category?           @relation("CategoryToTranslatedName") // Обратная связь для Category
+  @@index([type])               // Индекс для быстрого поиска по типу
 }
 
 model Tag {

@@ -8,12 +8,20 @@ import type {
   UserWithRelations,
   SimpleUserCreateInput,
   SimpleUserUpdateInput,
+  UserRole,
 } from '../model/types';
 
 export const userRepository = {
   findById: async (id: string): Promise<User | null> => {
     return prisma.user.findUnique({
       where: { id },
+    });
+  },
+
+  getUserRole: async (id: string): Promise<{ role: UserRole } | null> => {
+    return prisma.user.findUnique({
+      where: { id },
+      select: { role: true },
     });
   },
 
