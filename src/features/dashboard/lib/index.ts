@@ -1,0 +1,1 @@
+export { useDashboardPermissions } from './permissions';

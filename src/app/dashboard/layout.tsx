@@ -1,9 +1,10 @@
 import { redirect } from 'next/navigation';
 import { userRepository } from '@/entities/user/api/userRepository';
+import { DashboardLayout } from '@/features/dashboard';
 import { auth } from '@/shared/api/auth/auth';
 import { RoutePath } from '@/shared/constants/RoutePath';
 
-const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
+const DashboardRootLayout = async ({ children }: { children: React.ReactNode }) => {
   const session = await auth();
 
   if (!session?.user) {
@@ -16,7 +17,7 @@ const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
     redirect(RoutePath.PROFILE.path);
   }
 
-  return <>{children}</>;
+  return <DashboardLayout>{children}</DashboardLayout>;
 };
 
-export default DashboardLayout;
+export default DashboardRootLayout;
