@@ -1,14 +1,7 @@
 import { Menu, X } from 'lucide-react';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/shared/ui/shadcnComponents/breadcrumb';
 import { Button } from '@/shared/ui/shadcnComponents/button';
 import { Separator } from '@/shared/ui/shadcnComponents/separator';
+import { DashboardBreadcrumbs } from './DashboardBreadcrumbs';
 
 interface DashboardHeaderProps {
   title?: string;
@@ -27,7 +20,7 @@ export function DashboardHeader({
   isMenuOpen = false,
 }: DashboardHeaderProps) {
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
       <div className="flex items-center gap-2 px-4 w-full">
         {/* Mobile Menu Button */}
         <Button
@@ -43,28 +36,7 @@ export function DashboardHeader({
         <Separator orientation="vertical" className="mr-2 h-4 hidden md:block" />
 
         {/* Breadcrumbs */}
-        <div className="flex-1 min-w-0">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-              </BreadcrumbItem>
-              {breadcrumbs.length > 0 && <BreadcrumbSeparator className="hidden md:block" />}
-              {breadcrumbs.map((crumb, index) => (
-                <BreadcrumbItem key={index}>
-                  {crumb.href ? (
-                    <BreadcrumbLink href={crumb.href}>{crumb.label}</BreadcrumbLink>
-                  ) : (
-                    <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
-                  )}
-                  {index < breadcrumbs.length - 1 && (
-                    <BreadcrumbSeparator className="hidden md:block" />
-                  )}
-                </BreadcrumbItem>
-              ))}
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
+        <DashboardBreadcrumbs breadcrumbs={breadcrumbs} />
 
         {/* Page Title - Mobile */}
         <div className="md:hidden flex-1 text-center">
@@ -72,7 +44,12 @@ export function DashboardHeader({
         </div>
 
         {/* Right side actions */}
-        <div className="flex items-center gap-2">{/* Add any header actions here */}</div>
+        <div className="flex items-center gap-2">
+          {/* Add any header actions here */}
+          <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
+            {/* User info or other actions can go here */}
+          </div>
+        </div>
       </div>
     </header>
   );

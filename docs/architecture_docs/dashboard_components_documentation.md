@@ -9,33 +9,35 @@
 ```
 src/features/dashboard/
 ├── ui/
-│   ├── DashboardLayout.tsx      # Главный layout компонент
-│   ├── DashboardHeader.tsx      # Адаптивный header с breadcrumbs
-│   ├── DashboardSidebar.tsx     # Адаптивная навигационная панель
-│   ├── DashboardFooter.tsx      # Адаптивный footer
-│   └── index.ts                 # Экспорт UI компонентов
+│   ├── DashboardLayout.tsx      # Main dashboard layout component
+│   ├── DashboardHeader.tsx      # Adaptive header with breadcrumbs
+│   ├── DashboardSidebar.tsx     # Adaptive navigation panel
+│   ├── DashboardFooter.tsx      # Adaptive footer
+│   ├── DashboardBreadcrumbs.tsx # Reusable breadcrumbs component
+│   └── index.ts                 # UI components export
 ├── model/
-│   ├── types.ts                 # TypeScript типы
-│   ├── constants.ts             # Константы навигации
-│   └── index.ts                 # Экспорт model
+│   ├── types.ts                 # TypeScript types
+│   ├── constants.ts             # Navigation constants
+│   └── index.ts                 # Model export
 ├── lib/
-│   ├── permissions.ts           # Хук для проверки разрешений
-│   └── index.ts                 # Экспорт lib
-└── index.ts                     # Главный экспорт feature
+│   ├── permissions.ts           # Permission checking hook
+│   └── index.ts                 # Lib export
+└── index.ts                     # Main feature export
 ```
 
-## Компоненты
+## Components
 
 ### 1. DashboardLayout
 
-**Файл:** `src/features/dashboard/ui/DashboardLayout.tsx`
+**File:** `src/features/dashboard/ui/DashboardLayout.tsx`
 
-**Описание:** Главный layout компонент, объединяющий все элементы dashboard.
+**Description:** Main layout component that combines all dashboard elements.
 
-**Функциональность:**
-- Управление состоянием мобильного меню
-- Интеграция всех компонентов dashboard
-- Адаптивная структура
+**Functionality:**
+- Mobile menu state management
+- Integration of all dashboard components
+- Adaptive structure
+- Support for breadcrumbs navigation
 
 **Props:**
 ```typescript
@@ -51,15 +53,22 @@ interface DashboardLayoutProps {
 
 ### 2. DashboardHeader
 
-**Файл:** `src/features/dashboard/ui/DashboardHeader.tsx`
+**File:** `src/features/dashboard/ui/DashboardHeader.tsx`
 
-**Описание:** Адаптивный header с кнопкой мобильного меню и breadcrumbs.
+**Description:** Adaptive header with mobile menu button, breadcrumbs and improved navigation.
 
-**Функциональность:**
-- Кнопка мобильного меню (скрыта на desktop)
-- Breadcrumbs навигация
-- Адаптивный заголовок страницы
-- Поддержка действий в правой части
+**Functionality:**
+- Mobile menu button (hidden on desktop)
+- Adaptive breadcrumbs navigation
+- Sticky positioning for better UX
+- Adaptive page title
+- Support for actions in the right section
+
+**UX Features:**
+- **Sticky Header:** Header remains visible when scrolling
+- **Adaptability:** Different behavior on mobile and desktop devices
+- **Visual Hierarchy:** Clear separation of navigation elements
+- **Backdrop Blur:** Modern background blur effect
 
 **Props:**
 ```typescript
@@ -74,13 +83,56 @@ interface DashboardHeaderProps {
 }
 ```
 
-### 3. DashboardSidebar
+### 3. DashboardBreadcrumbs
 
-**Файл:** `src/features/dashboard/ui/DashboardSidebar.tsx`
+**File:** `src/features/dashboard/ui/DashboardBreadcrumbs.tsx`
 
-**Описание:** Адаптивная навигационная панель с группированными ссылками.
+**Description:** Reusable breadcrumbs component for dashboard pages.
 
-**Функциональность:**
+**Functionality:**
+- Home link with icon for quick navigation
+- Adaptive breadcrumbs navigation
+- Support for clickable and non-clickable items
+- Proper visual hierarchy
+
+**Features:**
+- **Home Link:** Quick navigation to dashboard with icon
+- **Adaptive Design:** Hidden on mobile devices
+- **Visual Hierarchy:** Current page is highlighted
+- **Accessibility:** Keyboard navigation support
+
+**Props:**
+```typescript
+interface DashboardBreadcrumbsProps {
+  breadcrumbs?: Array<{
+    label: string;
+    href?: string;
+  }>;
+}
+```
+
+**Usage Examples:**
+```typescript
+// Simple breadcrumbs
+<DashboardBreadcrumbs breadcrumbs={[
+  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Content', href: '/dashboard/content' },
+  { label: 'Categories' }
+]} />
+
+// Single page breadcrumbs
+<DashboardBreadcrumbs breadcrumbs={[
+  { label: 'Dashboard' }
+]} />
+```
+
+### 4. DashboardSidebar
+
+**File:** `src/features/dashboard/ui/DashboardSidebar.tsx`
+
+**Description:** Адаптивная навигационная панель с группированными ссылками.
+
+**Functionality:**
 - Мобильное меню с overlay
 - Группированная навигация по разделам
 - Проверка разрешений пользователя
@@ -100,13 +152,13 @@ interface DashboardSidebarProps {
 }
 ```
 
-### 4. DashboardFooter
+### 5. DashboardFooter
 
-**Файл:** `src/features/dashboard/ui/DashboardFooter.tsx`
+**File:** `src/features/dashboard/ui/DashboardFooter.tsx`
 
-**Описание:** Адаптивный footer с информацией о платформе.
+**Description:** Адаптивный footer с информацией о платформе.
 
-**Функциональность:**
+**Functionality:**
 - Информация о платформе
 - Версия dashboard
 - Адаптивная компоновка
@@ -161,6 +213,77 @@ interface DashboardSidebarProps {
 - `canModerateContent` - доступ к модерации (ADMIN, MODERATOR)
 - `canManageRoles` - управление ролями (ADMIN)
 
+## Лучшие практики Breadcrumbs
+
+### Структура Breadcrumbs
+
+**Рекомендуемая иерархия:**
+```typescript
+// Главная страница dashboard
+const breadcrumbs = [{ label: 'Dashboard' }];
+
+// Страница управления контентом
+const breadcrumbs = [
+  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Content' }
+];
+
+// Страница категорий
+const breadcrumbs = [
+  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Content', href: '/dashboard/content' },
+  { label: 'Categories' }
+];
+
+// Детальная страница категории
+const breadcrumbs = [
+  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Content', href: '/dashboard/content' },
+  { label: 'Categories', href: '/dashboard/content/categories' },
+  { label: 'Category Name' }
+];
+```
+
+### Правила именования
+
+1. **Краткость:** Используйте короткие, понятные названия
+2. **Консистентность:** Соблюдайте единый стиль именования
+3. **Локализация:** Поддерживайте многоязычность
+4. **Контекст:** Названия должны отражать текущий контекст
+
+### UX принципы
+
+1. **Всегда показывать путь:** Пользователь должен понимать, где он находится
+2. **Кликабельность:** Все элементы кроме последнего должны быть ссылками
+3. **Визуальная иерархия:** Последний элемент выделяется как текущая страница
+4. **Адаптивность:** На мобильных устройствах breadcrumbs могут скрываться
+5. **Доступность:** Поддержка клавиатурной навигации и screen readers
+
+### Техническая реализация
+
+```typescript
+// Типизация breadcrumbs
+interface BreadcrumbItem {
+  label: string;
+  href?: string; // undefined для текущей страницы
+}
+
+// Использование в компонентах
+const breadcrumbs: BreadcrumbItem[] = [
+  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Content', href: '/dashboard/content' },
+  { label: 'Categories' } // Текущая страница
+];
+
+// Передача в layout
+<DashboardLayout 
+  title="Управление категориями"
+  breadcrumbs={breadcrumbs}
+>
+  {/* Content */}
+</DashboardLayout>
+```
+
 ## Адаптивность
 
 ### Мобильная версия (< 768px):
@@ -168,11 +291,15 @@ interface DashboardSidebarProps {
 - Кнопка меню в header
 - Overlay при открытом меню
 - Вертикальная компоновка footer
+- Breadcrumbs скрыты, показывается только заголовок страницы
+- Sticky header для лучшей навигации
 
 ### Desktop версия (≥ 768px):
 - Sidebar всегда видим
 - Горизонтальная компоновка footer
-- Полные breadcrumbs
+- Полные breadcrumbs с навигацией
+- Кнопка "Home" для быстрой навигации
+- Расширенная область для действий в header
 
 ## Интеграция с существующей системой
 

@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { canDeleteCategories } from '@/features/dashboard/lib/permissions';
 import { getCategories } from '@/features/dashboard/server-actions/categories';
 import { CategoryList } from '@/features/dashboard/ui/components/ContentManagement/CategoryList';
+import { DashboardBreadcrumbs } from '@/features/dashboard/ui/DashboardBreadcrumbs';
 import { auth } from '@/shared/api/auth/auth';
 
 async function CategoriesContent() {
@@ -16,11 +17,11 @@ async function CategoriesContent() {
     redirect('/dashboard');
   }
 
-  // Получаем все категории для клиентской фильтрации
+  // Get all categories for client-side filtering
   const result = await getCategories('all');
 
   if (!result.success || !result.data) {
-    throw new Error(result.message || 'Ошибка получения данных');
+    throw new Error(result.message || 'Error getting data');
   }
 
   const { categories, stats } = result.data;
@@ -32,15 +33,26 @@ async function CategoriesContent() {
 }
 
 export default function CategoriesPage() {
+  const breadcrumbs = [
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Content', href: '/dashboard/content' },
+    { label: 'Categories' },
+  ];
+
   return (
     <div className="space-y-6">
+      {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Управление категориями</h1>
-          <p className="text-muted-foreground">Создавайте и управляйте категориями для стихов</p>
+          <h1 className="text-3xl font-bold">Category Management</h1>
+          <p className="text-muted-foreground">Create and manage categories for poems</p>
         </div>
       </div>
 
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumbs breadcrumbs={breadcrumbs} />
+
+      {/* Content */}
       <Suspense
         fallback={
           <div className="space-y-6">

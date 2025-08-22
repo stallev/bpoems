@@ -43,7 +43,7 @@ export function CategoryCreateForm() {
     },
   });
 
-  // Обработка успешного создания через useEffect
+  // Handle successful creation through useEffect
   useEffect(() => {
     if (state.success) {
       setIsExpanded(false);

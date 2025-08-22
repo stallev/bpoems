@@ -27,7 +27,7 @@ export function CategoryList({ categories, stats, isLoading, canDelete }: Catego
   const [, startTransition] = useTransition();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
-  // Фильтрация категорий
+  // Filter categories
   const filteredCategories = useMemo(() => {
     switch (activeFilter) {
       case 'active':

@@ -46,7 +46,7 @@ export function CategoryEditForm({ category, onCancel, onSuccess }: CategoryEdit
     },
   });
 
-  // Обработка успешного обновления через useEffect
+  // Handle successful update through useEffect
   useEffect(() => {
     if (state.success) {
       onSuccess();
