@@ -72,3 +72,22 @@ export interface UpdateCategoryData {
   order?: number;
   translations?: TranslationValues;
 }
+
+// Type for category filters
+export interface CategoryFilters {
+  isActive?: boolean;
+  search?: string;
+  orderBy?: 'name' | 'order' | 'createdAt' | 'updatedAt';
+  orderDirection?: 'asc' | 'desc';
+  limit?: number;
+  offset?: number;
+}
+
+// Type for category statistics
+export interface CategoryStats {
+  totalCategories: number;
+  activeCategories: number;
+  inactiveCategories: number;
+  categoriesWithPoems: number;
+  averagePoemsPerCategory: number;
+}

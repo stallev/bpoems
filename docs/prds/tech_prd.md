@@ -27,6 +27,153 @@
 - **Alternative Approaches Consideration:** Developers should review and understand the alternative approaches mentioned in the task description document and the rationale for the recommended approach
 - **Best Practices Adherence:** Implementation must follow the best practices from the official documentation of each technology, according to the specific version being used
 
+### Server Actions Requirements
+
+**MANDATORY:** All server-side operations, including form processing and data fetching, MUST be implemented using Next.js Server Actions. This requirement applies to:
+
+#### Form Processing
+- **User Registration and Login:** All authentication forms must use server actions
+- **Content Creation and Editing:** All forms for creating/editing poems, categories, user profiles, etc.
+- **Data Updates:** All operations that modify data in the database
+- **File Uploads:** All file upload operations must be handled through server actions
+
+#### Data Fetching
+- **Dashboard Data:** All data fetching for dashboard pages must use server actions
+- **User Profile Data:** Profile information retrieval must use server actions
+- **Content Lists:** All content listing operations (poems, categories, users, etc.)
+- **Search Operations:** All search functionality must be implemented via server actions
+
+#### Implementation Standards
+- **File Structure:** Server actions must be organized in `src/features/{feature-name}/server-actions/` directories
+- **Naming Convention:** Server action files must follow the pattern `{actionName}.ts` (e.g., `createCategory.ts`, `updateUser.ts`)
+- **Error Handling:** All server actions must include comprehensive error handling with proper error messages
+- **Validation:** All server actions must validate input data using Zod schemas
+- **Authentication:** All server actions must verify user authentication and authorization
+- **Revalidation:** Server actions must properly revalidate cache using `revalidatePath()` and `revalidateTag()`
+- **Type Safety:** All server actions must be fully typed with TypeScript
+
+#### Server Action Structure Example
+```typescript
+// src/features/dashboard/server-actions/categories/createCategory.ts
+'use server';
+
+import { revalidatePath } from 'next/cache';
+import { auth } from '@/shared/api/auth/auth';
+import { categoryRepository } from '@/entities/category';
+import { categoryFormSchema } from '@/features/dashboard/model/schemas';
+import { CATEGORY_ERRORS, CATEGORY_SUCCESS } from '@/entities/category/constants';
+
+export async function createCategory(formData: FormData) {
+  try {
+    // 1. Authentication check
+    const session = await auth();
+    if (!session?.user) {
+      throw new Error(CATEGORY_ERRORS.ACCESS_DENIED);
+    }
+
+    // 2. Authorization check
+    if (!['ADMIN', 'MODERATOR'].includes(session.user.role)) {
+      throw new Error(CATEGORY_ERRORS.MODERATOR_REQUIRED);
+    }
+
+    // 3. Data parsing and validation
+    const rawData = {
+      translations: {
+        EN: formData.get('translations.EN') as string,
+        RU: formData.get('translations.RU') as string,
+        UA: formData.get('translations.UA') as string,
+      },
+      isActive: formData.get('isActive') === 'true',
+      order: formData.get('order') ? Number(formData.get('order')) : undefined,
+    };
+
+    const validatedData = categoryFormSchema.parse(rawData);
+
+    // 4. Business logic
+    const category = await categoryRepository.create(validatedData);
+
+    // 5. Cache revalidation
+    revalidatePath('/dashboard/content/categories');
+    revalidatePath('/dashboard');
+
+    // 6. Success response
+    return {
+      success: true,
+      message: CATEGORY_SUCCESS.CREATED,
+      data: category,
+    };
+  } catch (error) {
+    // 7. Error handling
+    console.error('Error creating category:', error);
+    
+    if (error instanceof Error) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+
+    return {
+      success: false,
+      message: CATEGORY_ERRORS.UNKNOWN_ERROR,
+    };
+  }
+}
+```
+
+#### Client-Side Integration
+```typescript
+// Client component using server action
+'use client';
+
+import { useFormState } from 'react-dom';
+import { useFormStatus } from 'react-dom';
+import { createCategory } from './server-actions/createCategory';
+
+export function CategoryForm() {
+  const [state, formAction] = useFormState(createCategory, {
+    success: false,
+    message: '',
+  });
+
+  return (
+    <form action={formAction}>
+      {/* Form fields */}
+      <SubmitButton />
+      
+      {state.message && (
+        <div className={state.success ? 'text-green-600' : 'text-red-600'}>
+          {state.message}
+        </div>
+      )}
+    </form>
+  );
+}
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  
+  return (
+    <button type="submit" disabled={pending}>
+      {pending ? 'Сохранение...' : 'Сохранить'}
+    </button>
+  );
+}
+```
+
+#### Prohibited Patterns
+- **API Routes for Forms:** Do NOT use API routes (`/api/*`) for form processing
+- **Client-Side Data Fetching:** Do NOT use `fetch()` or `axios` for server operations in forms
+- **Direct Database Access:** Do NOT access database directly from client components
+- **Bypassing Server Actions:** Do NOT implement custom HTTP endpoints for operations that should use server actions
+
+#### Exceptions
+The following operations MAY use API routes instead of server actions:
+- **Third-party Integrations:** Webhooks and external API integrations
+- **File Serving:** Static file serving and media delivery
+- **Real-time Features:** WebSocket connections and real-time updates
+- **Public APIs:** External API endpoints for third-party consumption
+
 ### Architecture
 - **Feature-Sliced Design (FSD) Implementation:** All development must strictly follow Feature-Sliced Design methodology, adapted to the current technology stack (Next.js 15.4.4, TypeScript, Prisma v6.13.0, Auth.js v5 beta)
 - **Layer Separation:** Clear separation between app, pages, widgets, features, entities, and shared layers

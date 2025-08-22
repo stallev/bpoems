@@ -14,3 +14,7 @@ export function useDashboardPermissions(): DashboardPermissions {
     canManageRoles: userRole === 'ADMIN',
   };
 }
+
+export function canDeleteCategories(userRole?: string): boolean {
+  return userRole === 'ADMIN';
+}

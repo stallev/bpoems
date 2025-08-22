@@ -73,22 +73,45 @@ export const CATEGORY_VALIDATION = {
 
 // Category error messages
 export const CATEGORY_ERRORS = {
-  NAME_REQUIRED: 'Category name is required',
-  NAME_TOO_SHORT: `Category name must be at least ${CATEGORY_VALIDATION.MIN_NAME_LENGTH} characters`,
-  NAME_TOO_LONG: `Category name must be no more than ${CATEGORY_VALIDATION.MAX_NAME_LENGTH} characters`,
-  NAME_ALREADY_EXISTS: 'Category with this name already exists',
-  ORDER_INVALID: `Order must be between ${CATEGORY_VALIDATION.MIN_ORDER} and ${CATEGORY_VALIDATION.MAX_ORDER}`,
-  TRANSLATIONS_REQUIRED: 'Translations are required for all languages',
-  CATEGORY_NOT_FOUND: 'Category not found',
-  CATEGORY_IN_USE: 'Cannot delete category that has poems',
+  // Валидация
+  NAME_TOO_SHORT: 'Название категории должно содержать минимум 2 символа',
+  NAME_TOO_LONG: 'Название категории не должно превышать 50 символов',
+  NAME_REQUIRED: 'Название категории обязательно для заполнения',
+  ORDER_INVALID: 'Порядковый номер должен быть от 0 до 1000',
+  ORDER_REQUIRED: 'Порядковый номер обязателен для заполнения',
+
+  // Уникальность
+  NAME_EXISTS: 'Категория с таким названием уже существует',
+  NAME_EXISTS_EN: 'Category with this name already exists',
+  NAME_EXISTS_RU: 'Категория с таким названием уже существует',
+  NAME_EXISTS_UA: 'Категорія з такою назвою вже існує',
+
+  // Операции
+  NOT_FOUND: 'Категория не найдена',
+  CREATE_FAILED: 'Ошибка при создании категории',
+  UPDATE_FAILED: 'Ошибка при обновлении категории',
+  DELETE_FAILED: 'Ошибка при удалении категории',
+  ACTIVATE_FAILED: 'Ошибка при активации категории',
+  DEACTIVATE_FAILED: 'Ошибка при деактивации категории',
+  ORDER_UPDATE_FAILED: 'Ошибка при обновлении порядка',
+
+  // Права доступа
+  ACCESS_DENIED: 'Недостаточно прав для выполнения операции',
+  MODERATOR_REQUIRED: 'Требуются права модератора или администратора',
+
+  // Системные ошибки
+  DATABASE_ERROR: 'Ошибка базы данных',
+  VALIDATION_ERROR: 'Ошибка валидации данных',
+  UNKNOWN_ERROR: 'Неизвестная ошибка',
 } as const;
 
 // Category success messages
 export const CATEGORY_SUCCESS = {
-  CREATED: 'Category created successfully',
-  UPDATED: 'Category updated successfully',
-  DELETED: 'Category deleted successfully',
-  ACTIVATED: 'Category activated successfully',
-  DEACTIVATED: 'Category deactivated successfully',
-  ORDER_UPDATED: 'Category order updated successfully',
+  CREATED: 'Категория успешно создана',
+  UPDATED: 'Категория успешно обновлена',
+  DELETED: 'Категория успешно удалена',
+  ACTIVATED: 'Категория успешно активирована',
+  DEACTIVATED: 'Категория успешно деактивирована',
+  ORDER_UPDATED: 'Порядок категорий успешно обновлен',
+  BULK_OPERATION_COMPLETED: 'Массовая операция выполнена успешно',
 } as const;
