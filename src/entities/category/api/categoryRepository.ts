@@ -9,6 +9,7 @@ import type {
   CreateCategoryData,
   UpdateCategoryData,
   TranslationValues,
+  CategoryStats,
 } from '../model/types';
 
 export const categoryRepository = {
@@ -167,12 +168,27 @@ export const categoryRepository = {
   findForDashboard: async (params?: {
     skip?: number;
     take?: number;
-    includeInactive?: boolean;
+    filter?: 'all' | 'active' | 'inactive';
   }): Promise<CategoryWithTranslation[]> => {
-    const { skip, take, includeInactive = false } = params || {};
+    const { skip, take, filter = 'all' } = params || {};
+
+    // Определяем условие фильтрации
+    let whereCondition = {};
+    switch (filter) {
+      case 'active':
+        whereCondition = { isActive: true };
+        break;
+      case 'inactive':
+        whereCondition = { isActive: false };
+        break;
+      case 'all':
+      default:
+        whereCondition = {}; // Все категории
+        break;
+    }
 
     const categories = await prisma.category.findMany({
-      where: includeInactive ? {} : { isActive: true },
+      where: whereCondition,
       skip,
       take,
       orderBy: { order: 'asc' },
@@ -273,5 +289,45 @@ export const categoryRepository = {
     });
 
     return (lastCategory?.order || 0) + 1;
+  },
+
+  // Get category statistics
+  getStats: async (): Promise<CategoryStats> => {
+    const [totalCategories, activeCategories, inactiveCategories, categoriesWithPoems, totalPoems] =
+      await Promise.all([
+        prisma.category.count(),
+        prisma.category.count({ where: { isActive: true } }),
+        prisma.category.count({ where: { isActive: false } }),
+        prisma.category.count({
+          where: {
+            poems: {
+              some: {},
+            },
+          },
+        }),
+        prisma.poem.count(),
+      ]);
+
+    const averagePoemsPerCategory = totalCategories > 0 ? totalPoems / totalCategories : 0;
+
+    return {
+      totalCategories,
+      activeCategories,
+      inactiveCategories,
+      categoriesWithPoems,
+      averagePoemsPerCategory,
+    };
+  },
+
+  // Bulk update category order
+  bulkUpdateOrder: async (updates: Array<{ id: string; order: number }>): Promise<void> => {
+    await Promise.all(
+      updates.map(({ id, order }) =>
+        prisma.category.update({
+          where: { id },
+          data: { order },
+        })
+      )
+    );
   },
 };

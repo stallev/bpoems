@@ -61,7 +61,7 @@ export async function updateCategory(categoryId: string) {
 export async function getCategoriesForDashboard() {
   try {
     const dashboardCategories = await categoryRepository.findForDashboard({
-      includeInactive: true,
+      filter: 'all', // Получаем все категории (активные и неактивные)
     });
     console.log('Categories for dashboard:', dashboardCategories.length);
     return dashboardCategories;

@@ -68,13 +68,13 @@ export function UserDropdownMenu({ userRole }: UserDropdownMenuProps) {
         userRole === UserRole.ADMIN ? (
           <div className="my-2 flex flex-col gap-4">
             <DropdownMenuItem asChild>
-              <Link href={`${RoutePath.POEMS_LIST.path}?author=${session?.user?.name || 'user'}`}>
+              <Link href={RoutePath.PROFILE_MY_POEMS.path}>
                 <Book className="mr-2 h-4 w-4" />
                 <span>Мои стихи</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href={RoutePath.POEM_CREATE.path}>
+              <Link href={RoutePath.PROFILE_ADD_POEM.path}>
                 <Pencil className="mr-2 h-4 w-4" />
                 <span>Создать стих</span>
               </Link>
