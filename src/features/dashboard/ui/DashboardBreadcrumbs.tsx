@@ -1,5 +1,5 @@
 import { Home } from 'lucide-react';
-import Link from 'next/link';
+import * as React from 'react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -22,29 +22,33 @@ export function DashboardBreadcrumbs({ breadcrumbs = [] }: DashboardBreadcrumbsP
       <Breadcrumb>
         <BreadcrumbList>
           {/* Home Link */}
-          <Link
-            href="/dashboard"
-            className="hidden md:flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Home className="h-4 w-4" />
-            <span>Dashboard</span>
-          </Link>
+          <BreadcrumbItem className="hidden md:flex">
+            <BreadcrumbLink
+              href="/dashboard"
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Home className="h-4 w-4" />
+              <span>Dashboard</span>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
 
           {/* Breadcrumbs */}
           {breadcrumbs.length > 0 && (
             <>
               <BreadcrumbSeparator className="hidden md:block" />
               {breadcrumbs.map((crumb, index) => (
-                <BreadcrumbItem key={index}>
-                  {crumb.href ? (
-                    <BreadcrumbLink href={crumb.href}>{crumb.label}</BreadcrumbLink>
-                  ) : (
-                    <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
-                  )}
+                <React.Fragment key={index}>
+                  <BreadcrumbItem>
+                    {crumb.href ? (
+                      <BreadcrumbLink href={crumb.href}>{crumb.label}</BreadcrumbLink>
+                    ) : (
+                      <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                    )}
+                  </BreadcrumbItem>
                   {index < breadcrumbs.length - 1 && (
                     <BreadcrumbSeparator className="hidden md:block" />
                   )}
-                </BreadcrumbItem>
+                </React.Fragment>
               ))}
             </>
           )}
