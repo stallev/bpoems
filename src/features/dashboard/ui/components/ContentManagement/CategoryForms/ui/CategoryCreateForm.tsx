@@ -4,8 +4,8 @@ import { Plus, X } from 'lucide-react';
 import { useState, useActionState, startTransition, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import { createCategory } from '@/features/dashboard/server-actions/categories';
-import { CategoryForm } from './CategoryForm';
 import { Button } from '@/shared/ui/shadcnComponents/button';
+import { CategoryForm } from './CategoryForm';
 import { useCategoryForm } from '../lib/hooks/useCategoryForm';
 import type { CategoryFormData } from '../model/schemas';
 

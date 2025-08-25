@@ -2,8 +2,7 @@
 
 import { Edit, Trash2, Eye, EyeOff, MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
-import type { CategoryWithTranslation } from '@/entities/category/model/types';
-import type { CategoryRowProps } from '../model/types';
+// Removed unused import
 import { Badge } from '@/shared/ui/shadcnComponents/badge';
 import { Button } from '@/shared/ui/shadcnComponents/button';
 import {
@@ -14,6 +13,7 @@ import {
 } from '@/shared/ui/shadcnComponents/dropdown-menu';
 import { CategoryEditForm } from '../../CategoryForms/ui/CategoryEditForm';
 import { formatDate, getCategoryStatusText, getCategoryStatusVariant } from '../lib/utils';
+import type { CategoryRowProps } from '../model/types';
 
 export const CategoryRow = ({
   category,

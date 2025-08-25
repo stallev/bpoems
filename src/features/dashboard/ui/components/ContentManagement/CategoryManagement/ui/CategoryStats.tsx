@@ -1,12 +1,12 @@
 'use client';
 
 import { BarChart3, Folder, FileText, Users, Eye, EyeOff } from 'lucide-react';
-import type { CategoryStats as CategoryStatsType } from '@/entities/category/model/types';
-import type { CategoryStatsProps } from '../model/types';
+// Removed unused import
 import { Badge } from '@/shared/ui/shadcnComponents/badge';
 import { Button } from '@/shared/ui/shadcnComponents/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/shadcnComponents/card';
 import { calculateInactiveCategories, calculateActivePercentage } from '../lib/utils';
+import type { CategoryStatsProps } from '../model/types';
 
 export const CategoryStats = ({
   stats,

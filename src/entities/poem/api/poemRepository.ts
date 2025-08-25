@@ -23,6 +23,18 @@ export const poemRepository = {
     }) as Promise<PoemWithRelations | null>;
   },
 
+  findBySlug: async (slug: string): Promise<PoemWithRelations | null> => {
+    return prisma.poem.findUnique({
+      where: { slug },
+      include: {
+        author: true,
+        category: { include: { translatedName: true } },
+        tags: true,
+        statistics: true,
+      },
+    }) as Promise<PoemWithRelations | null>;
+  },
+
   findAll: async (params?: {
     skip?: number;
     take?: number;
