@@ -2,23 +2,13 @@
 
 import { BarChart3, Folder, FileText, Users, Eye, EyeOff } from 'lucide-react';
 import type { CategoryStats as CategoryStatsType } from '@/entities/category/model/types';
+import type { CategoryStatsProps } from '../model/types';
 import { Badge } from '@/shared/ui/shadcnComponents/badge';
 import { Button } from '@/shared/ui/shadcnComponents/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/shadcnComponents/card';
+import { calculateInactiveCategories, calculateActivePercentage } from '../lib/utils';
 
-interface CategoryStatsProps {
-  stats: CategoryStatsType;
-  isLoading: boolean;
-  activeFilter?: 'all' | 'active' | 'inactive';
-  onFilterChange?: (filter: 'all' | 'active' | 'inactive') => void;
-}
-
-export function CategoryStats({
-  stats,
-  isLoading,
-  activeFilter = 'all',
-  onFilterChange,
-}: CategoryStatsProps) {
+export const CategoryStats = ({ stats, isLoading, activeFilter, onFilterChange }: CategoryStatsProps) => {
   if (isLoading) {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -42,6 +32,8 @@ export function CategoryStats({
   const isActiveFilter = activeFilter === 'active';
   const isInactiveFilter = activeFilter === 'inactive';
   const isAllFilter = activeFilter === 'all';
+  const inactiveCategories = calculateInactiveCategories(stats.totalCategories, stats.activeCategories);
+  const activePercentage = calculateActivePercentage(stats.totalCategories, stats.activeCategories);
 
   return (
     <div className="space-y-4">
@@ -73,7 +65,7 @@ export function CategoryStats({
             className="h-8 cursor-pointer hover:shadow-md"
           >
             <EyeOff className="h-3 w-3 mr-1" />
-            Неактивные ({stats.totalCategories - stats.activeCategories})
+            Неактивные ({inactiveCategories})
           </Button>
         </div>
       </div>
@@ -144,9 +136,7 @@ export function CategoryStats({
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">
-              {stats.totalCategories - stats.activeCategories}
-            </div>
+            <div className="text-2xl font-bold text-orange-600">{inactiveCategories}</div>
             <p className="text-xs text-muted-foreground">Скрыты от пользователей</p>
           </CardContent>
         </Card>
@@ -185,12 +175,7 @@ export function CategoryStats({
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {stats.totalCategories > 0
-                ? Math.round((stats.activeCategories / stats.totalCategories) * 100)
-                : 0}
-              %
-            </div>
+            <div className="text-2xl font-bold">{activePercentage}%</div>
             <p className="text-xs text-muted-foreground">Категорий активно</p>
           </CardContent>
         </Card>
@@ -208,4 +193,4 @@ export function CategoryStats({
       </div>
     </div>
   );
-}
+};

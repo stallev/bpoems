@@ -26,6 +26,9 @@
 - **Documentation First Approach:** Before implementing any task, the detailed description document must be created or reviewed if it already exists
 - **Alternative Approaches Consideration:** Developers should review and understand the alternative approaches mentioned in the task description document and the rationale for the recommended approach
 - **Best Practices Adherence:** Implementation must follow the best practices from the official documentation of each technology, according to the specific version being used
+- **Code Review Requirement:** Before making any changes to the project code, the CursorAI agent must double-check the proposed code for correctness, completeness, and compliance with project requirements
+- **CursorAI Agent Rule:** "Before implementing any code changes, the CursorAI agent must thoroughly review and validate the proposed code to ensure it meets all project requirements, follows established patterns, and maintains code quality standards. This includes checking for proper TypeScript typing, FSD architecture compliance, SOLID principles adherence, and PRD requirements fulfillment."
+- **Documentation Language Requirement:** All project documentation, code comments, and technical specifications must be written exclusively in English. This includes PRD files, architecture documents, inline code comments, and development documentation.
 
 ### Server Actions Requirements
 
@@ -182,6 +185,91 @@ The following operations MAY use API routes instead of server actions:
 - **Shared Layer:** Common utilities, UI components, and configurations should be in the shared layer
 - **Strict Import Rules:** Enforce FSD import rules (layers can only import from layers below them)
 - **SOLID Principles:** Strict adherence to Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion principles
+
+### React Component Development Standards
+
+#### Component Structure Requirements
+- **Arrow Function Components:** All React components must be implemented as arrow functions
+- **FSD Architecture Compliance:** Components must follow Feature-Sliced Design methodology with proper layer separation
+- **Proper Folder Structure:** Each feature must have the following structure:
+  ```
+  src/features/feature-name/
+  ├── ui/
+  │   ├── ComponentName.tsx
+  │   └── index.ts
+  ├── model/
+  │   ├── types.ts
+  │   ├── schemas.ts
+  │   ├── constants.ts
+  │   └── index.ts
+  ├── lib/
+  │   ├── hooks/
+  │   │   ├── useHookName.ts
+  │   │   └── index.ts
+  │   ├── utils/
+  │   │   ├── utilsName.ts
+  │   │   └── index.ts
+  │   └── index.ts
+  ├── server-actions/
+  │   ├── actionName.ts
+  │   └── index.ts
+  └── index.ts
+  ```
+
+#### Code Reusability Requirements
+- **Base Component Pattern:** Create reusable base components for common functionality
+- **Custom Hooks:** Extract reusable logic into custom hooks
+- **Utility Functions:** Create utility functions for common operations
+- **Composition Pattern:** Use composition over inheritance for component extension
+
+#### TypeScript Requirements
+- **Strict Typing:** All components, props, states, and functions must be strictly typed
+- **Interface Definitions:** Define clear interfaces for all component props and data structures
+- **Type Safety:** Ensure type safety across all layers of the application
+- **Generic Types:** Use generic types where appropriate for reusable components
+
+#### SOLID Principles Implementation
+- **Single Responsibility Principle:** Each component should have a single, well-defined responsibility
+- **Open/Closed Principle:** Components should be open for extension but closed for modification
+- **Liskov Substitution Principle:** Derived components should be substitutable for their base components
+- **Interface Segregation Principle:** Components should not be forced to depend on interfaces they don't use
+- **Dependency Inversion Principle:** High-level components should not depend on low-level components
+
+#### PRD Compliance Requirements
+- **Multilingual Support:** All components must support multiple languages (EN, RU, UA) with proper internationalization
+- **Error Handling:** Implement comprehensive error handling with user-friendly error messages
+- **Server Actions Integration:** All forms and data operations must use Server Actions
+- **Accessibility:** Ensure components meet accessibility standards (ARIA attributes, keyboard navigation)
+- **Performance:** Optimize components for performance (memoization, lazy loading, code splitting)
+
+#### Form Development Standards
+- **React Hook Form Integration:** Use React Hook Form with Zod validation for all forms
+- **Server Actions:** All form submissions must use Server Actions with proper error handling
+- **Validation:** Implement both client-side and server-side validation
+- **User Experience:** Provide immediate feedback, loading states, and clear error messages
+- **Accessibility:** Ensure forms are accessible with proper labels, ARIA attributes, and keyboard navigation
+
+#### Hook Development Standards
+- **Custom Hooks:** Create custom hooks for reusable logic and state management
+- **Type Safety:** All hooks must be properly typed with TypeScript
+- **Error Handling:** Implement proper error handling in hooks
+- **Performance:** Optimize hooks for performance (useMemo, useCallback where appropriate)
+- **Testing:** Ensure hooks are testable and well-documented
+
+#### Utility Development Standards
+- **Pure Functions:** Utility functions should be pure and side-effect free
+- **Type Safety:** All utility functions must be properly typed
+- **Reusability:** Utilities should be designed for reuse across the application
+- **Performance:** Optimize utilities for performance
+- **Documentation:** Provide clear documentation for all utility functions
+
+#### Server Actions Standards
+- **Authentication:** All Server Actions must verify user authentication and authorization
+- **Validation:** Implement comprehensive input validation using Zod schemas
+- **Error Handling:** Provide detailed error messages and proper error logging
+- **Cache Management:** Use proper cache invalidation with revalidatePath and revalidateTag
+- **Type Safety:** Ensure all Server Actions are properly typed
+- **Security:** Implement security best practices (input sanitization, CSRF protection)
 
 ### Performance
 - Fast page loads and smooth interactions

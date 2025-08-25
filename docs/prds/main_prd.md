@@ -315,6 +315,14 @@ The platform implements comprehensive multilingual support with the following la
 
 For detailed technical requirements, architecture specifications, and implementation guidelines, please refer to the [Technical Requirements Document](tech_prd.md).
 
+## Documentation Requirements
+
+### Language Requirements
+- **English Only**: All project documentation, including PRD files, technical specifications, and architecture documents, must be written exclusively in English
+- **Code Comments**: All comments in TypeScript/JavaScript files must be written in English
+- **User Interface Text**: While the application supports multiple languages (EN, RU, UA) for end users, all development documentation and code comments must be in English
+- **Consistency**: Maintain consistent English terminology across all documentation and code comments
+
 ### Task Documentation Requirements
 
 - **Detailed Task Descriptions:** Each task defined in the release files under `docs/tasks/` must have a corresponding detailed description document in `docs/tasks_descriptions/release_X.Y/` directory

@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { canDeleteCategories } from '@/features/dashboard/lib/permissions';
 import { getCategories } from '@/features/dashboard/server-actions/categories';
-import { CategoryList } from '@/features/dashboard/ui/components/ContentManagement/CategoryList';
+import { CategoryList } from '@/features/dashboard/ui/components/ContentManagement';
 import { DashboardBreadcrumbs } from '@/features/dashboard/ui/DashboardBreadcrumbs';
 import { auth } from '@/shared/api/auth/auth';
 
@@ -33,11 +33,7 @@ async function CategoriesContent() {
 }
 
 export default function CategoriesPage() {
-  const breadcrumbs = [
-    { label: 'Dashboard', href: '/dashboard' },
-    { label: 'Content', href: '/dashboard/content' },
-    { label: 'Categories' },
-  ];
+  const breadcrumbs = [{ label: 'Content', href: '/dashboard/content' }, { label: 'Categories' }];
 
   return (
     <div className="space-y-6">
