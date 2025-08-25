@@ -33,6 +33,7 @@ enum ContentApprovalStatus {
   PENDING // Awaiting moderator review (for non-authors)
   APPROVED // Approved and published (default for Authors)
   REJECTED // Rejected by moderator
+  PENDINGREVIEW // Pending review due to a claim report
 }
 
 // Status for user accounts managed by moderators/admins
@@ -53,6 +54,13 @@ enum Locale {
   EN
   RU
   UA
+}
+
+// Resource types for claim reports
+enum ClaimResourceType {
+  POEM
+  COMMENT
+  REVIEW
 }
 
 // === Core Models for Authentication (Auth.js / NextAuth) ===
@@ -87,7 +95,8 @@ model User {
   readingLists           ReadingList[]
   authorRequests         AuthorRoleRequest[] @relation("AuthorRequests") // Requests made by this user
   authorRequestApprovals AuthorRoleRequest[] @relation("AuthorRequestApprovals") // Requests approved/rejected by this user (if Moderator/Admin)
-  // Add other relations as features are implemented (e.g., notifications)
+  claimReports           ClaimReport[]       @relation("ClaimReporter") // Claims reported by this user
+  handledClaims          ClaimReport[]       @relation("ClaimHandler") // Claims handled by this user (Moderator/Admin)
 }
 
 // Account model for storing linked OAuth accounts and Credentials info
@@ -175,6 +184,7 @@ model Tag {
 // Main model for poems
 model Poem {
   id          String                @id @default(cuid())
+  slug        String                @unique
   title       String
   content     Json // Rich text content from WYSIWYG editor as JSON
   description String? // Optional short description
@@ -182,7 +192,7 @@ model Poem {
   author      User                  @relation(fields: [authorId], references: [id])
   status      ContentApprovalStatus @default(APPROVED) // Authors: APPROVED; Others: PENDING
   categoryId  String?
-  category    Category?             @relation("PoemCategory", fields: [categoryId], references: [id], onDelete: Cascade)
+  category    Category?             @relation("PoemCategory", fields: [categoryId], references: [id])
   tags        Tag[] // Many-to-many relation via implicit join table
   statistics  Statistics?           @relation("PoemStatistics")
 
@@ -195,10 +205,7 @@ model Poem {
   comments        Comment[]
   ratings         Rating[]
   reviews         Review[]
-  // Add relation for collections/anthologies when implemented
-  // Consider adding full-text search index on title and content
-  // Full-text search index for PostgreSQL (if supported by Prisma and Neon)
-  // @@fulltext([title, content]) // Requires enabling full-text index in Prisma
+  claimReports    ClaimReport[] @relation("PoemClaims")
   ReadingListItem ReadingListItem[]
 
   @@index([authorId]) // Index for finding poems by author
@@ -209,30 +216,29 @@ model Poem {
 
 // Model for user comments on poems
 model Comment {
-  id       String @id @default(cuid())
+  id       String                @id @default(cuid())
   content  String // The comment text
   poemId   String
-  poem     Poem   @relation(fields: [poemId], references: [id], onDelete: Cascade)
+  poem     Poem                  @relation(fields: [poemId], references: [id], onDelete: Cascade)
   authorId String
-  author   User   @relation(fields: [authorId], references: [id])
+  author   User                  @relation(fields: [authorId], references: [id])
+  status   ContentApprovalStatus @default(APPROVED) // Default to APPROVED on creation
 
   // Moderation fields
   isApproved Boolean @default(true) // Simple moderation flag for MVP
-  // reportedBy User[] @relation("CommentReports") // Extend for detailed reporting
 
   // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
-  // replies   Comment[] @relation("CommentReplies")
-  // parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
-  // parentId  String?
+  claimReports ClaimReport[] @relation("CommentClaims")
 
   @@index([poemId]) // Index for finding comments on a poem
   @@index([authorId]) // Index for finding comments by a user
   @@index([createdAt]) // Index for sorting comments
   @@index([isApproved]) // Index for filtering approved comments
+  @@index([status]) // Index for filtering by approval status
 }
 
 // Model for poem ratings (1-5 stars)
@@ -254,20 +260,25 @@ model Rating {
 
 // Model for detailed poem reviews
 model Review {
-  id      String  @id @default(cuid())
+  id      String                @id @default(cuid())
   title   String? // Optional title for the review
   content String // The review text
   poemId  String
-  poem    Poem    @relation(fields: [poemId], references: [id])
+  poem    Poem                  @relation(fields: [poemId], references: [id])
   userId  String
-  user    User    @relation(fields: [userId], references: [id])
+  user    User                  @relation(fields: [userId], references: [id])
+  status  ContentApprovalStatus @default(APPROVED) // Default to APPROVED on creation
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Relations
+  claimReports ClaimReport[] @relation("ReviewClaims")
+
   @@unique([userId, poemId]) // A user can only review a poem once
   @@index([poemId]) // Index for finding reviews for a poem
   @@index([userId]) // Index for finding reviews by a user
+  @@index([status]) // Index for filtering by approval status
 }
 
 // Model for user reading lists/collections
@@ -293,7 +304,7 @@ model ReadingList {
 model ReadingListItem {
   id            String      @id @default(cuid())
   readingListId String
-  readingList   ReadingList @relation(fields: [readingListId], references: [id], onDelete: Cascade) // Delete item if list is deleted
+  readingList   ReadingList @relation(fields: [readingListId], references: [id], onDelete: Cascade) // Delete list if list is deleted
   poemId        String
   poem          Poem        @relation(fields: [poemId], references: [id], onDelete: Cascade)
 
@@ -324,4 +335,37 @@ model AuthorRoleRequest {
   @@index([requesterId]) // Index for finding requests by user
   @@index([status]) // Index for filtering requests by status
   @@index([createdAt]) // Index for sorting requests
+}
+
+// Model for claim reports on poems, comments, or reviews
+model ClaimReport {
+  id                    String                @id @default(cuid())
+  resourceType          ClaimResourceType // Type of resource (POEM, COMMENT, REVIEW)
+  poemId                String? // Nullable if not a poem
+  poem                  Poem?   @relation("PoemClaims", fields: [poemId], references: [id], onDelete: Cascade)
+  commentId             String? // Nullable if not a comment
+  comment               Comment? @relation("CommentClaims", fields: [commentId], references: [id], onDelete: Cascade)
+  reviewId              String? // Nullable if not a review
+  review                Review? @relation("ReviewClaims", fields: [reviewId], references: [id], onDelete: Cascade)
+  message               String // User's message about the claim
+  reporterId            String? // Nullable for unauthenticated users
+  reporter              User?   @relation("ClaimReporter", fields: [reporterId], references: [id])
+  claimResultDecision   ContentApprovalStatus? // APPROVED, REJECTED, or null if pending
+  claimResultDecisionAt DateTime? // Timestamp of decision
+  handlerId             String? // ID of Moderator/Admin who handled the claim
+  handler               User?   @relation("ClaimHandler", fields: [handlerId], references: [id])
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Indexes for performance
+  @@index([resourceType])
+  @@index([reporterId])
+  @@index([handlerId])
+  @@index([claimResultDecision])
+  @@index([createdAt])
+  @@index([poemId])
+  @@index([commentId])
+  @@index([reviewId])
 }

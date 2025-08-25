@@ -12,7 +12,9 @@ bpoems/
 │   ├── prds/
 │   │   ├── design_prd.md
 │   │   ├── main_prd.md
-│   │   └── tech_prd.md
+│   │   ├── tech_prd.md
+│   │   └── patterns/
+│   │       └── form_pattern.md
 │   ├── specs/
 │   │   ├── design_spec.md
 │   │   ├── pages_specs.md
@@ -63,12 +65,18 @@ bpoems/
 │   │   │           └── route.ts
 │   │   ├── auth/
 │   │   │   └── page.tsx
+│   │   ├── dashboard/
+│   │   │   ├── content/
+│   │   │   │   └── categories/
+│   │   │   │       └── page.tsx
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx
 │   │   ├── poems/
 │   │   │   ├── [slug]/
 │   │   │   │   └── page.tsx
 │   │   │   ├── edit-poem/
 │   │   │   │   └── page.tsx
-│   │   │   └── new-poem/
+│   │   │   └── add-poem/
 │   │   │       └── page.tsx
 │   │   ├── profile/
 │   │   │   └── page.tsx
@@ -115,14 +123,84 @@ bpoems/
 │   │       └── view/
 │   │           └── UserCard.tsx
 │   ├── features/                      # ✅ Features Layer
-│   │   └── auth/
-│   │       ├── constants/
-│   │       │   └── AuthConstants.ts
+│   │   ├── auth/
+│   │   │   ├── constants/
+│   │   │   │   └── AuthConstants.ts
+│   │   │   ├── server-actions/
+│   │   │   │   ├── login.ts
+│   │   │   │   └── register.ts
+│   │   │   └── ui/
+│   │   │       └── AuthForm.tsx
+│   │   └── dashboard/                 # ✅ Dashboard Feature
+│   │       ├── lib/
+│   │       │   ├── hooks/
+│   │       │   │   ├── index.ts
+│   │       │   │   ├── useCategoryActions.ts
+│   │       │   │   └── useCategoryFilters.ts
+│   │       │   ├── permissions.ts
+│   │       │   ├── utils/
+│   │       │   │   ├── index.ts
+│   │       │   │   └── categoryUtils.ts
+│   │       │   └── index.ts
+│   │       ├── model/
+│   │       │   ├── constants.ts
+│   │       │   ├── index.ts
+│   │       │   ├── schemas.ts
+│   │       │   └── types.ts
 │   │       ├── server-actions/
-│   │       │   ├── login.ts
-│   │       │   └── register.ts
+│   │       │   ├── categories/
+│   │       │   │   ├── createCategory.ts
+│   │       │   │   ├── deleteCategory.ts
+│   │       │   │   ├── getCategories.ts
+│   │       │   │   ├── toggleCategoryStatus.ts
+│   │       │   │   └── updateCategory.ts
+│   │       │   └── index.ts
 │   │       └── ui/
-│   │           └── AuthForm.tsx
+│   │           ├── components/
+│   │           │   └── ContentManagement/  # ✅ Content Management Feature
+│   │           │       ├── CategoryForms/  # ✅ Category Forms Slice
+│   │           │       │   ├── lib/
+│   │           │       │   │   ├── hooks/
+│   │           │       │   │   │   ├── index.ts
+│   │           │       │   │   │   └── useCategoryForm.ts
+│   │           │       │   │   └── index.ts
+│   │           │       │   ├── model/
+│   │           │       │   │   ├── index.ts
+│   │           │       │   │   ├── schemas.ts
+│   │           │       │   │   └── types.ts
+│   │           │       │   ├── ui/
+│   │           │       │   │   ├── CategoryCreateForm.tsx
+│   │           │       │   │   ├── CategoryEditForm.tsx
+│   │           │       │   │   ├── CategoryForm.tsx
+│   │           │       │   │   └── index.ts
+│   │           │       │   └── index.ts
+│   │           │       ├── CategoryManagement/  # ✅ Category Management Slice
+│   │           │       │   ├── lib/
+│   │           │       │   │   ├── hooks/
+│   │           │       │   │   │   ├── index.ts
+│   │           │       │   │   │   ├── useCategoryActions.ts
+│   │           │       │   │   │   └── useCategoryFilters.ts
+│   │           │       │   │   ├── utils/
+│   │           │       │   │   │   ├── categoryUtils.ts
+│   │           │       │   │   │   └── index.ts
+│   │           │       │   │   └── index.ts
+│   │           │       │   ├── model/
+│   │           │       │   │   ├── constants.ts
+│   │           │       │   │   ├── index.ts
+│   │           │       │   │   └── types.ts
+│   │           │       │   ├── ui/
+│   │           │       │   │   ├── CategoryList.tsx
+│   │           │       │   │   ├── CategoryRow.tsx
+│   │           │       │   │   ├── CategoryStats.tsx
+│   │           │       │   │   └── index.ts
+│   │           │       │   └── index.ts
+│   │           │       └── index.ts
+│   │           ├── DashboardBreadcrumbs.tsx
+│   │           ├── DashboardFooter.tsx
+│   │           ├── DashboardHeader.tsx
+│   │           ├── DashboardLayout.tsx
+│   │           ├── DashboardSidebar.tsx
+│   │           └── index.ts
 │   ├── generated/                     # ⚠️ Нестандартная папка
 │   ├── lib/                          # ⚠️ Нестандартная папка
 │   │   └── utils.ts
@@ -234,28 +312,62 @@ bpoems/
 
 #### 1. **Правильная иерархия слоев**
 - **App Layer + Pages Layer** (`src/app/`) - корректно размещен для Next.js App Router
-- **Entities Layer** (`src/entities/`) - содержит бизнес-сущности (user, poem)
-- **Features Layer** (`src/features/`) - содержит пользовательские функции (auth)
+- **Entities Layer** (`src/entities/`) - содержит бизнес-сущности (user, poem, category)
+- **Features Layer** (`src/features/`) - содержит пользовательские функции (auth, dashboard)
 - **Widgets Layer** (`src/widgets/`) - содержит сложные UI блоки (header, footer)
 - **Shared Layer** (`src/shared/`) - содержит общие утилиты и компоненты
 
-#### 2. **Структура сегментов в entities**
+#### 2. **Новая структура Dashboard Feature** ✅
 ```
-entities/poem/
-├── api/           # API интеграция
-├── constants/     # Константы
-├── model/         # Бизнес-логика и типы
-└── view/          # UI компоненты
+features/dashboard/
+├── lib/                    # Утилиты и хуки
+│   ├── hooks/             # Кастомные хуки
+│   ├── utils/             # Утилиты
+│   └── permissions.ts     # Логика разрешений
+├── model/                 # Бизнес-логика
+│   ├── constants.ts       # Константы
+│   ├── schemas.ts         # Zod схемы
+│   └── types.ts           # TypeScript типы
+├── server-actions/        # Server Actions
+│   └── categories/        # Действия с категориями
+└── ui/                    # UI компоненты
+    └── components/
+        └── ContentManagement/
+            ├── CategoryForms/    # Слайс форм категорий
+            └── CategoryManagement/ # Слайс управления категориями
 ```
 
-#### 3. **Правильное размещение UI компонентов**
+#### 3. **Правильная структура сегментов в ContentManagement**
+```
+ContentManagement/
+├── CategoryForms/         # ✅ Слайс форм
+│   ├── lib/              # Утилиты и хуки для форм
+│   ├── model/            # Схемы и типы форм
+│   ├── ui/               # UI компоненты форм
+│   └── index.ts          # Публичный API
+└── CategoryManagement/   # ✅ Слайс управления
+    ├── lib/              # Утилиты и хуки управления
+    ├── model/            # Константы и типы управления
+    ├── ui/               # UI компоненты управления
+    └── index.ts          # Публичный API
+```
+
+#### 4. **Полная структура сегментов в каждом слайсе**
+- **ui/** - UI компоненты с правильными экспортами
+- **model/** - Бизнес-логика, типы, схемы, константы
+- **lib/** - Утилиты и кастомные хуки
+- **index.ts** - Публичный API для каждого слайса
+
+#### 5. **Правильное размещение UI компонентов**
 - `shared/ui/shadcnComponents/` - переиспользуемые компоненты
 - `widgets/header/ui/` - UI компоненты виджетов
-- `features/auth/ui/` - UI компоненты функций
+- `features/dashboard/ui/` - UI компоненты функций
+- `features/dashboard/ui/components/ContentManagement/` - специализированные компоненты
 
-#### 4. **API структура**
+#### 6. **API структура**
 - `shared/api/` - общие API утилиты
 - `entities/*/api/` - API для сущностей
+- `features/dashboard/server-actions/` - Server Actions для функций
 - `app/api/` - роут-хендлеры Next.js
 
 ### ⚠️ Проблемы и рекомендации
@@ -276,11 +388,6 @@ entities/poem/
 В Next.js App Router страницы находятся в папке `app/`, что корректно для FSD архитектуры.
 
 **Статус:** ✅ Правильно реализовано
-
-#### 4. **Неполная структура сегментов**
-Некоторые сущности и функции не имеют полной структуры сегментов (ui, model, lib, api).
-
-**Рекомендация:** Дополнить недостающие сегменты.
 
 ### 🔧 Рекомендации по улучшению
 
@@ -314,18 +421,17 @@ src/
 | Аспект | Оценка | Комментарий |
 |--------|--------|-------------|
 | Иерархия слоев | 9/10 | Правильная структура для Next.js App Router |
-| Структура сегментов | 6/10 | Частично реализована |
-| Принципы импорта | 7/10 | В основном соблюдаются |
-| Публичные API | 5/10 | Не везде реализованы |
-| Изоляция слоев | 7/10 | Хорошая изоляция |
-| **Общая оценка** | **6.8/10** | **Хорошая основа, требует доработки** |
+| Структура сегментов | 8/10 | Хорошо реализована в новых компонентах |
+| Принципы импорта | 8/10 | В основном соблюдаются |
+| Публичные API | 7/10 | Реализованы в новых компонентах |
+| Изоляция слоев | 8/10 | Хорошая изоляция |
+| **Общая оценка** | **8.0/10** | **Отличная основа, требует небольших доработок** |
 
 ### 🎯 Приоритетные задачи
 
 1. **Высокий приоритет:**
    - Удалить нестандартные папки (`src/generated/`, `src/lib/`)
-   - Дополнить структуру сегментов
-   - Удалить пустые папки в `shared/`
+   - Удалить пустые папки в `shared/` (`model/`, `providers/`)
 
 2. **Средний приоритет:**
    - Создать публичные API для всех слоев
@@ -337,4 +443,24 @@ src/
    - Добавление тестов
    - Рефакторинг существующего кода
 
-Проект имеет хорошую основу для FSD архитектуры с правильной адаптацией под Next.js App Router. Структура соответствует принципам FSD, но требует доработки в области сегментов и публичных API.
+### 🆕 Новые улучшения
+
+#### 1. **Dashboard Feature** ✅
+- Полная структура сегментов
+- Правильная организация Server Actions
+- Кастомные хуки и утилиты
+- Типизация и схемы валидации
+
+#### 2. **ContentManagement Feature** ✅
+- Разделение на логические слайсы (CategoryForms, CategoryManagement)
+- Полная структура сегментов в каждом слайсе
+- Правильные экспорты и импорты
+- Соблюдение принципов FSD
+
+#### 3. **FSD Compliance** ✅
+- Правильная иерархия слоев
+- Изоляция компонентов
+- Переиспользуемые утилиты
+- Типобезопасность
+
+Проект значительно улучшился в плане соответствия FSD архитектуре. Новая структура компонентов управления категориями демонстрирует правильное применение принципов FSD с полной структурой сегментов, правильными экспортами и хорошей изоляцией. Структура соответствует принципам FSD и адаптирована под Next.js App Router.

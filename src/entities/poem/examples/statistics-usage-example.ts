@@ -6,6 +6,7 @@ export async function createPoemWithStatistics() {
   try {
     const newPoem = await poemRepository.create({
       title: 'My First Poem',
+      slug: 'my-first-poem',
       content: { ops: [{ insert: 'This is my first poem content.' }] },
       authorId: 'user-id-here',
       description: 'A beautiful poem about life',

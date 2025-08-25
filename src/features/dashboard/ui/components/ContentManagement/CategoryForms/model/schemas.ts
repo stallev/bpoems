@@ -2,12 +2,12 @@ import { z } from 'zod';
 
 export const categoryFormSchema = z.object({
   translations: z.object({
-    EN: z.string().min(2, 'Название должно содержать минимум 2 символа').max(50, 'Название не должно превышать 50 символов'),
-    RU: z.string().min(2, 'Название должно содержать минимум 2 символа').max(50, 'Название не должно превышать 50 символов'),
-    UA: z.string().min(2, 'Название должно содержать минимум 2 символа').max(50, 'Название не должно превышать 50 символов'),
+    EN: z.string().min(2, 'Название должно содержать минимум 2 символа'),
+    RU: z.string().min(2, 'Название должно содержать минимум 2 символа'),
+    UA: z.string().min(2, 'Название должно содержать минимум 2 символа'),
   }),
   isActive: z.boolean(),
-  order: z.number().min(0).max(1000).optional(),
+  order: z.number().optional(),
 });
 
 export type CategoryFormData = z.infer<typeof categoryFormSchema>;

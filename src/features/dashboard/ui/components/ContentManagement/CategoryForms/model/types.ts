@@ -1,19 +1,20 @@
-import type { CategoryWithTranslation } from '@/entities/category/model/types';
+import type { CategoryWithTranslation } from '@/entities/category';
 
 export interface CategoryFormProps {
-  defaultValues: CategoryFormData;
   onSubmit: (data: CategoryFormData) => void;
-  children: React.ReactNode;
+  isLoading?: boolean;
+  initialData?: Partial<CategoryFormData>;
 }
 
 export interface CategoryCreateFormProps {
-  // Базовые пропсы для формы создания
+  onSubmit: (data: CategoryFormData) => void;
+  isLoading?: boolean;
 }
 
 export interface CategoryEditFormProps {
   category: CategoryWithTranslation;
-  onCancel: () => void;
-  onSuccess: () => void;
+  onSubmit: (data: CategoryFormData) => void;
+  isLoading?: boolean;
 }
 
 export interface CategoryFormData {

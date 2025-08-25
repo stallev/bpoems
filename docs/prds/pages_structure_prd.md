@@ -20,8 +20,8 @@ src/app/
 │   │   │   └── page.tsx          # Individual poem page (/poems/[slug])
 │   │   ├── edit-poem/
 │   │   │   └── page.tsx          # Edit poem page (/poems/edit-poem)
-│   │   └── new-poem/
-│   │       └── page.tsx          # Create new poem page (/poems/new-poem)
+│   │   └── add-poem/
+│   │       └── page.tsx          # Create new poem page (/poems/add-poem)
 │   ├── profile/
 │   │   └── page.tsx              # User profile page (/profile)
 │   └── users/
@@ -65,7 +65,7 @@ Root Layout (src/app/layout.tsx)
 | `/poems` | `src/app/(noadmin)/poems/page.tsx` | Public | Poems listing |
 | `/poems/[slug]` | `src/app/(noadmin)/poems/[slug]/page.tsx` | Public | Individual poem view |
 | `/poems/edit-poem` | `src/app/(noadmin)/poems/edit-poem/page.tsx` | Private | Edit poem (AUTHOR+) |
-| `/poems/new-poem` | `src/app/(noadmin)/poems/new-poem/page.tsx` | Private | Create poem (AUTHOR+) |
+| `/poems/add-poem` | `src/app/(noadmin)/poems/add-poem/page.tsx` | Private | Create poem (AUTHOR+) |
 | `/profile` | `src/app/(noadmin)/profile/page.tsx` | Private | User profile (SUBSCRIBER+) |
 | `/users` | `src/app/(noadmin)/users/page.tsx` | Public | Users listing |
 | `/dashboard` | `src/app/dashboard/page.tsx` | Private | Admin dashboard (ADMIN only) |
