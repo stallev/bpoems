@@ -31,7 +31,7 @@ This document outlines the requirements for a Christian poetry platform that ser
 **For Authors:**
 - As a Christian author, I want to create an account so that I can publish my poetry
 - As a Christian author, I want to publish my poems with proper formatting using a WYSIWYG editor so that they display beautifully
-- As a Christian author, I want to categorize my poems by genre and add tags so that readers can easily find them
+- As a Christian author, I want to categorize my poems by genre so that readers can easily find them
 - As a Christian author, I want to edit and manage my published poems so that I can maintain quality
 - As a Christian author, I want to view my profile and published works so that I can track my activity
 - As an author, I want my content to be published immediately without moderation so that I can share my work quickly
@@ -41,7 +41,7 @@ This document outlines the requirements for a Christian poetry platform that ser
 - As an author, I want to edit my poems at `/profile/edit-poem/[poemSlug]` so that I can easily manage my content
 
 **For Readers (Unauthenticated):**
-- As a reader, I want to browse Christian poetry by categories and tags so that I can find content I enjoy
+- As a reader, I want to browse Christian poetry by categories so that I can find content I enjoy
 - As a reader, I want to search for specific poems or authors with full-text search so that I can discover new content
 - As a reader, I want to read poems in a clean, distraction-free format so that I can focus on the content
 - As a reader, I want to view author profiles so that I can learn more about the authors
@@ -107,10 +107,10 @@ This document outlines the requirements for a Christian poetry platform that ser
 
 #### Poetry Publishing
 11. The system must allow only users with author role or higher to create new poems
-12. The system must support rich text formatting for poems using a WYSIWYG editor (React Quill)
+12. The system must support rich text formatting for poems using a WYSIWYG editor (React QuillJS)
 13. The system must allow poets to add titles and descriptions to their poems
 14. The system must allow poets to categorize their poems by genre
-15. The system must implement a tagging system for poems to improve content organization and discovery
+15. The system must implement a tagging system for poems to improve content organization and discovery (Future versions - not MVP)
 16. The system must allow only users with author role or higher to edit and delete their own poems
 17. The system must display poems in a clean, readable format
 18. The system must allow moderators and admins to create and manage poem categories
@@ -122,10 +122,10 @@ This document outlines the requirements for a Christian poetry platform that ser
 #### Content Discovery
 23. The system must display a homepage with featured and recent poems
 24. The system must allow users to browse poems by category/genre
-25. The system must allow users to filter poems by tags
+25. The system must allow users to filter poems by tags (Future versions - not MVP)
 26. The system must provide a search function for poems and poets with full-text search capabilities
 27. The system must display individual poem pages with full content
-28. The system must show related poems based on category and tags
+28. The system must show related poems based on category and tags (Future versions - not MVP)
 
 #### Community Features
 29. The system must allow only authenticated users (Subscriber role and above) to leave comments on poems
@@ -146,6 +146,8 @@ This document outlines the requirements for a Christian poetry platform that ser
 42. The system must automatically set content status to REJECTED when claim is approved by moderator/admin
 43. The system must track claim report decisions, timestamps, and handler information
 44. The system must provide a dashboard page for managing claim reports
+45. The system must log all moderation activities (approving/rejecting author requests, banning/suspending users, approving/rejecting content or claims) in the ModerationActivity model for audit trail
+46. The system must provide admins with access to moderation activity logs to monitor moderator performance and ensure accountability
 
 #### Basic Moderation
 45. The system must allow users to report inappropriate content
@@ -163,7 +165,7 @@ This document outlines the requirements for a Christian poetry platform that ser
 
 #### Content Management
 53. The system must allow poets to create collections/anthologies of their work
-54. The system must provide advanced search filters (date, rating, length, tags, etc.)
+54. The system must provide advanced search filters (date, rating, length, etc.)
 55. The system must support poem drafts and scheduled publishing
 56. The system must allow poets to moderate comments on their own poems
 
@@ -199,6 +201,7 @@ This document outlines the requirements for a Christian poetry platform that ser
 - Content approval workflow
 - Notification system for subscribers
 - Ukrainian language support (EN and RU for MVP)
+- Tag system for poems (database schema prepared for future implementation)
 
 ### General Non-Goals
 - AI-generated poetry creation
@@ -226,7 +229,7 @@ The platform implements a hierarchical role-based access control system with the
 
 0. **Reader** (Unauthenticated)
    - Read access to all published content
-   - Browse poems by categories and tags
+   - Browse poems by categories
    - View author profiles
    - Use search functionality
    - Select interface language
@@ -382,6 +385,20 @@ The platform implements comprehensive multilingual support with the following la
 ## Technical Considerations
 
 For detailed technical requirements, architecture specifications, and implementation guidelines, please refer to the [Technical Requirements Document](tech_prd.md).
+
+## Development Requirements
+
+### Code Standards
+- All utility functions must be implemented as arrow functions to ensure consistency and compatibility with modern JavaScript practices.
+- Utility functions must be placed in `src/shared/lib/utils/` and exported via public APIs (`index.ts`) in accordance with FSD architecture.
+- All project documentation, code comments, and technical specifications must be written exclusively in English.
+- Maintain consistent English terminology across all documentation and code comments.
+
+### Architecture Compliance
+- Strict adherence to Feature-Sliced Design (FSD) methodology
+- Proper layer separation and import rules
+- Use of public APIs for all cross-layer communication
+- SOLID principles implementation
 
 ## Documentation Requirements
 

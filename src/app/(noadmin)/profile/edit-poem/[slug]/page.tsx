@@ -1,13 +1,12 @@
 import { redirect, notFound } from 'next/navigation';
 import { poemRepository } from '@/entities/poem';
-import { EditPoemForm } from '@/features/poem-management/ui/PoemForm/ui/EditPoemForm';
-import { auth } from '@/shared/api/auth';
-
-// Local constants
-const PAGE_LABELS = {
-  TITLE: 'Edit Poem',
-  DESCRIPTION: 'Update your poem content and settings',
-} as const;
+import { PoemForm } from '@/features/poem-creation';
+import { POEM_FORM_LABELS } from '@/features/poem-creation/lib/constants';
+import type { PoemContentBlock } from '@/features/poem-creation/model/types';
+import { getCategories } from '@/features/poem-creation/server-actions/getCategories';
+import { auth } from '@/shared/api/auth/auth';
+import { canCreateContent, canModerateContent } from '@/shared/lib/utils/roleUtils';
+import { getRoutePath } from '@/shared/lib/utils/routeUtils';
 
 interface EditPoemPageProps {
   params: Promise<{
@@ -15,41 +14,60 @@ interface EditPoemPageProps {
   }>;
 }
 
-const EditPoemPage = async ({ params }: EditPoemPageProps) => {
+export default async function EditPoemPage({ params }: EditPoemPageProps) {
   const { slug } = await params;
-
-  // 1. Authentication check
+  // Check authentication
   const session = await auth();
   if (!session?.user) {
-    redirect('/auth');
+    redirect(getRoutePath('LOGIN'));
   }
 
-  // 2. Authorization check - only authors can edit poems
-  if (!['AUTHOR', 'MODERATOR', 'ADMIN'].includes(session.user.role)) {
-    redirect('/profile?error=author_role_required');
+  // Check if user has permission to edit poems
+  if (!canCreateContent(session.user.role)) {
+    redirect(getRoutePath('PROFILE'));
   }
 
-  // 3. Fetch the poem
-  const poem = await poemRepository.findBySlug(slug);
+  // Get poem by slug
+  const poem = await poemRepository.getBySlug(slug);
   if (!poem) {
     notFound();
   }
 
-  // 4. Check ownership (authors can only edit their own poems, moderators/admins can edit any)
-  if (session.user.role === 'AUTHOR' && poem.authorId !== session.user.id) {
-    redirect('/profile?error=unauthorized');
+  // Check ownership (only author can edit their own poems, except MODERATOR/ADMIN)
+  if (poem.authorId !== session.user.id && !canModerateContent(session.user.role)) {
+    redirect(getRoutePath('PROFILE'));
   }
 
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">{PAGE_LABELS.TITLE}</h1>
-        <p className="text-muted-foreground">{PAGE_LABELS.DESCRIPTION}</p>
-      </div>
+  // Get categories for the form
+  const categoriesResult = await getCategories();
+  if (!categoriesResult.success) {
+    throw new Error(categoriesResult.message);
+  }
 
-      <EditPoemForm poem={poem} />
+  // Prepare default values for the form
+  const defaultValues = {
+    id: poem.id,
+    title: poem.title,
+    categoryId: poem.categoryId || '',
+    content: poem.content as unknown as PoemContentBlock[],
+  };
+
+  return (
+    <div className="container mx-auto py-8 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
+            {POEM_FORM_LABELS.RU.EDIT_TITLE}
+          </h1>
+          <p className="text-muted-foreground">
+            Отредактируйте ваше стихотворение, изменив заголовок, категорию или содержимое.
+          </p>
+        </div>
+
+        <div className="bg-card rounded-lg border p-6">
+          <PoemForm defaultValues={defaultValues} categories={categoriesResult.data} />
+        </div>
+      </div>
     </div>
   );
-};
-
-export default EditPoemPage;
+}

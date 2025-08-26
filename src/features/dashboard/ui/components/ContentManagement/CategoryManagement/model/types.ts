@@ -27,7 +27,7 @@ export interface CategoryStatsProps {
 export interface CategoryActionState {
   success: boolean;
   message: string;
-  data?: any;
+  data?: { id: string };
 }
 
 export interface CategoryFormData {

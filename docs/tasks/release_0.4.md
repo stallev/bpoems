@@ -52,7 +52,7 @@ Core functionality for authors following Feature-Sliced Design architecture with
 
 - [ ] 5.0 WYSIWYG Editor Integration
   - [ ] 5.1 Create shared WYSIWYG editor utilities
-  - [ ] 5.2 Integrate React Quill editor in poem creation
+  - [ ] 5.2 Integrate React QuillJS editor in poem creation
   - [ ] 5.3 Create custom editor toolbar
   - [ ] 5.4 Implement content sanitization
   - [ ] 5.5 Create editor configuration system

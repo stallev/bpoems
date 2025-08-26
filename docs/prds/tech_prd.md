@@ -227,6 +227,8 @@ The following operations MAY use API routes instead of server actions:
 - **Interface Definitions:** Define clear interfaces for all component props and data structures
 - **Type Safety:** Ensure type safety across all layers of the application
 - **Generic Types:** Use generic types where appropriate for reusable components
+- **No `any` Type:** The `any` type must not be used in hooks, components, or utilities. Instead, define specific types in `src/features/*/model/types.ts` or other appropriate FSD locations and import them as needed
+- **Explicit Typing:** All new hooks and components must include explicit TypeScript types for parameters, return values, and state to ensure type safety and maintainability
 
 #### SOLID Principles Implementation
 - **Single Responsibility Principle:** Each component should have a single, well-defined responsibility

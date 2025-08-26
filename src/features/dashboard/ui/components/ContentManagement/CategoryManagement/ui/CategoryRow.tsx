@@ -2,7 +2,6 @@
 
 import { Edit, Trash2, Eye, EyeOff, MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
-// Removed unused import
 import { Badge } from '@/shared/ui/shadcnComponents/badge';
 import { Button } from '@/shared/ui/shadcnComponents/button';
 import {

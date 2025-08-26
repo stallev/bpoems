@@ -97,6 +97,8 @@ model User {
   authorRequestApprovals AuthorRoleRequest[] @relation("AuthorRequestApprovals") // Requests approved/rejected by this user (if Moderator/Admin)
   claimReports           ClaimReport[]       @relation("ClaimReporter") // Claims reported by this user
   handledClaims          ClaimReport[]       @relation("ClaimHandler") // Claims handled by this user (Moderator/Admin)
+  moderationActivities   ModerationActivity[] @relation("ModeratorActivities") // Activities performed by this user
+  targetUserActivities   ModerationActivity[] @relation("TargetUserActivities") // Activities affecting this user
 }
 
 // Account model for storing linked OAuth accounts and Credentials info
@@ -352,6 +354,7 @@ model ClaimReport {
   reporter              User?   @relation("ClaimReporter", fields: [reporterId], references: [id])
   claimResultDecision   ContentApprovalStatus? // APPROVED, REJECTED, or null if pending
   claimResultDecisionAt DateTime? // Timestamp of decision
+  claimRejectDecisionReason String? // Reason for rejecting the claim
   handlerId             String? // ID of Moderator/Admin who handled the claim
   handler               User?   @relation("ClaimHandler", fields: [handlerId], references: [id])
 
@@ -368,4 +371,27 @@ model ClaimReport {
   @@index([poemId])
   @@index([commentId])
   @@index([reviewId])
+}
+
+// Model for logging moderation activities
+model ModerationActivity {
+  id          String   @id @default(cuid())
+  activityType String  // Type of moderation activity (e.g., "APPROVE_CLAIM", "REJECT_CLAIM", "SUSPEND_USER", "BAN_USER")
+  description String   // Description of the activity
+  moderatorId String   // ID of the moderator who performed the activity
+  moderator   User     @relation("ModeratorActivities", fields: [moderatorId], references: [id])
+  targetUserId String? // ID of the user affected by the activity (if applicable)
+  targetUser   User?   @relation("TargetUserActivities", fields: [targetUserId], references: [id])
+  resourceType String? // Type of resource affected (e.g., "POEM", "COMMENT", "REVIEW")
+  resourceId   String? // ID of the resource affected
+  metadata     Json?   // Additional metadata about the activity
+
+  // Timestamps
+  createdAt DateTime @default(now())
+
+  // Indexes for performance
+  @@index([activityType])
+  @@index([moderatorId])
+  @@index([targetUserId])
+  @@index([createdAt])
 }

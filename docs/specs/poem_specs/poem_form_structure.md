@@ -1,37 +1,234 @@
-# Poem Form Structure Specification
+# Poem Form Component Specification
 
-## Overview
+## Purpose
 
-This document outlines the detailed structure for the poem creation and editing form, following the established patterns and requirements from the project's technical specifications.
+The `PoemForm` component is designed to provide a comprehensive interface for creating and editing poems on the Christian Poetry Platform. It utilizes `react-quilljs` (version 2.0.5) as a WYSIWYG editor for rich text formatting, supporting the creation of structured poem content with formatting options while maintaining type safety and accessibility standards.
 
-## Form Architecture
+## Form Structure
 
-### FSD Structure
+### Form Fields
+
+1. **`title`** (Required)
+   - Type: `string`
+   - Validation: Required, 1-255 characters
+   - Component: `Input` from `@/shared/ui/shadcnComponents/input`
+   - Purpose: Poem title for display and SEO
+
+2. **`categoryId`** (Required)
+   - Type: `string`
+   - Validation: Required, must correspond to an active category ID
+   - Component: `Select` from `@/shared/ui/shadcnComponents/select`
+   - Data Source: Active categories via Server Action `getCategories`
+   - Display: Russian language names for MVP (planned EN support)
+
+3. **`content`** (Required)
+   - Type: `PoemContentBlock[]`
+   - Validation: Required, minimum one paragraph with non-empty content
+   - Component: `react-quilljs` WYSIWYG editor
+   - Storage: JSON field in `Poem.content` (schema.prisma)
+
+## PoemContentBlock Structure
+
+```typescript
+interface PoemContentBlock {
+  order: number;           // Sequential order for rendering
+  textType: 'paragraph';   // Type of content block
+  content: string;         // Text content of the paragraph
+  formatting: {
+    bold: boolean;         // Bold formatting
+    italic: boolean;       // Italic formatting
+    underline: boolean;    // Underline formatting
+  } | null;               // Null if no formatting applied
+}
 ```
-src/features/poem-management/
+
+## Delta to PoemContentBlock Conversion
+
+### Delta to PoemContentBlock
+```typescript
+// Example Delta from react-quilljs
+const delta = {
+  ops: [
+    { insert: 'First line of poem\n' },
+    { insert: 'Second line', attributes: { bold: true } },
+    { insert: '\n' },
+    { insert: 'Third line\n' }
+  ]
+};
+
+// Converted to PoemContentBlock[]
+const poemContent: PoemContentBlock[] = [
+  {
+    order: 0,
+    textType: 'paragraph',
+    content: 'First line of poem',
+    formatting: null
+  },
+  {
+    order: 1,
+    textType: 'paragraph',
+    content: 'Second line',
+    formatting: { bold: true, italic: false, underline: false }
+  },
+  {
+    order: 2,
+    textType: 'paragraph',
+    content: 'Third line',
+    formatting: null
+  }
+];
+```
+
+### PoemContentBlock to Delta
+```typescript
+// Convert PoemContentBlock[] back to Delta for react-quilljs
+const delta = {
+  ops: poemContent.map(block => ({
+    insert: block.content + '\n',
+    attributes: block.formatting || undefined
+  }))
+};
+```
+
+## Validation Rules
+
+### Client-side Validation (Zod)
+```typescript
+const poemFormSchema = z.object({
+  title: z
+    .string()
+    .min(1, 'Заголовок обязателен')
+    .max(255, 'Заголовок не может превышать 255 символов'),
+  categoryId: z
+    .string()
+    .min(1, 'Категория обязательна'),
+  content: z
+    .array(z.object({
+      order: z.number(),
+      textType: z.literal('paragraph'),
+      content: z.string().min(1, 'Содержимое параграфа не может быть пустым'),
+      formatting: z.object({
+        bold: z.boolean(),
+        italic: z.boolean(),
+        underline: z.boolean()
+      }).nullable()
+    }))
+    .min(1, 'Стихотворение должно содержать хотя бы один параграф')
+});
+```
+
+### Server-side Validation
+- Same validation rules as client-side
+- Additional XSS protection through content sanitization
+- Role-based approval status assignment
+
+## Accessibility Requirements
+
+### WCAG 2.1 AA Compliance
+- **ARIA Labels**: All form fields have proper `aria-label` attributes
+- **Keyboard Navigation**: Full keyboard accessibility with Tab order
+- **Focus Indicators**: Purple 2px focus ring as per design specification
+- **Screen Reader Support**: Semantic HTML and ARIA attributes
+- **Error Announcements**: Screen reader announcements for validation errors
+
+### Form Accessibility Features
+```typescript
+// Example ARIA implementation
+<FormField
+  control={form.control}
+  name="title"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel id="title-label">Заголовок стихотворения</FormLabel>
+      <FormControl>
+        <Input
+          {...field}
+          aria-labelledby="title-label"
+          aria-describedby="title-error"
+          aria-invalid={!!errors.title}
+        />
+      </FormControl>
+      <FormMessage id="title-error" />
+    </FormItem>
+  )}
+/>
+```
+
+## Multilingual Support
+
+### MVP Language Strategy
+- **Primary Language**: Russian (RU) for all UI elements
+- **Infrastructure**: Prepared for English (EN) support
+- **Fallback**: Russian as default fallback
+
+### Language Constants
+```typescript
+export const POEM_FORM_LABELS = {
+  RU: {
+    TITLE: 'Заголовок стихотворения',
+    CATEGORY: 'Категория',
+    CONTENT: 'Содержимое стихотворения',
+    SUBMIT: 'Сохранить стихотворение',
+    CANCEL: 'Отмена',
+    // ... other labels
+  },
+  EN: {
+    TITLE: 'Poem Title',
+    CATEGORY: 'Category',
+    CONTENT: 'Poem Content',
+    SUBMIT: 'Save Poem',
+    CANCEL: 'Cancel',
+    // ... other labels
+  }
+} as const;
+```
+
+## Dependencies
+
+### Exact Versions (from package.json)
+- `react-quilljs`: ^2.0.5
+- `next-auth`: 5.0.0-beta.29
+- `prisma`: 6.13.0
+- `react-hook-form`: 7.62.0
+- `zod`: 4.0.15
+- `@hookform/resolvers`: 5.2.1
+
+## Implementation Details
+
+### Final Implementation Notes
+- **Type Safety**: All components are fully typed with TypeScript
+- **Error Handling**: Comprehensive error handling in Server Actions and UI
+- **Accessibility**: WCAG 2.1 AA compliant with proper ARIA attributes
+- **Performance**: Optimized with useTransition and proper cache invalidation
+- **Security**: XSS prevention through content sanitization
+- **FSD Compliance**: Strict adherence to Feature-Sliced Design architecture
+
+### Resolved Implementation Questions
+- **Quill Integration**: Using react-quilljs with proper Delta type handling
+- **Form Validation**: Client-side Zod validation with server-side revalidation
+- **Role-based Access**: Proper RBAC implementation for different user roles
+- **Content Storage**: PoemContentBlock[] structure for rich text formatting
+- **Multilingual Support**: Russian language for MVP with EN infrastructure
+
+## FSD Architecture Structure
+
+```
+src/features/poem-creation/
 ├── ui/
-│   ├── PoemForm/
-│   │   ├── ui/
-│   │   │   ├── PoemForm.tsx
-│   │   │   ├── PoemContentEditor.tsx
-│   │   │   ├── PoemMetadataFields.tsx
-│   │   │   └── index.ts
-│   │   ├── model/
-│   │   │   ├── types.ts
-│   │   │   ├── schemas.ts
-│   │   │   ├── constants.ts
-│   │   │   └── index.ts
-│   │   ├── lib/
-│   │   │   ├── hooks/
-│   │   │   │   ├── usePoemForm.ts
-│   │   │   │   ├── usePoemContentEditor.ts
-│   │   │   │   └── index.ts
-│   │   │   ├── utils/
-│   │   │   │   ├── poemContentConverter.ts
-│   │   │   │   ├── poemValidation.ts
-│   │   │   │   └── index.ts
-│   │   │   └── index.ts
+│   ├── PoemForm.tsx
+│   └── index.ts
+├── model/
+│   ├── schemas.ts
+│   ├── types.ts
+│   └── index.ts
+├── lib/
+│   ├── hooks/
+│   │   ├── usePoemForm.ts
 │   │   └── index.ts
+│   ├── utils/
+│   │   ├── quillUtils.ts
+│   │   └── index.ts
+│   ├── constants.ts
 │   └── index.ts
 ├── server-actions/
 │   ├── createPoem.ts
@@ -40,363 +237,153 @@ src/features/poem-management/
 └── index.ts
 ```
 
-## Data Models
+## Usage Examples
 
-### PoemContentBlock Interface
+### Create Poem Page
 ```typescript
-interface PoemContentBlock {
-  order: number;
-  textType: 'paragraph' | 'image' | 'heading' | 'quote' | 'break';
-  content: string;
-  formatting: {
-    bold: boolean;
-    italic: boolean;
-    underline: boolean;
-    strikethrough: boolean;
-    color?: string;
-    backgroundColor?: string;
-  } | null;
-  emoji: string | null;
-  altText: string | null;
-  imageUrl?: string;
-  imageWidth?: number;
-  imageHeight?: number;
-  alignment?: 'left' | 'center' | 'right' | 'justify';
-  fontSize?: number;
-  fontFamily?: string;
-  lineHeight?: number;
-  marginTop?: number;
-  marginBottom?: number;
-  customStyles?: Record<string, string>;
+// src/app/(noadmin)/profile/add-poem/page.tsx
+export default async function AddPoemPage() {
+  const categories = await getCategories();
+  
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-2xl font-bold mb-6">Создать новое стихотворение</h1>
+      <PoemForm
+        categories={categories}
+        onSuccess={(data) => {
+          // Redirect to poem page
+          redirect(`/poems/${data.slug}`);
+        }}
+      />
+    </div>
+  );
 }
 ```
 
-### Poem Form Data Interface
+### Edit Poem Page
 ```typescript
-interface PoemFormData {
-  title: string;
-  slug: string;
-  description?: string;
-  content: PoemContentBlock[];
-  categoryId?: string;
-  tags: string[];
-  isPublished: boolean;
-  language: 'EN' | 'RU' | 'UA';
+// src/app/(noadmin)/profile/edit-poem/[slug]/page.tsx
+export default async function EditPoemPage({ params }: { params: { slug: string } }) {
+  const [poem, categories] = await Promise.all([
+    poemRepository.getBySlug(params.slug),
+    getCategories()
+  ]);
+  
+  if (!poem) {
+    notFound();
+  }
+  
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-2xl font-bold mb-6">Редактировать стихотворение</h1>
+      <PoemForm
+        defaultValues={{
+          title: poem.title,
+          categoryId: poem.categoryId,
+          content: poem.content as PoemContentBlock[]
+        }}
+        categories={categories}
+        onSuccess={(data) => {
+          redirect(`/poems/${data.slug}`);
+        }}
+      />
+    </div>
+  );
 }
 ```
 
-### Poem Form Props Interface
+## Moderation Integration
+
+### Content Approval Status
+- **AUTHOR, MODERATOR, ADMIN**: `Poem.status` set to `APPROVED`
+- **SUBSCRIBER**: `Poem.status` set to `PENDING`
+
+### Claim Report Integration
+- Server Actions check for existing `ClaimReport` entries
+- Content status updated based on claim decisions
+- Integration with `ContentApprovalStatus` enum
+
+### Role-based Access Control
 ```typescript
-interface PoemFormProps {
-  mode: 'create' | 'edit';
-  initialData?: Partial<PoemFormData>;
-  onSubmit: (data: PoemFormData) => Promise<void>;
-  onCancel?: () => void;
-  isLoading?: boolean;
+// Server Action authorization
+const session = await auth();
+if (!session?.user) {
+  throw new Error('Access denied');
 }
-```
 
-## Form Components Structure
-
-### 1. PoemForm (Main Component)
-- **Purpose**: Main form container that orchestrates all sub-components
-- **Features**:
-  - Form validation using Zod schema
-  - Error handling and display
-  - Loading states
-  - Submit/cancel actions
-  - Responsive layout
-
-### 2. PoemMetadataFields
-- **Purpose**: Handles basic poem metadata (title, slug, description, category, tags)
-- **Features**:
-  - Title input with auto-slug generation
-  - Manual slug editing capability
-  - Description textarea
-  - Category selection dropdown
-  - Tags input with autocomplete
-  - Language selection
-
-### 3. PoemContentEditor
-- **Purpose**: Rich text editor for poem content using react-quilljs
-- **Features**:
-  - React Quill integration
-  - Content conversion between Quill format and PoemContentBlock[]
-  - Real-time preview
-  - Image upload handling
-  - Emoji picker integration
-  - Formatting toolbar customization
-
-## Content Conversion Logic
-
-### Quill to PoemContentBlock Conversion
-```typescript
-function convertQuillToPoemBlocks(quillContent: any): PoemContentBlock[] {
-  // Parse Quill delta format
-  // Convert each operation to PoemContentBlock
-  // Handle different content types (text, image, formatting)
-  // Preserve order and styling information
+// Check if user has permission to create/edit poems
+if (!['SUBSCRIBER', 'AUTHOR', 'MODERATOR', 'ADMIN'].includes(session.user.role)) {
+  throw new Error('Insufficient permissions');
 }
+
+// Set approval status based on role
+const status = ['AUTHOR', 'MODERATOR', 'ADMIN'].includes(session.user.role)
+  ? 'APPROVED'
+  : 'PENDING';
 ```
 
-### PoemContentBlock to Quill Conversion
-```typescript
-function convertPoemBlocksToQuill(blocks: PoemContentBlock[]): any {
-  // Convert PoemContentBlock[] back to Quill delta format
-  // Reconstruct formatting and styling
-  // Handle images and emojis
-  // Maintain content structure
-}
-```
+## Security Considerations
 
-## Validation Schema
+### XSS Prevention
+- Content sanitization before database storage
+- HTML encoding for user-generated content
+- Validation of allowed HTML tags and attributes
 
-### Zod Schema for Poem Form
-```typescript
-const poemFormSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(200, 'Title too long'),
-  slug: z.string().min(1, 'Slug is required').regex(/^[a-z0-9-]+$/, 'Invalid slug format'),
-  description: z.string().max(500, 'Description too long').optional(),
-  content: z.array(poemContentBlockSchema).min(1, 'Content is required'),
-  categoryId: z.string().optional(),
-  tags: z.array(z.string()).max(10, 'Too many tags'),
-  isPublished: z.boolean(),
-  language: z.enum(['EN', 'RU', 'UA']),
-});
-```
+### Input Validation
+- Client-side validation with Zod
+- Server-side validation with same Zod schemas
+- Type safety throughout the application
 
-## Server Actions
+### CSRF Protection
+- Server Actions provide built-in CSRF protection
+- No additional CSRF tokens required
 
-### createPoem Server Action
-- **Location**: `src/features/poem-management/server-actions/createPoem.ts`
-- **Features**:
-  - Authentication and authorization checks
-  - Input validation
-  - Content processing and storage
-  - Database transaction handling
-  - Error handling and logging
-  - Cache invalidation
+## Performance Optimization
 
-### updatePoem Server Action
-- **Location**: `src/features/poem-management/server-actions/updatePoem.ts`
-- **Features**:
-  - Authentication and authorization checks
-  - Ownership verification
-  - Input validation
-  - Content processing and storage
-  - Database transaction handling
-  - Error handling and logging
-  - Cache invalidation
+### React Quill Optimization
+- Lazy loading of Quill editor
+- Debounced content updates
+- Efficient Delta to PoemContentBlock conversion
 
-## Custom Hooks
-
-### usePoemForm Hook
-- **Purpose**: Manages form state and validation
-- **Features**:
-  - React Hook Form integration
-  - Zod validation
-  - Error state management
-  - Loading state management
-  - Form submission handling
-
-### usePoemContentEditor Hook
-- **Purpose**: Manages rich text editor state and content conversion
-- **Features**:
-  - React Quill integration
-  - Content conversion utilities
-  - Editor configuration
-  - Image upload handling
-  - Emoji picker integration
-
-## Utility Functions
-
-### poemContentConverter
-- **Purpose**: Handles conversion between different content formats
-- **Functions**:
-  - `convertQuillToPoemBlocks()`
-  - `convertPoemBlocksToQuill()`
-  - `validatePoemContent()`
-  - `sanitizePoemContent()`
-
-### poemValidation
-- **Purpose**: Additional validation logic beyond Zod schema
-- **Functions**:
-  - `validateSlug()`
-  - `validateContentLength()`
-  - `validateImageCount()`
-  - `validateTagCount()`
-
-## Constants and Configuration
-
-### Form Constants
-```typescript
-export const POEM_FORM_CONSTANTS = {
-  MAX_TITLE_LENGTH: 200,
-  MAX_DESCRIPTION_LENGTH: 500,
-  MAX_TAGS_COUNT: 10,
-  MAX_IMAGES_COUNT: 5,
-  MIN_CONTENT_LENGTH: 10,
-  SLUG_PATTERN: /^[a-z0-9-]+$/,
-  SUPPORTED_LANGUAGES: ['EN', 'RU', 'UA'] as const,
-};
-```
-
-### Editor Configuration
-```typescript
-export const QUILL_EDITOR_CONFIG = {
-  modules: {
-    toolbar: [
-      ['bold', 'italic', 'underline', 'strike'],
-      ['blockquote', 'code-block'],
-      [{ 'header': 1 }, { 'header': 2 }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'script': 'sub'}, { 'script': 'super' }],
-      [{ 'indent': '-1'}, { 'indent': '+1' }],
-      [{ 'direction': 'rtl' }],
-      [{ 'size': ['small', false, 'large', 'huge'] }],
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'font': [] }],
-      [{ 'align': [] }],
-      ['clean'],
-      ['link', 'image', 'emoji'],
-    ],
-    emoji: {
-      showTooltip: true,
-    },
-    imageUploader: {
-      upload: (file: File) => Promise<string>,
-    },
-  },
-  placeholder: 'Write your poem here...',
-  theme: 'snow',
-};
-```
-
-## Error Handling
-
-### Form Error Types
-```typescript
-interface PoemFormErrors {
-  title?: string;
-  slug?: string;
-  description?: string;
-  content?: string;
-  categoryId?: string;
-  tags?: string;
-  general?: string;
-}
-```
-
-### Error Display Strategy
-- Field-level error messages
-- Form-level error summary
-- Toast notifications for success/error states
-- Loading indicators during submission
-
-## Accessibility Features
-
-### ARIA Attributes
-- Proper form labels and descriptions
-- Error message associations
-- Loading state announcements
-- Keyboard navigation support
-
-### Screen Reader Support
-- Semantic HTML structure
-- Descriptive error messages
-- Content change announcements
-- Form state announcements
-
-## Responsive Design
-
-### Mobile-First Approach
-- Touch-friendly form controls
-- Optimized editor toolbar for mobile
-- Collapsible sections for better UX
-- Swipe gestures for navigation
-
-### Desktop Enhancements
-- Full editor toolbar
-- Side-by-side preview mode
-- Keyboard shortcuts
-- Advanced formatting options
-
-## Performance Considerations
-
-### Optimization Strategies
-- Lazy loading of editor components
-- Debounced validation
-- Memoized content conversion
-- Efficient re-rendering with React.memo
-- Image optimization and compression
-
-### Caching Strategy
-- Form state persistence
-- Draft auto-save functionality
-- Content preview caching
-- Validation result caching
-
-## Security Measures
-
-### Input Sanitization
-- HTML content sanitization
-- XSS prevention
-- Content length limits
-- File upload restrictions
-
-### Authorization Checks
-- User authentication verification
-- Poem ownership validation
-- Role-based access control
-- Content moderation integration
+### Form Performance
+- `useTransition` for smooth form submission
+- Optimistic updates where appropriate
+- Proper cache invalidation with `revalidatePath`
 
 ## Testing Strategy
 
 ### Unit Tests
-- Form validation logic
-- Content conversion utilities
-- Custom hooks behavior
-- Error handling scenarios
+- Validation schema testing
+- Quill utility function testing
+- Server Action testing
 
 ### Integration Tests
 - Form submission flow
-- Server action integration
-- Database operations
-- Error recovery scenarios
+- Error handling scenarios
+- Role-based access control
 
 ### E2E Tests
-- Complete form workflow
-- Content editing experience
-- Error handling flows
-- Responsive behavior
-
-## Internationalization
-
-### Multi-language Support
-- Form labels and messages
-- Error messages
-- Placeholder text
-- Tooltip content
-
-### RTL Language Support
-- Text direction handling
-- Layout adjustments
-- Editor configuration
-- Content alignment
+- Complete create/edit workflows
+- Accessibility testing
+- Cross-browser compatibility
 
 ## Future Enhancements
 
 ### Planned Features
+- Image support in PoemContentBlock (post-MVP)
+- Advanced formatting options
 - Collaborative editing
 - Version history
-- Advanced formatting options
-- AI-powered content suggestions
-- Social sharing integration
-- Analytics integration
+- Auto-save functionality
 
-### Scalability Considerations
-- Modular component architecture
-- Plugin system for extensions
-- Performance monitoring
-- User feedback integration
+### Internationalization
+- Full English language support
+- Ukrainian language support (Phase 3)
+- Dynamic language switching
+- Locale-specific formatting
+
+---
+
+**Document Version**: 1.0  
+**Last Updated**: [Current Date]  
+**Next Review**: [Date + 2 weeks]

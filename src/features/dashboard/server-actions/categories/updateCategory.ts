@@ -25,30 +25,35 @@ export async function updateCategory(id: string, formData: FormData) {
 
     // Парсинг и валидация данных
     const rawData = {
-      translations: {
-        EN: formData.get('translations.EN') as string,
-        RU: formData.get('translations.RU') as string,
-        UA: formData.get('translations.UA') as string,
+      translatedName: {
+        update: {
+          values: {
+            EN: formData.get('translations.EN') as string,
+            RU: formData.get('translations.RU') as string,
+            UA: formData.get('translations.UA') as string,
+          },
+        },
       },
       isActive: formData.get('isActive') === 'true',
       order: formData.get('order') ? Number(formData.get('order')) : undefined,
     };
 
     // Проверка обязательных полей
-    if (!rawData.translations.EN || !rawData.translations.RU || !rawData.translations.UA) {
+    const translations = rawData.translatedName.update.values;
+    if (!translations.EN || !translations.RU || !translations.UA) {
       throw new Error(CATEGORY_ERRORS.NAME_REQUIRED);
     }
 
-    if (rawData.translations.EN.length < 2) {
+    if (translations.EN.length < 2) {
       throw new Error(CATEGORY_ERRORS.NAME_TOO_SHORT);
     }
 
-    if (rawData.translations.EN.length > 50) {
+    if (translations.EN.length > 50) {
       throw new Error(CATEGORY_ERRORS.NAME_TOO_LONG);
     }
 
     // Проверка уникальности названия (исключая текущую категорию)
-    const exists = await categoryRepository.existsByName(rawData.translations.EN, 'EN', id);
+    const exists = await categoryRepository.existsByName(translations.EN, 'EN', id);
     if (exists) {
       throw new Error(CATEGORY_ERRORS.NAME_EXISTS_EN);
     }

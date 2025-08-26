@@ -23,7 +23,7 @@ export const poemRepository = {
     }) as Promise<PoemWithRelations | null>;
   },
 
-  findBySlug: async (slug: string): Promise<PoemWithRelations | null> => {
+  getBySlug: async (slug: string): Promise<PoemWithRelations | null> => {
     return prisma.poem.findUnique({
       where: { slug },
       include: {

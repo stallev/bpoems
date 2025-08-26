@@ -19,30 +19,36 @@ export async function createCategory(formData: FormData) {
 
     // Парсинг и валидация данных
     const rawData = {
-      translations: {
-        EN: formData.get('translations.EN') as string,
-        RU: formData.get('translations.RU') as string,
-        UA: formData.get('translations.UA') as string,
+      translatedName: {
+        create: {
+          type: 'POEM_CATEGORY' as const,
+          values: {
+            EN: formData.get('translations.EN') as string,
+            RU: formData.get('translations.RU') as string,
+            UA: formData.get('translations.UA') as string,
+          },
+        },
       },
       isActive: formData.get('isActive') === 'true',
       order: formData.get('order') ? Number(formData.get('order')) : undefined,
     };
 
     // Проверка обязательных полей
-    if (!rawData.translations.EN || !rawData.translations.RU || !rawData.translations.UA) {
+    const translations = rawData.translatedName.create.values;
+    if (!translations.EN || !translations.RU || !translations.UA) {
       throw new Error(CATEGORY_ERRORS.NAME_REQUIRED);
     }
 
-    if (rawData.translations.EN.length < 2) {
+    if (translations.EN.length < 2) {
       throw new Error(CATEGORY_ERRORS.NAME_TOO_SHORT);
     }
 
-    if (rawData.translations.EN.length > 50) {
+    if (translations.EN.length > 50) {
       throw new Error(CATEGORY_ERRORS.NAME_TOO_LONG);
     }
 
     // Проверка уникальности названия
-    const exists = await categoryRepository.existsByName(rawData.translations.EN, 'EN');
+    const exists = await categoryRepository.existsByName(translations.EN, 'EN');
     if (exists) {
       throw new Error(CATEGORY_ERRORS.NAME_EXISTS_EN);
     }
