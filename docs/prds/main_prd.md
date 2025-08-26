@@ -14,10 +14,12 @@ This document outlines the requirements for a Christian poetry platform that ser
 3. Implement basic categorization and search functionality
 4. Create a simple, intuitive user interface
 5. Establish basic community features (comments, profiles)
+6. Implement content moderation system with claim reports
+7. Provide comprehensive content management dashboard
 
 ### Advanced Goals
 1. Implement comprehensive rating and review system
-2. Add content moderation capabilities
+2. Add advanced content moderation capabilities
 3. Enhance community engagement features
 4. Provide advanced analytics for poets
 5. Implement premium features and monetization options
@@ -29,19 +31,22 @@ This document outlines the requirements for a Christian poetry platform that ser
 **For Authors:**
 - As a Christian author, I want to create an account so that I can publish my poetry
 - As a Christian author, I want to publish my poems with proper formatting using a WYSIWYG editor so that they display beautifully
-- As a Christian author, I want to categorize my poems by genre and add tags so that readers can easily find them
+- As a Christian author, I want to categorize my poems by genre so that readers can easily find them
 - As a Christian author, I want to edit and manage my published poems so that I can maintain quality
 - As a Christian author, I want to view my profile and published works so that I can track my activity
 - As an author, I want my content to be published immediately without moderation so that I can share my work quickly
 - As a user, I want to edit my profile bio using a WYSIWYG editor so that I can create rich, formatted descriptions
 - As a user, I want to provide my profile information in multiple languages so that international readers can understand me better
+- As an author, I want to create poems with custom slugs so that I can have SEO-friendly URLs
+- As an author, I want to edit my poems at `/profile/edit-poem/[poemSlug]` so that I can easily manage my content
 
 **For Readers (Unauthenticated):**
-- As a reader, I want to browse Christian poetry by categories and tags so that I can find content I enjoy
+- As a reader, I want to browse Christian poetry by categories so that I can find content I enjoy
 - As a reader, I want to search for specific poems or authors with full-text search so that I can discover new content
 - As a reader, I want to read poems in a clean, distraction-free format so that I can focus on the content
 - As a reader, I want to view author profiles so that I can learn more about the authors
 - As a reader, I want to use the platform in my preferred language so that I can navigate comfortably
+- As a reader, I want to report inappropriate content using the claim button so that I can help maintain community standards
 
 **For Subscribers (Authenticated):**
 - As a subscriber, I want to browse and read all published poems so that I can enjoy Christian poetry
@@ -53,6 +58,8 @@ This document outlines the requirements for a Christian poetry platform that ser
 - As a subscriber, I want to follow favorite authors so that I can stay updated on their new work
 - As a subscriber, I want to rate and review poems so that I can provide feedback to authors
 - As a subscriber, I want to create reading lists so that I can save poems for later
+- As a subscriber, I want to report inappropriate content so that I can help maintain community standards
+- As a subscriber, I want to create poems at `/profile/add-poem` so that I can publish my work
 
 ### Advanced User Stories
 
@@ -69,6 +76,9 @@ This document outlines the requirements for a Christian poetry platform that ser
 - As a moderator, I want to create and manage poem categories so that I can organize content effectively
 - As a moderator, I want to provide category names in multiple languages so that all users can understand them
 - As a moderator, I want to temporarily suspend users who violate community guidelines
+- As a moderator, I want to review claim reports in the dashboard so that I can handle content moderation efficiently
+- As a moderator, I want to make decisions on claim reports so that I can maintain content quality
+- As a moderator, I want to see the status of all reported content so that I can track moderation progress
 
 **For Administrators:**
 - As an administrator, I want to approve or reject author role requests from subscribers so that I can control who can publish content
@@ -77,6 +87,7 @@ This document outlines the requirements for a Christian poetry platform that ser
 - As an administrator, I want to view platform analytics so that I can understand usage patterns
 - As an administrator, I want to permanently ban users who repeatedly violate community guidelines
 - As an administrator, I want to manage system configuration so that I can control platform settings
+- As an administrator, I want to access comprehensive claim reports management so that I can oversee content moderation
 
 ## Functional Requirements
 
@@ -95,67 +106,86 @@ This document outlines the requirements for a Christian poetry platform that ser
 10. Authentication Providers (MVP and future): For MVP, the platform will support Email/Password (Credentials) and Google via NextAuth v5 using JWT tokens (stateless). Future releases will add Apple and Facebook providers.
 
 #### Poetry Publishing
-10. The system must allow only users with author role or higher to create new poems
-11. The system must support rich text formatting for poems using a WYSIWYG editor (React Quill)
-12. The system must allow poets to add titles and descriptions to their poems
-13. The system must allow poets to categorize their poems by genre
-14. The system must implement a tagging system for poems to improve content organization and discovery
-15. The system must allow only users with author role or higher to edit and delete their own poems
-16. The system must display poems in a clean, readable format
-17. The system must allow moderators and admins to create and manage poem categories
-18. The system must support multilingual categories with translations for all interface languages
+11. The system must allow only users with author role or higher to create new poems
+12. The system must support rich text formatting for poems using a WYSIWYG editor (React QuillJS)
+13. The system must allow poets to add titles and descriptions to their poems
+14. The system must allow poets to categorize their poems by genre
+15. The system must implement a tagging system for poems to improve content organization and discovery (Future versions - not MVP)
+16. The system must allow only users with author role or higher to edit and delete their own poems
+17. The system must display poems in a clean, readable format
+18. The system must allow moderators and admins to create and manage poem categories
+19. The system must support multilingual categories with translations for all interface languages
+20. The system must allow authors to create custom slugs for their poems based on the title
+21. The system must provide a form for creating poems at `/profile/add-poem`
+22. The system must provide a form for editing poems at `/profile/edit-poem/[poemSlug]`
 
 #### Content Discovery
-19. The system must display a homepage with featured and recent poems
-20. The system must allow users to browse poems by category/genre
-21. The system must allow users to filter poems by tags
-22. The system must provide a search function for poems and poets with full-text search capabilities
-23. The system must display individual poem pages with full content
-24. The system must show related poems based on category and tags
+23. The system must display a homepage with featured and recent poems
+24. The system must allow users to browse poems by category/genre
+25. The system must allow users to filter poems by tags (Future versions - not MVP)
+26. The system must provide a search function for poems and poets with full-text search capabilities
+27. The system must display individual poem pages with full content
+28. The system must show related poems based on category and tags (Future versions - not MVP)
 
 #### Community Features
-25. The system must allow only authenticated users (Subscriber role and above) to leave comments on poems
-26. The system must allow poets to respond to comments on their poems
-27. The system must display user profiles with their published poems
-28. The system must show recent activity and poem counts on profiles
+29. The system must allow only authenticated users (Subscriber role and above) to leave comments on poems
+30. The system must allow poets to respond to comments on their poems
+31. The system must display user profiles with their published poems
+32. The system must show recent activity and poem counts on profiles
+33. The system must allow authenticated users to rate and review poems
+34. The system must allow authenticated users to create reading lists
+
+#### Content Moderation & Claim Reports
+35. The system must implement a claim report system for poems, comments, and reviews
+36. The system must provide a "claim" button for each poem, comment, and review
+37. The system must display a modal form for submitting claim reports with user messages
+38. The system must store claim reports in the database with resource type, message, and reporter information
+39. The system must automatically set content status to PENDINGREVIEW when claim is submitted by AUTHOR, MODERATOR, or ADMIN
+40. The system must not change content status when claim is submitted by unauthenticated users or SUBSCRIBER role
+41. The system must allow moderators and admins to review and make decisions on claim reports
+42. The system must automatically set content status to REJECTED when claim is approved by moderator/admin
+43. The system must track claim report decisions, timestamps, and handler information
+44. The system must provide a dashboard page for managing claim reports
+45. The system must log all moderation activities (approving/rejecting author requests, banning/suspending users, approving/rejecting content or claims) in the ModerationActivity model for audit trail
+46. The system must provide admins with access to moderation activity logs to monitor moderator performance and ensure accountability
 
 #### Basic Moderation
-29. The system must allow users to report inappropriate content
-30. The system must provide basic content filtering for offensive language
+45. The system must allow users to report inappropriate content
+46. The system must provide basic content filtering for offensive language
 
 ### Advanced Requirements
 
 #### Enhanced User Experience
-31. The system must implement a rating system (1-5 stars) for authenticated users only
-32. The system must allow only authenticated users to write detailed reviews for poems
-33. The system must provide a following system for authenticated users to follow poets
-34. The system must allow authenticated users to create and manage reading lists
-35. The system must implement a recommendation algorithm based on user preferences
-36. The system must allow subscribers to receive notifications about new posts from followed authors
+47. The system must implement a rating system (1-5 stars) for authenticated users only
+48. The system must allow only authenticated users to write detailed reviews for poems
+49. The system must provide a following system for authenticated users to follow poets
+50. The system must allow authenticated users to create and manage reading lists
+51. The system must implement a recommendation algorithm based on user preferences
+52. The system must allow subscribers to receive notifications about new posts from followed authors
 
 #### Content Management
-37. The system must allow poets to create collections/anthologies of their work
-38. The system must provide advanced search filters (date, rating, length, tags, etc.)
-39. The system must support poem drafts and scheduled publishing
-40. The system must allow poets to moderate comments on their own poems
+53. The system must allow poets to create collections/anthologies of their work
+54. The system must provide advanced search filters (date, rating, length, etc.)
+55. The system must support poem drafts and scheduled publishing
+56. The system must allow poets to moderate comments on their own poems
 
 #### Analytics & Insights
-41. The system must provide poets with analytics on their poems (views, comments, ratings)
-42. The system must show reading time estimates for poems
-43. The system must track user engagement metrics
-44. The system must provide platform-wide analytics for administrators
+57. The system must provide poets with analytics on their poems (views, comments, ratings)
+58. The system must show reading time estimates for poems
+59. The system must track user engagement metrics
+60. The system must provide platform-wide analytics for administrators
 
 #### Advanced Moderation
-45. The system must implement automated content filtering
-46. The system must provide admin tools for content moderation
-47. The system must allow for temporary and permanent user bans
-48. The system must implement a content review queue for flagged items
-49. The system must allow admins to assign moderator roles to users
+61. The system must implement automated content filtering
+62. The system must provide admin tools for content moderation
+63. The system must allow for temporary and permanent user bans
+64. The system must implement a content review queue for flagged items
+65. The system must allow admins to assign moderator roles to users
 
 #### Premium Features (Future)
-50. The system must support premium subscriptions for enhanced features
-51. The system must allow for sponsored content and featured poems
-52. The system must provide advanced publishing tools for premium users
+66. The system must support premium subscriptions for enhanced features
+67. The system must allow for sponsored content and featured poems
+68. The system must provide advanced publishing tools for premium users
 
 ## Non-Goals (Out of Scope)
 
@@ -171,6 +201,7 @@ This document outlines the requirements for a Christian poetry platform that ser
 - Content approval workflow
 - Notification system for subscribers
 - Ukrainian language support (EN and RU for MVP)
+- Tag system for poems (database schema prepared for future implementation)
 
 ### General Non-Goals
 - AI-generated poetry creation
@@ -198,10 +229,11 @@ The platform implements a hierarchical role-based access control system with the
 
 0. **Reader** (Unauthenticated)
    - Read access to all published content
-   - Browse poems by categories and tags
+   - Browse poems by categories
    - View author profiles
    - Use search functionality
    - Select interface language
+   - Submit claim reports (content status not affected)
 
 1. **Subscriber** (Base Authenticated Role)
    - All Reader privileges
@@ -210,6 +242,7 @@ The platform implements a hierarchical role-based access control system with the
    - Create reading lists
    - Rate and review poems
    - Request author role upgrade
+   - Submit claim reports (content status not affected)
 
 2. **Author** (Includes all Subscriber privileges)
    - Submit poems for publication
@@ -217,6 +250,7 @@ The platform implements a hierarchical role-based access control system with the
    - Respond to comments on own poems
    - View analytics for own content
    - Create collections/anthologies
+   - Submit claim reports (content status changes to PENDINGREVIEW)
 
 3. **Moderator** (Includes all Author privileges)
    - Approve/reject author role requests
@@ -224,6 +258,9 @@ The platform implements a hierarchical role-based access control system with the
    - Moderate comments and user-generated content
    - Manage content reports and flags
    - Temporary user suspensions
+   - Review and handle claim reports
+   - Make decisions on content moderation
+   - Submit claim reports (content status changes to PENDINGREVIEW)
 
 4. **Admin** (Includes all Moderator privileges)
    - Assign moderator roles to users
@@ -231,6 +268,8 @@ The platform implements a hierarchical role-based access control system with the
    - Access platform-wide analytics
    - Permanent user bans
    - System configuration management
+   - Comprehensive claim reports management
+   - Submit claim reports (content status changes to PENDINGREVIEW)
 
 ### Content Approval Workflow
 - Users with author role can publish content immediately (approval status = 'approved')
@@ -239,6 +278,15 @@ The platform implements a hierarchical role-based access control system with the
 - Approved content is automatically published
 - Rejected content is returned to authors with feedback
 - Admins can override moderator decisions
+
+### Claim Report Workflow
+- Any user can submit a claim report on poems, comments, or reviews
+- Multiple claim reports can be submitted for the same resource
+- Claim reports from unauthenticated users or SUBSCRIBER role do not affect content status
+- Claim reports from AUTHOR, MODERATOR, or ADMIN roles automatically set content status to PENDINGREVIEW
+- Moderators and admins review claim reports and make decisions
+- Approved claims automatically set content status to REJECTED
+- Rejected claims restore original content status
 
 ### Notification System
 - Subscribers receive notifications about new posts from followed authors
@@ -273,6 +321,29 @@ The platform implements a comprehensive category management system with the foll
 - Poems can be assigned to multiple categories
 - Category assignment is required for poem publication
 - Categories help users discover content through browsing and filtering
+
+## Content Moderation System
+
+### Claim Reports Management
+The platform implements a comprehensive claim reports system with the following features:
+
+1. **Claim Report Submission**
+   - Claim button available on all poems, comments, and reviews
+   - Modal form for submitting claim reports with user messages
+   - Support for both authenticated and unauthenticated users
+   - Multiple claim reports allowed per resource
+
+2. **Claim Report Processing**
+   - Automatic status changes based on reporter role
+   - Dashboard interface for moderators and admins
+   - Decision tracking with timestamps and handler information
+   - Automatic content status updates based on decisions
+
+3. **Dashboard Management**
+   - Dedicated page in dashboard for claim reports management
+   - Filtering and sorting capabilities
+   - Bulk actions for efficient processing
+   - Integration with user management system
 
 ## Multilingual Support
 
@@ -314,6 +385,20 @@ The platform implements comprehensive multilingual support with the following la
 ## Technical Considerations
 
 For detailed technical requirements, architecture specifications, and implementation guidelines, please refer to the [Technical Requirements Document](tech_prd.md).
+
+## Development Requirements
+
+### Code Standards
+- All utility functions must be implemented as arrow functions to ensure consistency and compatibility with modern JavaScript practices.
+- Utility functions must be placed in `src/shared/lib/utils/` and exported via public APIs (`index.ts`) in accordance with FSD architecture.
+- All project documentation, code comments, and technical specifications must be written exclusively in English.
+- Maintain consistent English terminology across all documentation and code comments.
+
+### Architecture Compliance
+- Strict adherence to Feature-Sliced Design (FSD) methodology
+- Proper layer separation and import rules
+- Use of public APIs for all cross-layer communication
+- SOLID principles implementation
 
 ## Documentation Requirements
 
@@ -369,6 +454,8 @@ For detailed CI/CD requirements, deployment strategies, and technical implementa
 - Average time spent reading poems
 - Comment engagement rates
 - Search functionality usage
+- Claim reports processing efficiency
+- Content moderation response times
 
 ### Advanced Success Metrics
 - Rating and review completion rates
@@ -376,6 +463,7 @@ For detailed CI/CD requirements, deployment strategies, and technical implementa
 - Content quality scores
 - Moderation effectiveness
 - Platform engagement depth
+- Claim reports accuracy and resolution times
 
 ### Technical Success Metrics
 For detailed technical success metrics and performance indicators, please refer to the [Technical Requirements Document](tech_prd.md).
@@ -405,12 +493,14 @@ For detailed technical success metrics and performance indicators, please refer 
 - Simple search and categorization
 - Basic community features
 - Initial design implementation
-- Basic content moderation (reporting system)
+- Basic content moderation (claim reports system)
 - Multilingual interface (EN, RU)
 - Multilingual user profiles
 - Basic category management system
 - CI/CD pipeline setup and deployment to Vercel
 - Detailed task documentation and guidance
+- Claim reports dashboard page
+- Content moderation workflow
 
 ### Phase 2: Enhanced Features (Weeks 9-16)
 - Rating and review system
@@ -423,6 +513,8 @@ For detailed technical success metrics and performance indicators, please refer 
 - Advanced category management with multilingual support
 - Authentication providers expansion: add Apple and Facebook (in addition to Email/Password and Google); JWT token strategy remains in place
 - Automated testing and QA pipeline
+- Advanced claim reports management
+- Content moderation analytics
 
 ### Phase 3: Advanced Features (Weeks 17-24)
 - Advanced content moderation system
@@ -433,6 +525,8 @@ For detailed technical success metrics and performance indicators, please refer 
 - Notification system for subscribers
 - Advanced role management features
 - Ukrainian language support
+- Advanced claim reports analytics
+- Content quality scoring
 
 ---
 

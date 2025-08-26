@@ -1,4 +1,12 @@
+/**
+ * Route Path Constants
+ *
+ * Centralized route paths for the application to ensure consistency
+ * and maintainability. All route paths should be imported from this file.
+ */
+
 export const RoutePath = {
+  // Public routes
   HOME: {
     path: '/',
     name: 'Главная',
@@ -11,18 +19,14 @@ export const RoutePath = {
     type: 'public',
     role: 'all',
   },
-  DASHBOARD: {
-    path: '/dashboard',
-    name: 'dashboard',
-    type: 'private',
-    role: 'admin',
-  },
   LOGIN: {
     path: '/auth',
     name: 'Войти',
     type: 'public',
     role: 'all',
   },
+
+  // Poem routes
   POEMS_LIST: {
     path: '/poems',
     name: 'Стихи',
@@ -30,11 +34,13 @@ export const RoutePath = {
     role: 'all',
   },
   POEM_DETAIL: {
-    path: '/poems/[id]',
+    path: '/poems/[slug]',
     name: 'poemDetail',
     type: 'public',
     role: 'all',
   },
+
+  // Profile routes
   PROFILE: {
     path: '/profile',
     name: 'Профиль',
@@ -60,11 +66,13 @@ export const RoutePath = {
     role: 'author',
   },
   PROFILE_EDIT_POEM: {
-    path: '/profile/edit-poem',
+    path: '/profile/edit-poem/[slug]',
     name: 'profileEditPoem',
     type: 'private',
     role: 'author',
   },
+
+  // Category and tag routes
   CATEGORY: {
     path: '/poems/category/[slug]',
     name: 'category',
@@ -77,14 +85,24 @@ export const RoutePath = {
     type: 'public',
     role: 'all',
   },
+
+  // Search route
   SEARCH: {
     path: '/search',
     name: 'search',
     type: 'public',
     role: 'all',
   },
+
+  // Dashboard routes
+  DASHBOARD: {
+    path: '/dashboard',
+    name: 'dashboard',
+    type: 'private',
+    role: 'admin',
+  },
   ADMIN_CATEGORIES: {
-    path: '/admin/categories',
+    path: '/dashboard/content/categories',
     name: 'adminCategories',
     type: 'private',
     role: 'moderator',
@@ -95,4 +113,16 @@ export const RoutePath = {
     type: 'private',
     role: 'admin',
   },
-};
+  POEMS: {
+    path: '/poems',
+    name: 'Стихотворения',
+    type: 'public',
+    role: 'all',
+  },
+  CLAIM_REPORTS: {
+    path: '/dashboard/claim-reports',
+    name: 'Жалобы',
+    type: 'private',
+    role: 'moderator',
+  },
+} as const;

@@ -2,15 +2,25 @@
 
 import { Edit, Trash2, Eye, EyeOff, MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
-import type { CategoryWithTranslation } from '@/entities/category/model/types';
-import type { CategoryRowProps } from '../model/types';
 import { Badge } from '@/shared/ui/shadcnComponents/badge';
 import { Button } from '@/shared/ui/shadcnComponents/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/shared/ui/shadcnComponents/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/shared/ui/shadcnComponents/dropdown-menu';
 import { CategoryEditForm } from '../../CategoryForms/ui/CategoryEditForm';
 import { formatDate, getCategoryStatusText, getCategoryStatusVariant } from '../lib/utils';
+import type { CategoryRowProps } from '../model/types';
 
-export const CategoryRow = ({ category, onDelete, onToggleStatus, onEdit, canDelete }: CategoryRowProps) => {
+export const CategoryRow = ({
+  category,
+  onDelete,
+  onToggleStatus,
+  onEdit,
+  canDelete,
+}: CategoryRowProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const handleEdit = () => {
@@ -91,7 +101,10 @@ export const CategoryRow = ({ category, onDelete, onToggleStatus, onEdit, canDel
                 )}
               </DropdownMenuItem>
               {canDelete && (
-                <DropdownMenuItem onClick={handleDelete} className="text-destructive focus:text-destructive">
+                <DropdownMenuItem
+                  onClick={handleDelete}
+                  className="text-destructive focus:text-destructive"
+                >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Удалить
                 </DropdownMenuItem>

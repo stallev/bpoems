@@ -16,7 +16,7 @@ import { CATEGORY_LABELS } from '../../CategoryManagement/model/constants';
 import { categoryFormSchema, type CategoryFormData } from '../model/schemas';
 
 interface CategoryFormProps {
-  defaultValues: CategoryFormData;
+  defaultValues?: Partial<CategoryFormData>;
   onSubmit: (data: CategoryFormData) => void;
   children: React.ReactNode;
 }
@@ -24,7 +24,16 @@ interface CategoryFormProps {
 export const CategoryForm = ({ defaultValues, onSubmit, children }: CategoryFormProps) => {
   const form = useForm<CategoryFormData>({
     resolver: zodResolver(categoryFormSchema),
-    defaultValues,
+    defaultValues: {
+      translations: {
+        EN: '',
+        RU: '',
+        UA: '',
+      },
+      isActive: true,
+      order: undefined,
+      ...defaultValues,
+    },
   });
 
   const handleSubmit = (data: CategoryFormData) => {

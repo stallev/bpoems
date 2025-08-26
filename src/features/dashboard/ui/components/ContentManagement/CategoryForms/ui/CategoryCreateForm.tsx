@@ -4,15 +4,21 @@ import { Plus, X } from 'lucide-react';
 import { useState, useActionState, startTransition, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import { createCategory } from '@/features/dashboard/server-actions/categories';
-import { CategoryForm } from './CategoryForm';
 import { Button } from '@/shared/ui/shadcnComponents/button';
+import { CategoryForm } from './CategoryForm';
 import { useCategoryForm } from '../lib/hooks/useCategoryForm';
 import type { CategoryFormData } from '../model/schemas';
+
+interface FormState {
+  success: boolean;
+  message: string;
+  data?: { id: string };
+}
 
 export const CategoryCreateForm = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [state, formAction] = useActionState(
-    (prevState: any, formData: FormData) => createCategory(formData),
+    (prevState: FormState, formData: FormData) => createCategory(formData),
     { success: false, message: '' }
   );
 

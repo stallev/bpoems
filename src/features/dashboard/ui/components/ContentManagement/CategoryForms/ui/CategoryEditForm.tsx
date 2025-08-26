@@ -5,10 +5,16 @@ import { startTransition, useActionState, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import type { CategoryWithTranslation } from '@/entities/category/model/types';
 import { updateCategory } from '@/features/dashboard/server-actions/categories';
-import { CategoryForm } from './CategoryForm';
 import { Button } from '@/shared/ui/shadcnComponents/button';
+import { CategoryForm } from './CategoryForm';
 import { useCategoryForm } from '../lib/hooks/useCategoryForm';
 import type { CategoryFormData } from '../model/schemas';
+
+interface FormState {
+  success: boolean;
+  message: string;
+  data?: { id: string };
+}
 
 interface CategoryEditFormProps {
   category: CategoryWithTranslation;
@@ -18,7 +24,7 @@ interface CategoryEditFormProps {
 
 export const CategoryEditForm = ({ category, onCancel, onSuccess }: CategoryEditFormProps) => {
   const [state, formAction] = useActionState(
-    (prevState: any, formData: FormData) => updateCategory(category.id, formData),
+    (prevState: FormState, formData: FormData) => updateCategory(category.id, formData),
     { success: false, message: '' }
   );
 

@@ -1,14 +1,18 @@
 'use client';
 
 import { BarChart3, Folder, FileText, Users, Eye, EyeOff } from 'lucide-react';
-import type { CategoryStats as CategoryStatsType } from '@/entities/category/model/types';
-import type { CategoryStatsProps } from '../model/types';
 import { Badge } from '@/shared/ui/shadcnComponents/badge';
 import { Button } from '@/shared/ui/shadcnComponents/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/shadcnComponents/card';
 import { calculateInactiveCategories, calculateActivePercentage } from '../lib/utils';
+import type { CategoryStatsProps } from '../model/types';
 
-export const CategoryStats = ({ stats, isLoading, activeFilter, onFilterChange }: CategoryStatsProps) => {
+export const CategoryStats = ({
+  stats,
+  isLoading,
+  activeFilter,
+  onFilterChange,
+}: CategoryStatsProps) => {
   if (isLoading) {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -32,7 +36,10 @@ export const CategoryStats = ({ stats, isLoading, activeFilter, onFilterChange }
   const isActiveFilter = activeFilter === 'active';
   const isInactiveFilter = activeFilter === 'inactive';
   const isAllFilter = activeFilter === 'all';
-  const inactiveCategories = calculateInactiveCategories(stats.totalCategories, stats.activeCategories);
+  const inactiveCategories = calculateInactiveCategories(
+    stats.totalCategories,
+    stats.activeCategories
+  );
   const activePercentage = calculateActivePercentage(stats.totalCategories, stats.activeCategories);
 
   return (
