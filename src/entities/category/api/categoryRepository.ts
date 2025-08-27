@@ -1,13 +1,11 @@
 import { prisma } from '@/shared/api/database/prisma';
 import type {
-  Category,
   CategoryCreateInput,
   CategoryUpdateInput,
-  CategoryOrderByWithRelationInput,
-  CategoryWhereInput,
-  CategoryWithRelations,
   CategoryWithTranslation,
+  CategoryWithRelations,
   CategoryStats,
+  CategoryWhereInput,
 } from '../model/types';
 
 export const categoryRepository = {
@@ -34,7 +32,7 @@ export const categoryRepository = {
   findAll: async (params?: {
     skip?: number;
     take?: number;
-    orderBy?: CategoryOrderByWithRelationInput;
+    orderBy?: any; // CategoryOrderByWithRelationInput; // This type is not imported
     where?: CategoryWhereInput;
   }): Promise<CategoryWithRelations[]> => {
     const { skip, take, orderBy, where } = params || {};
@@ -51,20 +49,23 @@ export const categoryRepository = {
     }) as unknown as Promise<CategoryWithRelations[]>;
   },
 
-  create: async (data: CategoryCreateInput): Promise<Category> => {
+  create: async (data: CategoryCreateInput): Promise<any> => {
+    // Category; // This type is not imported
     return prisma.category.create({
       data,
     });
   },
 
-  update: async (id: string, data: CategoryUpdateInput): Promise<Category> => {
+  update: async (id: string, data: CategoryUpdateInput): Promise<any> => {
+    // Category; // This type is not imported
     return prisma.category.update({
       where: { id },
       data,
     });
   },
 
-  delete: async (id: string): Promise<Category> => {
+  delete: async (id: string): Promise<any> => {
+    // Category; // This type is not imported
     return prisma.category.delete({
       where: { id },
     });
@@ -188,19 +189,19 @@ export const categoryRepository = {
     language: 'EN' | 'RU' | 'UA',
     excludeId?: string
   ): Promise<boolean> => {
-    const whereClause: any = {
-      translatedName: {
-        path: `$.${language}`,
-        equals: name,
+    // Get all categories with their translations
+    const categories = await prisma.category.findMany({
+      where: excludeId ? { id: { not: excludeId } } : {},
+      include: {
+        translatedName: true,
       },
-    };
+    });
 
-    if (excludeId) {
-      whereClause.id = { not: excludeId };
-    }
-
-    const count = await prisma.category.count({ where: whereClause });
-    return count > 0;
+    // Check if any category has the given name in the specified language
+    return categories.some(category => {
+      const values = category.translatedName.values as Record<string, string>;
+      return values[language] === name;
+    });
   },
 
   activate: async (id: string): Promise<void> => {
