@@ -10,6 +10,8 @@ export const ErrorMessages = {
   ACCESS_DENIED: 'Доступ запрещен. Необходима авторизация.',
   INSUFFICIENT_PERMISSIONS: 'Недостаточно прав для выполнения операции.',
   MODERATOR_REQUIRED: 'Требуются права модератора или администратора.',
+  AUTHOR_NOT_FOUND: 'Автор не найден.',
+  PAGE_LOAD_FAILED: 'Ошибка загрузки страницы.',
 
   // Poem-related errors
   GET_CATEGORIES_FAILED: 'Ошибка получения категорий для стихотворения',
