@@ -22,6 +22,7 @@ export async function createReview(formData: FormData) {
     const rawData = {
       content: formData.get('content') as string,
       poemId: formData.get('poemId') as string,
+      ...(formData.has('rating') && { rating: Number(formData.get('rating')) }),
     };
 
     const validatedData = ReviewFormSchema.parse(rawData);
@@ -35,6 +36,7 @@ export async function createReview(formData: FormData) {
       content: sanitizedContent,
       userId: session.user.id,
       poemId: validatedData.poemId,
+      rating: validatedData.rating,
     });
 
     revalidatePath(`/poems/${review.poemId}`);

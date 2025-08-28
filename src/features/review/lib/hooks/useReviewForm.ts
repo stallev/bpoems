@@ -12,7 +12,7 @@ export function useReviewForm({ poemId }: UseReviewFormProps) {
     resolver: zodResolver(ReviewFormSchema),
     defaultValues: {
       content: '',
-      rating: 0,
+
       poemId,
     },
   });
@@ -20,7 +20,9 @@ export function useReviewForm({ poemId }: UseReviewFormProps) {
   const handleSubmit = (data: ReviewFormData) => {
     const formData = new FormData();
     formData.append('content', data.content);
-    formData.append('rating', data.rating.toString());
+    if (data.rating !== undefined) {
+      formData.append('rating', data.rating.toString());
+    }
     formData.append('poemId', data.poemId);
     return formData;
   };

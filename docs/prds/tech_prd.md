@@ -29,6 +29,38 @@
 - **Code Review Requirement:** Before making any changes to the project code, the CursorAI agent must double-check the proposed code for correctness, completeness, and compliance with project requirements
 - **CursorAI Agent Rule:** "Before implementing any code changes, the CursorAI agent must thoroughly review and validate the proposed code to ensure it meets all project requirements, follows established patterns, and maintains code quality standards. This includes checking for proper TypeScript typing, FSD architecture compliance, SOLID principles adherence, and PRD requirements fulfillment."
 - **Documentation Language Requirement:** All project documentation, code comments, and technical specifications must be written exclusively in English. This includes PRD files, architecture documents, inline code comments, and development documentation.
+- **Constants for UI and Error Messages**:
+  - **Mandatory Use of Constants:** Hooks, components, and server actions must not use hardcoded string values for error logs, input or textarea placeholders, or labels. Instead, they must use predefined constants from the appropriate `ui.ts` files located in the respective `constants/` directories (e.g., `src/entities/{entity}/constants/ui.ts` or `src/features/{feature}/constants/ui.ts`).
+  - **Single Source of Truth:** Constants ensure a single source of truth for UI text and error messages, facilitating maintainability, consistency, and localization (e.g., Next.js i18n support for English default and Russian MVP).
+  - **File Structure:** Constants must be defined in `ui.ts` files within the relevant entity or feature directory, following the Feature-Sliced Design (FSD) structure.
+  - **Naming Convention:** Constants should use descriptive, uppercase names with underscores (e.g., `COMMENT_CONTENT_PLACEHOLDER`, `ERROR_UNAUTHORIZED`).
+  - **Implementation Example**:
+    ```typescript
+    // src/features/comment/constants/ui.ts
+    export const UIConstants = {
+      COMMENT_CONTENT_LABEL: 'Your Comment',
+      COMMENT_CONTENT_PLACEHOLDER: 'Write your comment here...',
+      COMMENT_SUCCESS_MESSAGE: 'Comment submitted successfully',
+      SUBMIT_BUTTON: 'Submit',
+      CANCEL_BUTTON: 'Cancel',
+      SUBMITTING_BUTTON: 'Submitting...',
+    };
+
+    // src/features/comment/ui/CommentForm.tsx
+    import { UIConstants } from '../constants/ui';
+    // Usage in component
+    <FormLabel>{UIConstants.COMMENT_CONTENT_LABEL}</FormLabel>
+    <Textarea placeholder={UIConstants.COMMENT_CONTENT_PLACEHOLDER} />
+
+    // src/features/comment/server-actions/createComment.ts
+    import { UIConstants } from '../constants/ui';
+    import { ErrorMessages } from '@/shared/constants/ErrorMessages';
+    // Usage in server action
+    throw new Error(ErrorMessages.UNAUTHORIZED);
+    return { success: true, message: UIConstants.COMMENT_SUCCESS_MESSAGE };
+    ```
+  - **Validation:** Code reviews and linting rules must enforce the use of constants, rejecting hardcoded strings for UI text or error messages.
+  - **Documentation:** Task description documents must include the constants defined and their usage in hooks, components, and server actions.
 
 ### Server Actions Requirements
 

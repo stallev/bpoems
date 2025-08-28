@@ -28,15 +28,17 @@ export function ReviewForm({ poemId, onSuccess, onCancel }: ReviewFormProps) {
     resolver: zodResolver(ReviewFormSchema),
     defaultValues: {
       content: '',
-      rating: 0,
       poemId,
     },
   });
 
   const onSubmit = async (data: ReviewFormData) => {
     const formData = new FormData();
+
     formData.append('content', data.content);
-    formData.append('rating', data.rating.toString());
+    if (data.rating !== undefined) {
+      formData.append('rating', data.rating.toString());
+    }
     formData.append('poemId', data.poemId);
 
     startTransition(async () => {
@@ -63,7 +65,7 @@ export function ReviewForm({ poemId, onSuccess, onCancel }: ReviewFormProps) {
                     <Button
                       key={value}
                       type="button"
-                      variant={field.value >= value ? 'default' : 'outline'}
+                      variant={(field.value ?? 0) >= value ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => field.onChange(value)}
                       className="w-10 h-10"
