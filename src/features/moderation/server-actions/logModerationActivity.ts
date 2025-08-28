@@ -85,7 +85,7 @@ export async function logModerationActivity(data: ModerationActivityData) {
         targetUserId: validatedData.targetUserId,
         resourceType: validatedData.resourceType,
         resourceId: validatedData.resourceId,
-        metadata: validatedData.metadata,
+        metadata: data.metadata as any,
       },
     });
 

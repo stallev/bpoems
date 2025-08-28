@@ -34,6 +34,46 @@ export const poemRepository = {
       },
     }) as Promise<PoemWithRelations | null>;
   },
+  getPoemBySlugWithReviewsAndComments: async (slug: string): Promise<PoemWithRelations | null> => {
+    return prisma.poem.findUnique({
+      where: { slug },
+      include: {
+        author: true,
+        category: { include: { translatedName: true } },
+        tags: true,
+        statistics: true,
+        comments: {
+          select: {
+            id: true,
+            content: true,
+            createdAt: true,
+            updatedAt: true,
+            isApproved: true,
+            status: true,
+            claimReports: true,
+            author: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+        reviews: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+      },
+    }) as Promise<PoemWithRelations | null>;
+  },
 
   findAll: async (params?: {
     skip?: number;

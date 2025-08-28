@@ -102,9 +102,20 @@ export async function handleClaimReport(formData: FormData) {
 
     // Log moderation activity
     await logModerationActivity({
-      actionType: data.claimResultDecision === 'REJECTED' ? 'CLAIM_REJECT' : 'CLAIM_APPROVE',
-      claimReportId: claimReport.id,
-      reason: data.claim_reject_decision_reason,
+      activityType: data.claimResultDecision === 'REJECTED' ? 'CLAIM_REJECT' : 'CLAIM_APPROVE',
+      description: `Claim ${data.claimResultDecision.toLowerCase()} for ${existingClaim.resourceType}`,
+      resourceType: existingClaim.resourceType,
+      resourceId:
+        existingClaim.resourceType === 'POEM'
+          ? existingClaim.poemId || undefined
+          : existingClaim.resourceType === 'COMMENT'
+            ? existingClaim.commentId || undefined
+            : existingClaim.reviewId || undefined,
+      metadata: {
+        claimReportId: claimReport.id,
+        reason: data.claim_reject_decision_reason,
+        claimResultDecision: data.claimResultDecision,
+      },
     });
 
     // Revalidate relevant paths
@@ -123,7 +134,7 @@ export async function handleClaimReport(formData: FormData) {
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        message: (error as any).errors[0]?.message || ErrorMessages.VALIDATION_ERROR,
+        message: error.issues[0]?.message || ErrorMessages.VALIDATION_ERROR,
       };
     }
 

@@ -265,6 +265,7 @@ model Review {
   id      String                @id @default(cuid())
   title   String? // Optional title for the review
   content String // The review text
+  rating  Int? // Optional rating value (1-5)
   poemId  String
   poem    Poem                  @relation(fields: [poemId], references: [id])
   userId  String

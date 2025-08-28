@@ -23,7 +23,18 @@ export interface PoemWithRelations extends PrismaPoem {
   comments?: {
     id: string;
     content: string;
+    createdAt: Date;
     author: {
+      id: string;
+      name: string | null;
+    };
+  }[];
+  reviews?: {
+    id: string;
+    title: string | null;
+    content: string;
+    createdAt: Date;
+    user: {
       id: string;
       name: string | null;
     };

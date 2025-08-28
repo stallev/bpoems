@@ -1,0 +1,16 @@
+export const UIConstants = {
+  REVIEW_CONTENT_LABEL: 'Your Review',
+  REVIEW_CONTENT_PLACEHOLDER: 'Share your thoughts about this poem...',
+  RATING_LABEL: 'Rating',
+  SUBMIT_BUTTON: 'Post Review',
+  SUBMITTING_BUTTON: 'Posting...',
+  CANCEL_BUTTON: 'Cancel',
+  REVIEWS_TITLE: 'Reviews',
+  NO_REVIEWS_MESSAGE: 'No reviews yet. Be the first to review!',
+  REVIEW_SUCCESS_MESSAGE: 'Review posted successfully',
+  REVIEW_ERROR_MESSAGE: 'Failed to post review',
+  REPORT_BUTTON: 'Report',
+  DELETE_BUTTON: 'Delete',
+  EDIT_BUTTON: 'Edit',
+  RATING_STARS_LABEL: 'out of 5 stars',
+} as const;
