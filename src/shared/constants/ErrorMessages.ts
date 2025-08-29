@@ -51,8 +51,8 @@ export const ErrorMessages = {
   UPLOAD_FAILED: 'Ошибка загрузки файла.',
 
   // Moderation error messages
-  INVALID_REJECTION_REASON: 'Неверная причина отклонения жалобы.',
-  REJECTION_REASON_REQUIRED: 'Причина отклонения обязательна при отклонении жалобы.',
+  INVALID_APPROVAL_REASON: 'Неверная причина одобрения жалобы.',
+  APPROVAL_REASON_REQUIRED: 'Причина одобрения обязательна при одобрении жалобы.',
   UNAUTHORIZED: 'Неавторизованный доступ.',
   CLAIM_NOT_FOUND: 'Жалоба не найдена.',
   HANDLE_CLAIM_REPORT_FAILED: 'Ошибка обработки жалобы.',

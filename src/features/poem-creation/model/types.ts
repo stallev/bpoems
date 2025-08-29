@@ -21,11 +21,11 @@ export interface PoemFormData {
 // Category data structure for form display
 export interface CategoryOption {
   id: string;
-  translatedName: {
-    RU: string;
-    EN?: string;
-    UA?: string;
-  };
+  translatedItems: Array<{
+    id: string;
+    type: string;
+    values: any;
+  }>;
 }
 
 // Props for PoemForm component

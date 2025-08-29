@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { auth } from '@/shared/api/auth/auth';
 import { prisma } from '@/shared/api/database/prisma';
-import { ClaimRejectReasons } from '@/shared/constants/ClaimRejectReasons';
+import { ClaimApproveReasons } from '@/shared/constants/ClaimApproveReasons';
 import { ErrorMessages } from '@/shared/constants/ErrorMessages';
 import { RoutePath } from '@/shared/constants/RoutePath';
 import { logModerationActivity } from './logModerationActivity';
@@ -16,16 +16,16 @@ const claimReportSchema = z
   .object({
     claimId: z.string(),
     claimResultDecision: z.enum(['PENDING', 'APPROVED', 'REJECTED', 'PENDINGREVIEW']),
-    claim_reject_decision_reason: z
+    claim_approve_decision_reason: z
       .string()
       .optional()
-      .refine(value => !value || ClaimRejectReasons.some(reason => reason.reasonId === value), {
-        message: ErrorMessages.INVALID_REJECTION_REASON,
+      .refine(value => !value || ClaimApproveReasons.some(reason => reason.reasonId === value), {
+        message: ErrorMessages.INVALID_APPROVAL_REASON,
       }),
   })
-  .refine(data => data.claimResultDecision !== 'REJECTED' || !!data.claim_reject_decision_reason, {
-    message: ErrorMessages.REJECTION_REASON_REQUIRED,
-    path: ['claim_reject_decision_reason'],
+  .refine(data => data.claimResultDecision !== 'APPROVED' || !!data.claim_approve_decision_reason, {
+    message: ErrorMessages.APPROVAL_REASON_REQUIRED,
+    path: ['claim_approve_decision_reason'],
   });
 
 /**
@@ -52,7 +52,7 @@ export async function handleClaimReport(formData: FormData) {
     const data = claimReportSchema.parse({
       claimId: formData.get('claimId'),
       claimResultDecision: formData.get('claimResultDecision'),
-      claim_reject_decision_reason: formData.get('claim_reject_decision_reason'),
+      claim_approve_decision_reason: formData.get('claim_approve_decision_reason'),
     });
 
     // Get the claim report to check if it exists
@@ -74,7 +74,7 @@ export async function handleClaimReport(formData: FormData) {
       where: { id: data.claimId },
       data: {
         claimResultDecision: data.claimResultDecision,
-        // claim_reject_decision_reason: data.claim_reject_decision_reason, // TODO: Uncomment after schema update
+        claimApproveDecisionReason: data.claim_approve_decision_reason,
         handlerId: session.user.id,
         claimResultDecisionAt: new Date(),
       },
@@ -102,7 +102,7 @@ export async function handleClaimReport(formData: FormData) {
 
     // Log moderation activity
     await logModerationActivity({
-      activityType: data.claimResultDecision === 'REJECTED' ? 'CLAIM_REJECT' : 'CLAIM_APPROVE',
+      activityType: data.claimResultDecision === 'APPROVED' ? 'CLAIM_APPROVE' : 'CLAIM_REJECT',
       description: `Claim ${data.claimResultDecision.toLowerCase()} for ${existingClaim.resourceType}`,
       resourceType: existingClaim.resourceType,
       resourceId:
@@ -113,7 +113,7 @@ export async function handleClaimReport(formData: FormData) {
             : existingClaim.reviewId || undefined,
       metadata: {
         claimReportId: claimReport.id,
-        reason: data.claim_reject_decision_reason,
+        reason: data.claim_approve_decision_reason,
         claimResultDecision: data.claimResultDecision,
       },
     });

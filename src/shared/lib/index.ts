@@ -2,7 +2,7 @@
 export * from './utils/roleUtils';
 export * from './utils/routeUtils';
 export * from './utils/contentStatusUtils';
-export * from './utils/claimRejectUtils';
+export * from './utils/claimApproveUtils';
 export * from './utils/slugify';
 
 // Hooks exports

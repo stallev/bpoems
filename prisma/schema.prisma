@@ -150,15 +150,16 @@ model Statistics {
 }
 
 model Category {
-  id             String         @id @default(cuid())
-  slug           String         @unique // Ссылка на TranslatedItem.id
-  isActive       Boolean        @default(true)
-  order          Int            @default(0)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  translatedName TranslatedItem @relation("CategoryToTranslatedName", fields: [slug], references: [id])
-  poems          Poem[]         @relation("PoemCategory")
+  id                String         @id @default(cuid())
+  slug              String         @unique // SEO-friendly URL slug
+  isActive          Boolean        @default(true)
+  order             Int            @default(0)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  translatedItems   TranslatedItem[]
+  poems             Poem[]         @relation("PoemCategory")
   @@index([isActive, order])
+  @@index([slug])
 }
 
 model TranslatedItem {
@@ -167,7 +168,8 @@ model TranslatedItem {
   values    Json                // { "EN": "value", "RU": "value", "UA": "value" }
   createdAt DateTime            @default(now())
   updatedAt DateTime            @updatedAt
-  category  Category?           @relation("CategoryToTranslatedName") // Обратная связь для Category
+  categoryId    String?           // Внешний ключ, nullable для поддержки других типов переводов
+  category      Category?         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   @@index([type])               // Индекс для быстрого поиска по типу
 }
 
@@ -355,7 +357,7 @@ model ClaimReport {
   reporter              User?   @relation("ClaimReporter", fields: [reporterId], references: [id])
   claimResultDecision   ContentApprovalStatus? // APPROVED, REJECTED, or null if pending
   claimResultDecisionAt DateTime? // Timestamp of decision
-  claimRejectDecisionReason String? // Reason for rejecting the claim
+  claimApproveDecisionReason String? // Reason for approving the claim
   handlerId             String? // ID of Moderator/Admin who handled the claim
   handler               User?   @relation("ClaimHandler", fields: [handlerId], references: [id])
 

@@ -13,7 +13,7 @@ export const categoryRepository = {
     return prisma.category.findUnique({
       where: { id },
       include: {
-        translatedName: true,
+        translatedItems: true,
         poems: true,
       },
     }) as Promise<CategoryWithRelations | null>;
@@ -23,7 +23,7 @@ export const categoryRepository = {
     return prisma.category.findUnique({
       where: { slug },
       include: {
-        translatedName: true,
+        translatedItems: true,
         poems: true,
       },
     }) as Promise<CategoryWithRelations | null>;
@@ -43,14 +43,13 @@ export const categoryRepository = {
       orderBy,
       where,
       include: {
-        translatedName: true,
+        translatedItems: true,
         poems: true,
       },
     }) as unknown as Promise<CategoryWithRelations[]>;
   },
 
   create: async (data: CategoryCreateInput): Promise<any> => {
-    // Category; // This type is not imported
     return prisma.category.create({
       data,
     });
@@ -83,14 +82,16 @@ export const categoryRepository = {
 
     return prisma.category.findMany({
       where: {
-        translatedName: {
-          type: type as any,
+        translatedItems: {
+          some: {
+            type: type as any,
+          },
         },
       },
       skip,
       take,
       include: {
-        translatedName: true,
+        translatedItems: true,
         poems: true,
       },
     }) as unknown as Promise<CategoryWithRelations[]>;
@@ -110,7 +111,7 @@ export const categoryRepository = {
       skip,
       take,
       include: {
-        translatedName: true,
+        translatedItems: true,
         poems: true,
       },
     }) as unknown as Promise<CategoryWithRelations[]>;
@@ -133,7 +134,11 @@ export const categoryRepository = {
     const categories = await prisma.category.findMany({
       where: whereClause,
       include: {
-        translatedName: true,
+        translatedItems: {
+          where: {
+            type: 'POEM_CATEGORY',
+          },
+        },
         _count: {
           select: {
             poems: true,
@@ -145,15 +150,22 @@ export const categoryRepository = {
       },
     });
 
-    return categories.map(category => ({
-      id: category.id,
-      isActive: category.isActive,
-      order: category.order,
-      createdAt: category.createdAt,
-      updatedAt: category.updatedAt,
-      name: category.translatedName.values as { EN: string; RU: string; UA: string },
-      poemCount: category._count.poems,
-    }));
+    return categories.map(category => {
+      const translatedItem = category.translatedItems.find(item => item.type === 'POEM_CATEGORY');
+      return {
+        id: category.id,
+        isActive: category.isActive,
+        order: category.order,
+        createdAt: category.createdAt,
+        updatedAt: category.updatedAt,
+        name: (translatedItem?.values as { EN: string; RU: string; UA: string }) || {
+          EN: '',
+          RU: '',
+          UA: '',
+        },
+        poemCount: category._count.poems,
+      };
+    });
   },
 
   getStats: async (): Promise<CategoryStats> => {
@@ -193,13 +205,19 @@ export const categoryRepository = {
     const categories = await prisma.category.findMany({
       where: excludeId ? { id: { not: excludeId } } : {},
       include: {
-        translatedName: true,
+        translatedItems: {
+          where: {
+            type: 'POEM_CATEGORY',
+          },
+        },
       },
     });
 
     // Check if any category has the given name in the specified language
     return categories.some(category => {
-      const values = category.translatedName.values as Record<string, string>;
+      const translatedItem = category.translatedItems.find(item => item.type === 'POEM_CATEGORY');
+      if (!translatedItem) return false;
+      const values = translatedItem.values as Record<string, string>;
       return values[language] === name;
     });
   },

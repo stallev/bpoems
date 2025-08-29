@@ -10,7 +10,10 @@ import { POEM_ERRORS } from '../lib/constants';
 type GetCategoriesResult =
   | {
       success: true;
-      data: Array<{ id: string; translatedName: { RU: string; EN?: string; UA?: string } }>;
+      data: Array<{
+        id: string;
+        translatedItems: Array<{ id: string; type: string; values: any }>;
+      }>;
     }
   | { success: false; message: string; data?: never };
 
@@ -32,14 +35,9 @@ export async function getCategories(): Promise<GetCategoriesResult> {
 
     // 4. Transform categories for form display
     const categoryOptions = categories.map((category: CategoryWithRelations) => {
-      const translations = category.translatedName.values as { EN: string; RU: string; UA: string };
       return {
         id: category.id,
-        translatedName: {
-          RU: translations.RU,
-          EN: translations.EN,
-          UA: translations.UA,
-        },
+        translatedItems: category.translatedItems,
       };
     });
 

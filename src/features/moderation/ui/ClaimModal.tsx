@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { startTransition } from 'react';
 import { useForm } from 'react-hook-form';
-import { ClaimRejectReasons } from '@/shared/constants/ClaimRejectReasons';
+import { ClaimApproveReasons } from '@/shared/constants/ClaimApproveReasons';
 import { Button } from '@/shared/ui/shadcnComponents/button';
 import {
   Dialog,
@@ -87,7 +87,7 @@ export function ClaimModal({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.entries(ClaimRejectReasons).map(([key, value]) => (
+                      {Object.entries(ClaimApproveReasons).map(([key, value]) => (
                         <SelectItem key={key} value={key}>
                           {String(value)}
                         </SelectItem>

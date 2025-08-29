@@ -24,7 +24,7 @@ export interface TranslationValues {
 
 // Extended type for category with included relations
 export interface CategoryWithRelations extends PrismaCategory {
-  translatedName: TranslatedItem;
+  translatedItems: TranslatedItem[];
   poems?: {
     id: string;
     title: string;

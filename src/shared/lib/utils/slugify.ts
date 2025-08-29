@@ -150,6 +150,22 @@ export const ensureUniqueSlug = async (title: string, prisma: any): Promise<stri
 };
 
 /**
+ * Ensures a unique slug for a category name using Prisma
+ */
+export const ensureUniqueCategorySlug = async (name: string, prisma: any): Promise<string> => {
+  const baseSlug = slugify(name);
+
+  const checkExists = async (slug: string): Promise<boolean> => {
+    const existingCategory = await prisma.category.findUnique({
+      where: { slug },
+    });
+    return !!existingCategory;
+  };
+
+  return generateUniqueSlug(baseSlug, checkExists);
+};
+
+/**
  * Validates if a string is a valid slug
  */
 export const isValidSlug = (slug: string): boolean => {
@@ -176,4 +192,35 @@ export const isValidSlug = (slug: string): boolean => {
   }
 
   return slugPattern.test(slug);
+};
+
+/**
+ * Generate slug from English category name
+ * @param englishName - English name of the category
+ * @returns Generated slug
+ */
+export const generateCategorySlug = (englishName: string): string => {
+  return slugify(englishName);
+};
+
+/**
+ * Generate unique slug for category
+ * @param englishName - English name of the category
+ * @param existingSlugs - Array of existing slugs to check against
+ * @returns Unique slug
+ */
+export const generateUniqueCategorySlug = (
+  englishName: string,
+  existingSlugs: string[]
+): string => {
+  const baseSlug = generateCategorySlug(englishName);
+  let uniqueSlug = baseSlug;
+  let counter = 1;
+
+  while (existingSlugs.includes(uniqueSlug)) {
+    uniqueSlug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+
+  return uniqueSlug;
 };
