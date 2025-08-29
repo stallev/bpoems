@@ -1,26 +1,26 @@
 /**
- * Claim rejection reasons for content moderation
+ * Claim approval reasons for content moderation
  *
- * @module shared/constants/ClaimRejectReasons
+ * @module shared/constants/ClaimApproveReasons
  */
 
-export type ClaimRejectReason = {
+export type ClaimApproveReason = {
   reasonId: string;
   reasonName: { RU: string; EN: string };
 };
 
 /**
- * Available reasons for rejecting claim reports
+ * Available reasons for approving claim reports
  *
  * @example
  * ```typescript
- * import { ClaimRejectReasons } from '@/shared/constants/ClaimRejectReasons';
+ * import { ClaimApproveReasons } from '@/shared/constants/ClaimApproveReasons';
  *
- * const reason = ClaimRejectReasons.find(r => r.reasonId === 'INAPPROPRIATE_CONTENT');
+ * const reason = ClaimApproveReasons.find(r => r.reasonId === 'INAPPROPRIATE_CONTENT');
  * console.log(reason?.reasonName.RU); // 'Неприемлемый контент'
  * ```
  */
-export const ClaimRejectReasons: ClaimRejectReason[] = [
+export const ClaimApproveReasons: ClaimApproveReason[] = [
   {
     reasonId: 'INAPPROPRIATE_CONTENT',
     reasonName: {

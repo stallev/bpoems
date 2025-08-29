@@ -357,7 +357,7 @@ model ClaimReport {
   reporter              User?   @relation("ClaimReporter", fields: [reporterId], references: [id])
   claimResultDecision   ContentApprovalStatus? // APPROVED, REJECTED, or null if pending
   claimResultDecisionAt DateTime? // Timestamp of decision
-  claimRejectDecisionReason String? // Reason for rejecting the claim
+  claimApproveDecisionReason String? // Reason for approving the claim
   handlerId             String? // ID of Moderator/Admin who handled the claim
   handler               User?   @relation("ClaimHandler", fields: [handlerId], references: [id])
 
