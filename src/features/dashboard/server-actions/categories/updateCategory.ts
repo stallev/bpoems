@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { categoryRepository } from '@/entities/category';
 import { CATEGORY_ERRORS, CATEGORY_SUCCESS } from '@/entities/category/constants';
 import { auth } from '@/shared/api/auth/auth';
+import { prisma } from '@/shared/api/database/prisma';
 
 export async function updateCategory(id: string, formData: FormData) {
   try {
@@ -24,22 +25,18 @@ export async function updateCategory(id: string, formData: FormData) {
     }
 
     // Парсинг и валидация данных
+    const translations = {
+      EN: formData.get('translations.EN') as string,
+      RU: formData.get('translations.RU') as string,
+      UA: formData.get('translations.UA') as string,
+    };
+
     const rawData = {
-      translatedName: {
-        update: {
-          values: {
-            EN: formData.get('translations.EN') as string,
-            RU: formData.get('translations.RU') as string,
-            UA: formData.get('translations.UA') as string,
-          },
-        },
-      },
       isActive: formData.get('isActive') === 'true',
       order: formData.get('order') ? Number(formData.get('order')) : undefined,
     };
 
     // Проверка обязательных полей
-    const translations = rawData.translatedName.update.values;
     if (!translations.EN || !translations.RU || !translations.UA) {
       throw new Error(CATEGORY_ERRORS.NAME_REQUIRED);
     }
@@ -60,6 +57,23 @@ export async function updateCategory(id: string, formData: FormData) {
 
     // Обновление категории
     const category = await categoryRepository.update(id, rawData);
+
+    // Обновление переводов
+    const translatedItem = await prisma.translatedItem.findFirst({
+      where: {
+        categoryId: id,
+        type: 'POEM_CATEGORY',
+      },
+    });
+
+    if (translatedItem) {
+      await prisma.translatedItem.update({
+        where: { id: translatedItem.id },
+        data: {
+          values: translations,
+        },
+      });
+    }
 
     // Ревалидация кэша
     revalidatePath('/dashboard/content/categories');

@@ -16,7 +16,7 @@ export const poemRepository = {
       where: { id },
       include: {
         author: true,
-        category: { include: { translatedName: true } },
+        category: { include: { translatedItems: true } },
         tags: true,
         statistics: true,
       },
@@ -28,7 +28,7 @@ export const poemRepository = {
       where: { slug },
       include: {
         author: true,
-        category: { include: { translatedName: true } },
+        category: { include: { translatedItems: true } },
         tags: true,
         statistics: true,
       },
@@ -39,7 +39,7 @@ export const poemRepository = {
       where: { slug },
       include: {
         author: true,
-        category: { include: { translatedName: true } },
+        category: { include: { translatedItems: true } },
         tags: true,
         statistics: true,
         comments: {
@@ -90,7 +90,7 @@ export const poemRepository = {
       where,
       include: {
         author: true,
-        category: { include: { translatedName: true } },
+        category: { include: { translatedItems: true } },
         tags: true,
         statistics: true,
       },
@@ -192,7 +192,7 @@ export const poemRepository = {
       take,
       include: {
         author: true,
-        category: { include: { translatedName: true } },
+        category: { include: { translatedItems: true } },
         tags: true,
         statistics: true,
       },
@@ -221,7 +221,7 @@ export const poemRepository = {
       take,
       include: {
         author: true,
-        category: { include: { translatedName: true } },
+        category: { include: { translatedItems: true } },
         tags: true,
         statistics: true,
       },

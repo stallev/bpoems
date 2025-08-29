@@ -131,10 +131,12 @@ export const PoemForm = ({ defaultValues, categories, onSuccess, onCancel }: Poe
                   aria-labelledby="title-label"
                   aria-describedby="title-error"
                   aria-invalid={!!form.formState.errors.title}
-                  className="bg-background border-input text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  className={`bg-background border-input text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 ${
+                    form.formState.errors.title ? 'border-red-500' : ''
+                  }`}
                 />
               </FormControl>
-              <FormMessage id="title-error" />
+              <FormMessage style={{ color: '#dc2626' }} className="text-red-700" id="title-error" />
             </FormItem>
           )}
         />
@@ -144,7 +146,7 @@ export const PoemForm = ({ defaultValues, categories, onSuccess, onCancel }: Poe
           control={form.control}
           name="categoryId"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="cursor-pointer">
               <FormLabel id="category-label">{POEM_FORM_LABELS.RU.CATEGORY}</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
@@ -152,20 +154,32 @@ export const PoemForm = ({ defaultValues, categories, onSuccess, onCancel }: Poe
                     aria-labelledby="category-label"
                     aria-describedby="category-error"
                     aria-invalid={!!form.formState.errors.categoryId}
-                    className="bg-background border-input text-foreground focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    className={`bg-background border-input text-foreground focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 ${
+                      form.formState.errors.categoryId ? 'border-red-500' : ''
+                    }`}
                   >
                     <SelectValue placeholder={POEM_FORM_LABELS.RU.CATEGORY_PLACEHOLDER} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className="bg-background border-input">
-                  {categories.map(category => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.translatedName.RU}
-                    </SelectItem>
-                  ))}
+                  {categories.map(category => {
+                    const translatedItem = category.translatedItems?.find(
+                      item => item.type === 'POEM_CATEGORY'
+                    );
+                    const categoryName = translatedItem?.values?.RU || category.id;
+                    return (
+                      <SelectItem key={category.id} value={category.id}>
+                        {categoryName}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
-              <FormMessage id="category-error" />
+              <FormMessage
+                style={{ color: '#dc2626' }}
+                className="text-red-700"
+                id="category-error"
+              />
             </FormItem>
           )}
         />
@@ -179,15 +193,30 @@ export const PoemForm = ({ defaultValues, categories, onSuccess, onCancel }: Poe
               <FormLabel id="content-label">{POEM_FORM_LABELS.RU.CONTENT}</FormLabel>
               <FormControl>
                 <div
-                  className="min-h-[200px] border border-input rounded-md focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 bg-background"
+                  className={`min-h-[200px] border border-input rounded-md focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 bg-background transition-all duration-200 ${
+                    form.formState.errors.content ? 'border-red-500' : ''
+                  }`}
                   aria-labelledby="content-label"
                   aria-describedby="content-error"
                   aria-invalid={!!form.formState.errors.content}
                 >
-                  <div ref={quillRef} />
+                  <div
+                    ref={quillRef}
+                    className="ql-editor ql-blank h-full overflow-y-auto rounded-md text-xl"
+                    style={{
+                      maxHeight: 'calc(100% - 40px)',
+                      borderColor: 'transparent',
+                      fontSize: '1.2rem',
+                      lineHeight: '1.5',
+                    }}
+                  />
                 </div>
               </FormControl>
-              <FormMessage id="content-error" />
+              <FormMessage
+                className="text-red-700"
+                id="content-error"
+                style={{ color: '#dc2626' }}
+              />
             </FormItem>
           )}
         />
@@ -214,7 +243,7 @@ export const PoemForm = ({ defaultValues, categories, onSuccess, onCancel }: Poe
               type="button"
               variant="outline"
               onClick={onCancel}
-              className="bg-background border-input text-foreground hover:bg-accent hover:text-accent-foreground"
+              className="bg-background border-input text-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer"
             >
               {POEM_FORM_LABELS.RU.CANCEL}
             </Button>

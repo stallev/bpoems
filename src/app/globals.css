@@ -471,4 +471,25 @@ p {
   }
 }
 
+/* Стили для Quill редактора */
+.ql-editor.ql-blank {
+  @apply h-full overflow-y-auto text-foreground;
+  max-height: calc(100% - var(--spacing-md)); /* Используем переменную для отступа тулбара */
+  padding: var(--spacing-sm);
+  font-family: var(--font-serif); /* Соответствует стилю поэзии */
+  line-height: 1.8;
+}
+
+.dark .ql-editor.ql-blank {
+  @apply bg-card text-card-foreground;
+}
+
+.ql-container {
+  @apply border-0;
+}
+
+.ql-toolbar {
+  @apply border-b border-input bg-background;
+}
+
 @import '../shared/styles/container.css';

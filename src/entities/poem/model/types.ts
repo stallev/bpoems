@@ -17,7 +17,11 @@ export interface PoemWithRelations extends PrismaPoem {
   } | null;
   category: {
     id: string;
-    name: Record<string, string>;
+    translatedItems: Array<{
+      id: string;
+      type: string;
+      values: Record<string, string>;
+    }>;
   } | null;
   tags: Tag[]; // Changed: array of Tag objects instead of { tag: { id, name } }
   comments?: {

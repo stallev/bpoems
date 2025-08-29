@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { categoryRepository } from '@/entities/category';
 import { CATEGORY_ERRORS, CATEGORY_SUCCESS } from '@/entities/category/constants';
 import { auth } from '@/shared/api/auth/auth';
+import { prisma } from '@/shared/api/database/prisma';
+import { ensureUniqueCategorySlug } from '@/shared/lib/utils/slugify';
 
 export async function createCategory(formData: FormData) {
   try {
@@ -53,10 +55,26 @@ export async function createCategory(formData: FormData) {
       throw new Error(CATEGORY_ERRORS.NAME_EXISTS_EN);
     }
 
-    // Создание категории
-    const category = await categoryRepository.create(rawData);
+    const slug = await ensureUniqueCategorySlug(translations.EN, prisma);
 
-    // Ревалидация кэша
+    const category = await prisma.category.create({
+      data: {
+        slug: slug, // SEO-friendly slug
+        isActive: rawData.isActive,
+        order: rawData.order,
+        translatedItems: {
+          create: {
+            type: 'POEM_CATEGORY',
+            values: {
+              EN: translations.EN,
+              RU: translations.RU,
+              UA: translations.UA,
+            },
+          },
+        },
+      },
+    });
+
     revalidatePath('/dashboard/content/categories');
     revalidatePath('/dashboard');
 
