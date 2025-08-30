@@ -1,95 +1,54 @@
 'use client';
 
-import type { PoemContentBlock } from '@/features/poem-creation/model/types';
+import type { PoemContentRendererProps } from './types';
 
-interface PoemContentRendererProps {
-  content: PoemContentBlock[];
-  className?: string;
-}
+import { POEM_CONTENT_LABELS } from '../constants/ui';
+import { cn } from '../lib/utils';
+import { renderContentBlock } from './utils/textFormatting';
 
 /**
- * Component for rendering poem content with different block types
+ * PoemContentRenderer component for displaying formatted poem content
+ *
+ * @param props - Component props
+ * @param props.content - Array of content blocks to render
+ * @param props.className - Additional CSS classes
+ *
+ * @example
+ * ```tsx
+ * <PoemContentRenderer
+ *   content={poemContentBlocks}
+ *   className="prose prose-lg"
+ * />
+ * ```
  */
 export const PoemContentRenderer = ({ content, className }: PoemContentRendererProps) => {
+  // UI Constants for poem content rendering
+  const UI_CONSTANTS = {
+    NO_CONTENT_MESSAGE: POEM_CONTENT_LABELS.NO_CONTENT,
+  } as const;
+
   if (!content || content.length === 0) {
     return (
-      <div className="text-muted-foreground italic text-center py-8 text-sm sm:text-base">
-        Нет содержимого
+      <div className={cn('text-center text-muted-foreground py-8', className)}>
+        {UI_CONSTANTS.NO_CONTENT_MESSAGE}
       </div>
     );
   }
-  console.log('content PoemContentRenderer', content);
 
   return (
-    <div
-      className={`poem-content space-y-3 sm:space-y-4 text-sm sm:text-base leading-relaxed ${className || ''}`}
-    >
+    <div className={cn('prose prose-lg max-w-none', className)}>
       {content.map((block, index) => (
-        <ContentBlock key={index} block={block} />
+        <ContentBlock key={`${block.type}-${index}`} block={block} />
       ))}
     </div>
   );
 };
 
-interface ContentBlockProps {
-  block: PoemContentBlock;
-}
+/**
+ * ContentBlock component for rendering individual content blocks
+ */
+const ContentBlock = ({ block }: { block: PoemContentRendererProps['content'][0] }) => {
+  const renderedContent = renderContentBlock(block);
 
-const ContentBlock = ({ block }: ContentBlockProps) => {
-  if (block.type === 'paragraph') {
-    return <ParagraphBlock content={block.content} />;
-  }
-
-  return null;
-};
-
-interface ParagraphBlockProps {
-  content: Array<{
-    type: 'text';
-    text: string;
-    marks?: Array<{
-      type: 'bold' | 'italic' | 'underline' | 'strike';
-      attrs?: Record<string, any>;
-    }>;
-  }>;
-}
-
-const ParagraphBlock = ({ content }: ParagraphBlockProps) => {
-  if (!content || content.length === 0) {
-    return <div className="h-4" />; // Empty paragraph spacing
-  }
-
-  const renderText = (textBlock: ParagraphBlockProps['content'][0]) => {
-    let text = textBlock.text;
-
-    if (textBlock.marks) {
-      textBlock.marks.forEach(mark => {
-        switch (mark.type) {
-          case 'bold':
-            text = `<strong>${text}</strong>`;
-            break;
-          case 'italic':
-            text = `<em>${text}</em>`;
-            break;
-          case 'underline':
-            text = `<u>${text}</u>`;
-            break;
-          case 'strike':
-            text = `<s>${text}</s>`;
-            break;
-        }
-      });
-    }
-
-    return text;
-  };
-
-  const combinedText = content.map(renderText).join('');
-
-  return (
-    <p
-      className="text-foreground leading-relaxed"
-      dangerouslySetInnerHTML={{ __html: combinedText }}
-    />
-  );
+  return <div dangerouslySetInnerHTML={{ __html: renderedContent }} className="mb-4 last:mb-0" />;
 };

@@ -55,6 +55,8 @@ export const PoemForm = ({ defaultValues, categories, onSuccess, onCancel }: Poe
         : createPoem(formData),
     { success: false, message: '' }
   );
+  console.log('editstate', isEditing);
+  console.log('defaultValues', defaultValues);
 
   const { form, handleSubmit, getTiptapValue } = usePoemForm({
     defaultValues,

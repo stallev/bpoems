@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Schema for text content block within PoemContentBlock
 const textContentSchema = z.object({
   type: z.literal('text'),
-  text: z.string().min(1, 'Текст не может быть пустым').max(10000, 'Текст слишком длинный'),
+  text: z.string().max(10000, 'Текст слишком длинный'),
   marks: z
     .array(
       z.object({

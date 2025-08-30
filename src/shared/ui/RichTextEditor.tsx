@@ -1,8 +1,6 @@
 'use client';
 
-import Underline from '@tiptap/extension-underline';
-import { EditorContent, useEditor, Editor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
+import { EditorContent, Editor } from '@tiptap/react';
 import {
   Bold,
   Heading1,
@@ -14,19 +12,11 @@ import {
   Strikethrough,
   Underline as UnderlineIcon,
 } from 'lucide-react';
-import type { TiptapJson } from '@/features/poem-creation/model/types';
 import { cn } from '../lib/utils';
 import { Toggle } from './shadcnComponents/toggle';
-
-interface RichTextEditorProps {
-  content?: TiptapJson | string;
-  onChange: (content: TiptapJson) => void;
-  placeholder?: string;
-  className?: string;
-  minHeight?: string;
-  disabled?: boolean;
-  error?: boolean;
-}
+import { RICH_TEXT_EDITOR_LABELS } from '../constants/ui';
+import { useRichTextEditor } from './hooks/useRichTextEditor';
+import type { RichTextEditorProps } from './types';
 
 /**
  * RichTextEditor component with toolbar for text formatting
@@ -53,48 +43,19 @@ interface RichTextEditorProps {
 export const RichTextEditor = ({
   content,
   onChange,
-  placeholder = 'Начните писать...',
+  placeholder = RICH_TEXT_EDITOR_LABELS.PLACEHOLDER,
   className,
   minHeight = '200px',
   disabled = false,
   error = false,
 }: RichTextEditorProps) => {
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        bulletList: {
-          HTMLAttributes: {
-            class: 'list-disc ml-3',
-          },
-        },
-        orderedList: {
-          HTMLAttributes: {
-            class: 'list-decimal ml-3',
-          },
-        },
-      }),
-      Underline,
-    ],
-    content: content,
-    editable: !disabled,
-    editorProps: {
-      attributes: {
-        class: cn(
-          'min-h-[156px] border rounded-md bg-background py-2 px-3 focus:outline-none',
-          'prose prose-sm max-w-none',
-          'text-foreground placeholder:text-muted-foreground',
-          error && 'border-red-500 focus:ring-red-500',
-          !error && 'border-input focus:ring-2 focus:ring-primary focus:ring-offset-2',
-          disabled && 'opacity-50 cursor-not-allowed'
-        ),
-        style: `min-height: ${minHeight}`,
-        placeholder,
-      },
-    },
-    onUpdate: ({ editor }) => {
-      const json = editor.getJSON() as TiptapJson;
-      onChange(json);
-    },
+  const { editor } = useRichTextEditor({
+    content,
+    onChange,
+    placeholder,
+    minHeight,
+    disabled,
+    error,
   });
 
   if (!editor) {
@@ -118,55 +79,55 @@ const MenuBar = ({ editor, disabled }: { editor: Editor; disabled: boolean }) =>
       icon: <Heading1 className="size-4" />,
       onClick: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
       pressed: editor.isActive('heading', { level: 1 }),
-      title: 'Заголовок 1',
+      title: RICH_TEXT_EDITOR_LABELS.TOOLBAR.HEADING_1,
     },
     {
       icon: <Heading2 className="size-4" />,
       onClick: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
       pressed: editor.isActive('heading', { level: 2 }),
-      title: 'Заголовок 2',
+      title: RICH_TEXT_EDITOR_LABELS.TOOLBAR.HEADING_2,
     },
     {
       icon: <Heading3 className="size-4" />,
       onClick: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
       pressed: editor.isActive('heading', { level: 3 }),
-      title: 'Заголовок 3',
+      title: RICH_TEXT_EDITOR_LABELS.TOOLBAR.HEADING_3,
     },
     {
       icon: <Bold className="size-4" />,
       onClick: () => editor.chain().focus().toggleBold().run(),
       pressed: editor.isActive('bold'),
-      title: 'Жирный',
+      title: RICH_TEXT_EDITOR_LABELS.TOOLBAR.BOLD,
     },
     {
       icon: <Italic className="size-4" />,
       onClick: () => editor.chain().focus().toggleItalic().run(),
       pressed: editor.isActive('italic'),
-      title: 'Курсив',
+      title: RICH_TEXT_EDITOR_LABELS.TOOLBAR.ITALIC,
     },
     {
       icon: <UnderlineIcon className="size-4" />,
       onClick: () => editor.chain().focus().toggleUnderline().run(),
       pressed: editor.isActive('underline'),
-      title: 'Подчеркнутый',
+      title: RICH_TEXT_EDITOR_LABELS.TOOLBAR.UNDERLINE,
     },
     {
       icon: <Strikethrough className="size-4" />,
       onClick: () => editor.chain().focus().toggleStrike().run(),
       pressed: editor.isActive('strike'),
-      title: 'Зачеркнутый',
+      title: RICH_TEXT_EDITOR_LABELS.TOOLBAR.STRIKETHROUGH,
     },
     {
       icon: <List className="size-4" />,
       onClick: () => editor.chain().focus().toggleBulletList().run(),
       pressed: editor.isActive('bulletList'),
-      title: 'Маркированный список',
+      title: RICH_TEXT_EDITOR_LABELS.TOOLBAR.BULLET_LIST,
     },
     {
       icon: <ListOrdered className="size-4" />,
       onClick: () => editor.chain().focus().toggleOrderedList().run(),
       pressed: editor.isActive('orderedList'),
-      title: 'Нумерованный список',
+      title: RICH_TEXT_EDITOR_LABELS.TOOLBAR.ORDERED_LIST,
     },
   ];
 

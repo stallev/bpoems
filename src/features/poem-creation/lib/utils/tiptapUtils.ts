@@ -12,11 +12,31 @@ export const tiptapJsonToPoemContentBlocks = (json: TiptapContent): PoemContentB
     return json;
   }
 
+  if (Array.isArray(json.content)) {
+    if (json.content.length !== 0) {
+      json.content.map(item => {
+        if (item.type === 'paragraph' && !item?.content) {
+          item.content = [{ type: 'text', text: '' }];
+        }
+        return item;
+      });
+    }
+  }
+
+  console.log('json.content', json.content);
+
   // If json is TiptapJson object, process it
   if (json && typeof json === 'object' && 'content' in json) {
-    if (!json.content || !Array.isArray(json.content)) {
-      console.log('json.content is empty');
-      return [];
+    // Handle empty content array - create a single empty paragraph
+    if (!json.content || !Array.isArray(json.content) || json.content.length === 0) {
+      console.log('json.content is empty, creating empty paragraph');
+      return [
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: '' }],
+          order: 0,
+        },
+      ];
     }
 
     const blocks: PoemContentBlock[] = [];
@@ -42,8 +62,9 @@ export const tiptapJsonToPoemContentBlocks = (json: TiptapContent): PoemContentB
 
         // Process content recursively for nested lists
         const processContent = (content: any[]): void => {
+          console.log('processContent', content);
           for (const textNode of content) {
-            if (textNode.type === 'text' && textNode.text) {
+            if (textNode.type === 'text' && textNode.text !== undefined) {
               contentBlocks.push({
                 type: 'text',
                 text: textNode.text,

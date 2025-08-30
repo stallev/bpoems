@@ -59,6 +59,7 @@ export async function updatePoem(slug: string, formData: FormData): Promise<Upda
     };
 
     const validatedData = poemFormSchema.parse(rawData);
+    console.log('validatedData content', validatedData.content);
 
     // 6. Content sanitization (basic XSS prevention)
     const sanitizedContent = validatedData.content.map(block => ({
@@ -68,6 +69,7 @@ export async function updatePoem(slug: string, formData: FormData): Promise<Upda
         text: textBlock.text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''),
       })),
     }));
+    console.log('sanitizedContent content', sanitizedContent);
 
     // 7. Determine new status based on user role and current status
     let newStatus = existingPoem.status;

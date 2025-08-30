@@ -1,10 +1,10 @@
 export const UIConstants = {
-  MODAL_TITLE: 'Report Content',
-  REASON_LABEL: 'Reason for Report',
-  MESSAGE_LABEL: 'Additional Details',
-  SUBMIT_BUTTON: 'Submit Report',
-  CANCEL_BUTTON: 'Cancel',
-  SUBMITTING_BUTTON: 'Submitting...',
-  SUCCESS_MESSAGE: 'Report submitted successfully',
-  ERROR_MESSAGE: 'Failed to submit report',
+  MODAL_TITLE: 'Пожаловаться на контент',
+  REASON_LABEL: 'Причина жалобы',
+  MESSAGE_LABEL: 'Дополнительные детали',
+  SUBMIT_BUTTON: 'Отправить жалобу',
+  CANCEL_BUTTON: 'Отмена',
+  SUBMITTING_BUTTON: 'Отправка...',
+  SUCCESS_MESSAGE: 'Жалоба успешно отправлена',
+  ERROR_MESSAGE: 'Ошибка при отправке жалобы',
 } as const;
