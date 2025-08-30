@@ -10,7 +10,7 @@ import { getDefaultContentStatusForRole } from '@/shared/lib/utils/contentStatus
 import { canCreateContent } from '@/shared/lib/utils/roleUtils';
 import { getRoutePath } from '@/shared/lib/utils/routeUtils';
 import { ensureUniqueSlug } from '@/shared/lib/utils/slugify';
-import { POEM_ERRORS, POEM_SUCCESS } from '../lib/constants';
+import { POEM_ERRORS, POEM_SUCCESS, FORM_FIELDS } from '../lib/constants';
 import { poemFormSchema } from '../model/schemas';
 import type { CreatePoemResult } from '../model/types';
 
@@ -43,9 +43,9 @@ export async function createPoem(formData: FormData): Promise<CreatePoemResult> 
 
     // 3. Data parsing and validation
     const rawData = {
-      title: formData.get('title') as string,
-      categoryId: formData.get('categoryId') as string,
-      content: JSON.parse(formData.get('content') as string),
+      title: formData.get(FORM_FIELDS.TITLE) as string,
+      categoryId: formData.get(FORM_FIELDS.CATEGORY_ID) as string,
+      content: JSON.parse(formData.get(FORM_FIELDS.CONTENT) as string),
     };
 
     const validatedData = poemFormSchema.parse(rawData);
@@ -53,7 +53,10 @@ export async function createPoem(formData: FormData): Promise<CreatePoemResult> 
     // 4. Content sanitization (basic XSS prevention)
     const sanitizedContent = validatedData.content.map(block => ({
       ...block,
-      content: block.content.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''),
+      content: block.content.map(textBlock => ({
+        ...textBlock,
+        text: textBlock.text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''),
+      })),
     }));
 
     // 5. Generate unique slug from title

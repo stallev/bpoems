@@ -5,19 +5,19 @@
  */
 
 /**
- * Convert Quill Delta to PoemContentBlock array
+ * Convert Tiptap JSON to PoemContentBlock array
  *
  * @example
  * ```typescript
- * import { deltaToPoemContentBlocks } from '@/features/poem-creation/lib/utils';
+ * import { tiptapJsonToPoemContentBlocks } from '@/features/poem-creation/lib/utils';
  *
- * const delta = { ops: [{ insert: 'Hello\nWorld', attributes: { bold: true } }] };
- * const blocks = deltaToPoemContentBlocks(delta);
+ * const json = { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Hello World' }] }] };
+ * const blocks = tiptapJsonToPoemContentBlocks(json);
  * ```
  */
 export {
-  deltaToPoemContentBlocks,
-  poemContentBlocksToDelta,
+  tiptapJsonToPoemContentBlocks,
+  poemContentBlocksToTiptapJson,
   sanitizeContent,
   validatePoemContentBlocks,
-} from './quillUtils';
+} from './tiptapUtils';

@@ -245,28 +245,30 @@ bpoems/
 │   │   │       ├── createClaimReport.ts # ✅ Создание жалоб на контент
 │   │   │       ├── handleClaimReport.ts # ✅ Обработка жалоб модераторами
 │   │   │       └── logModerationActivity.ts # ✅ Логирование действий модерации
-│   │   └── poem-creation/            # ✅ Poem Creation Feature
+│   │   └── poem-creation/            # ✅ Poem Creation Feature (Tiptap Integration)
 │   │       ├── examples/
 │   │       ├── index.ts
 │   │       ├── lib/
-│   │       │   ├── constants.ts      # ✅ Содержит строковые константы статусов
+│   │       │   ├── constants.ts      # ✅ Tiptap конфигурация и UI константы
 │   │       │   ├── hooks/
 │   │       │   │   ├── index.ts
-│   │       │   │   └── usePoemForm.ts
+│   │       │   │   ├── usePoemForm.ts
+│   │       │   │   └── useTiptapUtils.ts # ✅ Новый хук для работы с Tiptap
 │   │       │   └── utils/
 │   │       │       ├── index.ts
-│   │       │       └── quillUtils.ts # ✅ Удалена поддержка эмодзи
+│   │       │       ├── tiptapUtils.ts # ✅ Новые утилиты для Tiptap
+│   │       │       └── quillUtils.ts # ✅ Устаревший файл (для обратной совместимости)
 │   │       ├── model/
 │   │       │   ├── index.ts
-│   │       │   ├── schemas.ts        # ✅ Удалена валидация эмодзи
-│   │       │   └── types.ts          # ✅ Удалено поле emoji из PoemContentBlock
+│   │       │   ├── schemas.ts        # ✅ Валидация Tiptap JSON структуры
+│   │       │   └── types.ts          # ✅ Типы для Tiptap JSON и PoemContentBlock
 │   │       ├── server-actions/       # ✅ Использует константы маршрутов и ошибок
 │   │       │   ├── createPoem.ts     # ✅ Константы: RoutePath, ErrorMessages + уникальный slug
 │   │       │   ├── getCategories.ts  # ✅ Типизированные переводы категорий
 │   │       │   ├── updatePoem.ts     # ✅ Константы: RoutePath, ErrorMessages
 │   │       │   └── index.ts
 │   │       └── ui/
-│   │           └── PoemForm.tsx      # ✅ UI компонент без эмодзи
+│   │           └── PoemForm.tsx      # ✅ UI компонент с Tiptap редактором
 │   ├── generated/                     # ⚠️ Нестандартная папка (Prisma Client)
 │   ├── lib/                          # ⚠️ Нестандартная папка
 │   │   └── utils.ts
@@ -746,3 +748,22 @@ src/
 6. ✅ Создан `docs/specs/plans/poem_page_plan.md`
 
 Проект значительно улучшился в плане соответствия FSD архитектуре. Рефакторинг строковых констант и утилит, типизация any, удаление поддержки эмодзи и создание единого источника истины успешно завершены. Новая структура компонентов управления категориями демонстрирует правильное применение принципов FSD с полной структурой сегментов, правильными экспортами и хорошей изоляцией. Принцип "один источник истины" соблюден, все строковые константы заменены на enum, утилиты вынесены в отдельные файлы как стрелочные функции, тип any полностью устранен из poem-creation feature. Добавлена полная система модерации с логированием действий, уникальные slug для стихотворений, создана подробная документация структуры страницы Poem, форм комментариев и рецензий, а также планы разработки соответствующих функций.
+
+#### ✅ Этап 12: Миграция на Tiptap
+1. ✅ Обновлен `package.json` - заменен react-quilljs на Tiptap зависимости
+2. ✅ Создан `src/features/poem-creation/lib/utils/tiptapUtils.ts` - новые утилиты для Tiptap
+3. ✅ Создан `src/features/poem-creation/lib/hooks/useTiptapUtils.ts` - новый хук для Tiptap
+4. ✅ Обновлен `src/features/poem-creation/lib/hooks/usePoemForm.ts` - интеграция с Tiptap
+5. ✅ Обновлен `src/features/poem-creation/ui/PoemForm.tsx` - замена Quill на Tiptap редактор
+6. ✅ Обновлен `src/features/poem-creation/lib/constants.ts` - конфигурация Tiptap
+7. ✅ Обновлен `src/features/poem-creation/model/types.ts` - типы для Tiptap JSON
+8. ✅ Обновлены все index.ts файлы - экспорт новых Tiptap утилит
+9. ✅ Обновлена документация - добавлена информация о Tiptap интеграции
+10. ✅ Установлены дополнительные зависимости - sanitize-html и @types/sanitize-html
+
+**Миграция на Tiptap завершена успешно** ✅
+- Заменен устаревший react-quilljs на современный Tiptap
+- Сохранена вся функциональность и обратная совместимость
+- Улучшена расширяемость и поддерживаемость кода
+- Добавлена поддержка современного JSON-based формата контента
+- Сохранена интеграция с React Hook Form и серверными действиями

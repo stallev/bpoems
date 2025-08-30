@@ -3,7 +3,7 @@ export type {
   PoemFormData,
   CategoryOption,
   PoemFormProps,
-  QuillDelta,
+  TiptapJson,
 } from './types';
 
 export { poemFormSchema } from './schemas';

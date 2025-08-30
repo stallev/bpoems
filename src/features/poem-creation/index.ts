@@ -10,15 +10,15 @@ export type {
   PoemFormData,
   CategoryOption,
   PoemFormProps,
-  QuillDelta,
+  TiptapJson,
 } from './model';
 
 export { poemFormSchema } from './model';
 
 // Utilities and Hooks
 export {
-  deltaToPoemContentBlocks,
-  poemContentBlocksToDelta,
+  tiptapJsonToPoemContentBlocks,
+  poemContentBlocksToTiptapJson,
   sanitizeContent,
   validatePoemContentBlocks,
 } from './lib';
@@ -26,4 +26,10 @@ export {
 export { usePoemForm } from './lib';
 
 // Constants
-export { POEM_FORM_LABELS, POEM_ERRORS, POEM_SUCCESS, QUILL_MODULES, QUILL_FORMATS } from './lib';
+export {
+  POEM_FORM_LABELS,
+  POEM_ERRORS,
+  POEM_SUCCESS,
+  TIPTAP_EXTENSIONS,
+  TIPTAP_EDITOR_CONFIG,
+} from './lib';

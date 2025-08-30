@@ -5,6 +5,7 @@ import { categoryRepository } from '@/entities/category';
 import { CATEGORY_ERRORS, CATEGORY_SUCCESS } from '@/entities/category/constants';
 import { auth } from '@/shared/api/auth/auth';
 import { prisma } from '@/shared/api/database/prisma';
+import { CONTENT_TYPES } from '@/shared/constants/ContentTypes';
 import { ensureUniqueCategorySlug } from '@/shared/lib/utils/slugify';
 
 export async function createCategory(formData: FormData) {
@@ -23,7 +24,7 @@ export async function createCategory(formData: FormData) {
     const rawData = {
       translatedName: {
         create: {
-          type: 'POEM_CATEGORY' as const,
+          type: CONTENT_TYPES.POEM_CATEGORY,
           values: {
             EN: formData.get('translations.EN') as string,
             RU: formData.get('translations.RU') as string,
@@ -64,7 +65,7 @@ export async function createCategory(formData: FormData) {
         order: rawData.order,
         translatedItems: {
           create: {
-            type: 'POEM_CATEGORY',
+            type: CONTENT_TYPES.POEM_CATEGORY,
             values: {
               EN: translations.EN,
               RU: translations.RU,
