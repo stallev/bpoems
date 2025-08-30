@@ -5,6 +5,7 @@ import { categoryRepository } from '@/entities/category';
 import { CATEGORY_ERRORS, CATEGORY_SUCCESS } from '@/entities/category/constants';
 import { auth } from '@/shared/api/auth/auth';
 import { prisma } from '@/shared/api/database/prisma';
+import { CONTENT_TYPES } from '@/shared/constants/ContentTypes';
 
 export async function updateCategory(id: string, formData: FormData) {
   try {
@@ -62,7 +63,7 @@ export async function updateCategory(id: string, formData: FormData) {
     const translatedItem = await prisma.translatedItem.findFirst({
       where: {
         categoryId: id,
-        type: 'POEM_CATEGORY',
+        type: CONTENT_TYPES.POEM_CATEGORY,
       },
     });
 

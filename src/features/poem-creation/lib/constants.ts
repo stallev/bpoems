@@ -51,9 +51,17 @@ export const POEM_SUCCESS = {
   UPDATED_PENDING: 'Стихотворение успешно обновлено и отправлено на модерацию.',
 } as const;
 
-// Quill editor configuration
-export const QUILL_MODULES = {
-  toolbar: [['bold', 'italic', 'underline']],
+// Form field names
+export const FORM_FIELDS = {
+  TITLE: 'title',
+  CATEGORY_ID: 'categoryId',
+  CONTENT: 'content',
 } as const;
 
-export const QUILL_FORMATS = ['bold', 'italic', 'underline'] as const;
+// Tiptap editor configuration
+export const TIPTAP_EXTENSIONS = ['StarterKit', 'Underline'] as const;
+
+export const TIPTAP_EDITOR_CONFIG = {
+  placeholder: 'Начните писать ваше стихотворение...',
+  extensions: TIPTAP_EXTENSIONS,
+} as const;

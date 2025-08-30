@@ -30,37 +30,53 @@
 - **CursorAI Agent Rule:** "Before implementing any code changes, the CursorAI agent must thoroughly review and validate the proposed code to ensure it meets all project requirements, follows established patterns, and maintains code quality standards. This includes checking for proper TypeScript typing, FSD architecture compliance, SOLID principles adherence, and PRD requirements fulfillment."
 - **Documentation Language Requirement:** All project documentation, code comments, and technical specifications must be written exclusively in English. This includes PRD files, architecture documents, inline code comments, and development documentation.
 - **Constants for UI and Error Messages**:
-  - **Mandatory Use of Constants:** Hooks, components, and server actions must not use hardcoded string values for error logs, input or textarea placeholders, or labels. Instead, they must use predefined constants from the appropriate `ui.ts` files located in the respective `constants/` directories (e.g., `src/entities/{entity}/constants/ui.ts` or `src/features/{feature}/constants/ui.ts`).
-  - **Single Source of Truth:** Constants ensure a single source of truth for UI text and error messages, facilitating maintainability, consistency, and localization (e.g., Next.js i18n support for English default and Russian MVP).
-  - **File Structure:** Constants must be defined in `ui.ts` files within the relevant entity or feature directory, following the Feature-Sliced Design (FSD) structure.
-  - **Naming Convention:** Constants should use descriptive, uppercase names with underscores (e.g., `COMMENT_CONTENT_PLACEHOLDER`, `ERROR_UNAUTHORIZED`).
+  - **Mandatory Use of Constants:** Hooks, components, and server actions must not use hardcoded string values for error logs, input or textarea placeholders, labels, form field names, content types, or any other string literals. Instead, they must use predefined constants from the appropriate `constants/` files located in the respective directories according to FSD methodology (e.g., `src/entities/{entity}/constants/` or `src/features/{feature}/constants/` or `src/shared/constants/`).
+  - **Single Source of Truth:** Constants ensure a single source of truth for UI text, error messages, form field names, content types, and other string values, facilitating maintainability, consistency, and localization (e.g., Next.js i18n support for English default and Russian MVP).
+  - **File Structure:** Constants must be defined in appropriate files within the relevant entity, feature, or shared directory, following the Feature-Sliced Design (FSD) structure:
+    - `src/shared/constants/` - for global constants (ErrorMessages, ContentTypes, Roles, etc.)
+    - `src/entities/{entity}/constants/` - for entity-specific constants
+    - `src/features/{feature}/constants/` - for feature-specific constants
+  - **Naming Convention:** Constants should use descriptive, uppercase names with underscores (e.g., `COMMENT_CONTENT_PLACEHOLDER`, `ERROR_UNAUTHORIZED`, `FORM_FIELDS_TITLE`, `CONTENT_TYPES_POEM_CATEGORY`).
   - **Implementation Example**:
     ```typescript
-    // src/features/comment/constants/ui.ts
-    export const UIConstants = {
-      COMMENT_CONTENT_LABEL: 'Your Comment',
-      COMMENT_CONTENT_PLACEHOLDER: 'Write your comment here...',
-      COMMENT_SUCCESS_MESSAGE: 'Comment submitted successfully',
-      SUBMIT_BUTTON: 'Submit',
-      CANCEL_BUTTON: 'Cancel',
-      SUBMITTING_BUTTON: 'Submitting...',
-    };
+    // src/features/poem-creation/lib/constants.ts
+    export const FORM_FIELDS = {
+      TITLE: 'title',
+      CATEGORY_ID: 'categoryId',
+      CONTENT: 'content',
+    } as const;
 
-    // src/features/comment/ui/CommentForm.tsx
-    import { UIConstants } from '../constants/ui';
-    // Usage in component
-    <FormLabel>{UIConstants.COMMENT_CONTENT_LABEL}</FormLabel>
-    <Textarea placeholder={UIConstants.COMMENT_CONTENT_PLACEHOLDER} />
+    export const POEM_ERRORS = {
+      ACCESS_DENIED: 'Доступ запрещен. Необходима авторизация.',
+      INSUFFICIENT_PERMISSIONS: 'Недостаточно прав для создания стихотворений.',
+    } as const;
 
-    // src/features/comment/server-actions/createComment.ts
-    import { UIConstants } from '../constants/ui';
-    import { ErrorMessages } from '@/shared/constants/ErrorMessages';
+    // src/shared/constants/ContentTypes.ts
+    export const CONTENT_TYPES = {
+      POEM_CATEGORY: 'POEM_CATEGORY',
+      USER_PROFILE: 'USER_PROFILE',
+      POEM_TAG: 'POEM_TAG',
+    } as const;
+
+    // src/features/poem-creation/server-actions/createPoem.ts
+    import { FORM_FIELDS, POEM_ERRORS } from '../lib/constants';
+    import { CONTENT_TYPES } from '@/shared/constants/ContentTypes';
+    
     // Usage in server action
-    throw new Error(ErrorMessages.UNAUTHORIZED);
-    return { success: true, message: UIConstants.COMMENT_SUCCESS_MESSAGE };
+    const rawData = {
+      title: formData.get(FORM_FIELDS.TITLE) as string,
+      categoryId: formData.get(FORM_FIELDS.CATEGORY_ID) as string,
+      content: JSON.parse(formData.get(FORM_FIELDS.CONTENT) as string),
+    };
+    
+    throw new Error(POEM_ERRORS.ACCESS_DENIED);
+    
+    // Usage for content types
+    type: CONTENT_TYPES.POEM_CATEGORY,
     ```
-  - **Validation:** Code reviews and linting rules must enforce the use of constants, rejecting hardcoded strings for UI text or error messages.
+  - **Validation:** Code reviews and linting rules must enforce the use of constants, rejecting hardcoded strings for UI text, error messages, form field names, content types, or any other string literals.
   - **Documentation:** Task description documents must include the constants defined and their usage in hooks, components, and server actions.
+  - **SOLID and DRY Principles:** This approach follows the Single Responsibility Principle (each constant has a single purpose) and the Don't Repeat Yourself principle (avoiding duplication of string literals across the codebase).
 
 ### Server Actions Requirements
 

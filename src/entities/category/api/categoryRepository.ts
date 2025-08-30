@@ -1,4 +1,5 @@
 import { prisma } from '@/shared/api/database/prisma';
+import { CONTENT_TYPES } from '@/shared/constants/ContentTypes';
 import type {
   CategoryCreateInput,
   CategoryUpdateInput,
@@ -136,7 +137,7 @@ export const categoryRepository = {
       include: {
         translatedItems: {
           where: {
-            type: 'POEM_CATEGORY',
+            type: CONTENT_TYPES.POEM_CATEGORY,
           },
         },
         _count: {
@@ -151,7 +152,9 @@ export const categoryRepository = {
     });
 
     return categories.map(category => {
-      const translatedItem = category.translatedItems.find(item => item.type === 'POEM_CATEGORY');
+      const translatedItem = category.translatedItems.find(
+        item => item.type === CONTENT_TYPES.POEM_CATEGORY
+      );
       return {
         id: category.id,
         isActive: category.isActive,
@@ -207,7 +210,7 @@ export const categoryRepository = {
       include: {
         translatedItems: {
           where: {
-            type: 'POEM_CATEGORY',
+            type: CONTENT_TYPES.POEM_CATEGORY,
           },
         },
       },
@@ -215,7 +218,9 @@ export const categoryRepository = {
 
     // Check if any category has the given name in the specified language
     return categories.some(category => {
-      const translatedItem = category.translatedItems.find(item => item.type === 'POEM_CATEGORY');
+      const translatedItem = category.translatedItems.find(
+        item => item.type === CONTENT_TYPES.POEM_CATEGORY
+      );
       if (!translatedItem) return false;
       const values = translatedItem.values as Record<string, string>;
       return values[language] === name;

@@ -1,11 +1,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import type { Delta } from 'quill';
 import { useState, useActionState, startTransition, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
-import { useQuill } from 'react-quilljs';
-import 'quill/dist/quill.snow.css';
+import { toast } from 'sonner';
+import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { Button } from '@/shared/ui/shadcnComponents/button';
 import {
   Form,
@@ -23,10 +22,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/shadcnComponents/select';
-import { POEM_FORM_LABELS, QUILL_MODULES, QUILL_FORMATS } from '../lib/constants';
+import { POEM_FORM_LABELS } from '../lib/constants';
 import { usePoemForm } from '../lib/hooks/usePoemForm';
-import { deltaToPoemContentBlocks } from '../lib/utils/quillUtils';
-import type { PoemFormProps, PoemFormData, QuillDelta, FormState } from '../model/types';
+import { tiptapJsonToPoemContentBlocks } from '../lib/utils/tiptapUtils';
+import type { PoemFormProps, PoemFormData, FormState, TiptapJson } from '../model/types';
 import { createPoem, updatePoem } from '../server-actions';
 
 /**
@@ -51,67 +50,46 @@ export const PoemForm = ({ defaultValues, categories, onSuccess, onCancel }: Poe
   const router = useRouter();
   const [state, formAction] = useActionState(
     (prevState: FormState, formData: FormData) =>
-      isEditing && defaultValues?.id
-        ? updatePoem(defaultValues.id, formData)
+      isEditing && defaultValues?.slug
+        ? updatePoem(defaultValues.slug, formData)
         : createPoem(formData),
     { success: false, message: '' }
   );
 
-  const { form, handleSubmit, getQuillValue } = usePoemForm({
+  const { form, handleSubmit, getTiptapValue } = usePoemForm({
     defaultValues,
     onSuccess,
     onCancel,
   });
 
-  // Initialize Quill editor
-  const { quill, quillRef } = useQuill({
-    modules: QUILL_MODULES,
-    formats: QUILL_FORMATS as unknown as string[],
-    placeholder: POEM_FORM_LABELS.RU.CONTENT_PLACEHOLDER,
-    theme: 'snow',
-  });
-
-  // Set initial Quill content
-  useEffect(() => {
-    if (quill && defaultValues?.content) {
-      const delta = getQuillValue(defaultValues.content);
-      quill.setContents(delta as Delta);
-    }
-  }, [quill, defaultValues?.content, getQuillValue]);
-
-  // Handle Quill content changes
-  useEffect(() => {
-    if (quill) {
-      const handleChange = () => {
-        const delta = quill.getContents();
-        const contentBlocks = deltaToPoemContentBlocks(delta as QuillDelta);
-        form.setValue('content', contentBlocks);
-      };
-
-      quill.on('text-change', handleChange);
-      return () => {
-        quill.off('text-change', handleChange);
-      };
-    }
-  }, [quill, form]);
-
   // Handle form submission success
   useEffect(() => {
     if (state.success && state.data) {
+      // Show success notification
+      toast.success(state.message || 'Стихотворение успешно сохранено');
+
       if (onSuccess) {
         onSuccess(state.data);
       } else {
         // Default redirect behavior
         router.push(`/poems/${state.data.slug}`);
       }
+    } else if (state.message && !state.success) {
+      // Show error notification
+      toast.error(state.message);
     }
-  }, [state.success, state.data, onSuccess, router]);
+  }, [state.success, state.data, state.message, onSuccess, router]);
 
-  const onSubmit = (data: PoemFormData) => {
-    const formData = handleSubmit(data);
+  const onSubmit = (data: any) => {
+    const formData = handleSubmit(data as PoemFormData);
     startTransition(() => {
       formAction(formData);
     });
+  };
+
+  const handleContentChange = (content: TiptapJson) => {
+    const contentBlocks = tiptapJsonToPoemContentBlocks(content);
+    form.setValue('content', contentBlocks);
   };
 
   return (
@@ -192,25 +170,16 @@ export const PoemForm = ({ defaultValues, categories, onSuccess, onCancel }: Poe
             <FormItem>
               <FormLabel id="content-label">{POEM_FORM_LABELS.RU.CONTENT}</FormLabel>
               <FormControl>
-                <div
-                  className={`min-h-[200px] border border-input rounded-md focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 bg-background transition-all duration-200 ${
-                    form.formState.errors.content ? 'border-red-500' : ''
-                  }`}
-                  aria-labelledby="content-label"
-                  aria-describedby="content-error"
-                  aria-invalid={!!form.formState.errors.content}
-                >
-                  <div
-                    ref={quillRef}
-                    className="ql-editor ql-blank h-full overflow-y-auto rounded-md text-xl"
-                    style={{
-                      maxHeight: 'calc(100% - 40px)',
-                      borderColor: 'transparent',
-                      fontSize: '1.2rem',
-                      lineHeight: '1.5',
-                    }}
-                  />
-                </div>
+                <RichTextEditor
+                  content={
+                    defaultValues?.content ? getTiptapValue(defaultValues.content) : undefined
+                  }
+                  onChange={handleContentChange}
+                  placeholder={POEM_FORM_LABELS.RU.CONTENT_PLACEHOLDER}
+                  minHeight="200px"
+                  error={!!form.formState.errors.content}
+                  className="min-h-[200px]"
+                />
               </FormControl>
               <FormMessage
                 className="text-red-700"
@@ -270,11 +239,14 @@ const SubmitButton = ({ isEditing }: { isEditing: boolean }) => {
       disabled={pending}
       className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
     >
-      {pending
-        ? isEditing
-          ? POEM_FORM_LABELS.RU.SUBMIT_UPDATING
-          : POEM_FORM_LABELS.RU.SUBMIT_CREATING
-        : POEM_FORM_LABELS.RU.SUBMIT}
+      {pending ? (
+        <div className="flex items-center gap-2">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          {isEditing ? POEM_FORM_LABELS.RU.SUBMIT_UPDATING : POEM_FORM_LABELS.RU.SUBMIT_CREATING}
+        </div>
+      ) : (
+        POEM_FORM_LABELS.RU.SUBMIT
+      )}
     </Button>
   );
 };

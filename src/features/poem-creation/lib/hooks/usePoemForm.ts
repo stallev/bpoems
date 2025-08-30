@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useQuillUtils } from './useQuillUtils';
+import { useTiptapUtils } from './useTiptapUtils';
 import { poemFormSchema } from '../../model/schemas';
 import type { PoemFormData, UsePoemFormParams } from '../../model/types';
 
@@ -18,7 +18,7 @@ export const usePoemForm = ({ defaultValues, onSuccess }: UsePoemFormParams = {}
     },
   });
 
-  const { getQuillValue, prepareFormData } = useQuillUtils();
+  const { getTiptapValue, prepareFormData } = useTiptapUtils();
 
   const handleSubmit = useCallback(
     (data: PoemFormData) => {
@@ -43,6 +43,6 @@ export const usePoemForm = ({ defaultValues, onSuccess }: UsePoemFormParams = {}
   return {
     form,
     handleSubmit,
-    getQuillValue,
+    getTiptapValue,
   };
 };

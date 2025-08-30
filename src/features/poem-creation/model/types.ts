@@ -1,18 +1,21 @@
-// Poem content block structure for rich text formatting
+// Poem content block structure for rich text formatting (Tiptap-compatible)
 export interface PoemContentBlock {
-  order: number; // Sequential order for rendering
-  textType: 'paragraph'; // Type of content block
-  content: string; // Text content of the paragraph
-  formatting: {
-    bold: boolean; // Bold formatting
-    italic: boolean; // Italic formatting
-    underline: boolean; // Underline formatting
-  } | null; // Null if no formatting applied
+  type: 'paragraph'; // Type of content block (always paragraph for now)
+  content: Array<{
+    type: 'text';
+    text: string;
+    marks?: Array<{
+      type: 'bold' | 'italic' | 'underline' | 'strike';
+      attrs?: Record<string, any>;
+    }>;
+  }>;
+  order?: number; // Optional sequential order for backward compatibility
 }
 
 // Form data structure for poem creation/editing
 export interface PoemFormData {
   id?: string; // Poem ID (for editing)
+  slug?: string; // Poem slug (for editing)
   title: string; // Poem title (1-255 characters)
   categoryId: string; // Selected category ID
   content: PoemContentBlock[]; // Array of content blocks
@@ -36,21 +39,16 @@ export interface PoemFormProps {
   onCancel?: () => void;
 }
 
-// Delta structure from react-quilljs
-export interface QuillDelta {
-  ops: Array<{
-    insert: string;
-    attributes?: {
-      bold?: boolean;
-      italic?: boolean;
-      underline?: boolean;
-    };
-  }>;
-}
-
 // Type for content block with sanitization
 export interface SanitizedContentBlock extends PoemContentBlock {
-  content: string; // Sanitized content
+  content: Array<{
+    type: 'text';
+    text: string; // Sanitized text content
+    marks?: Array<{
+      type: 'bold' | 'italic' | 'underline' | 'strike';
+      attrs?: Record<string, any>;
+    }>;
+  }>;
 }
 
 // Type for form state in useActionState
@@ -81,21 +79,45 @@ export interface UsePoemFormParams {
   onCancel?: () => void;
 }
 
-// Quill utility types
-export interface QuillEditorConfig {
-  modules: Record<string, unknown>;
-  formats: string[];
+// Tiptap utility types
+export interface TiptapEditorConfig {
+  extensions: any[];
+  content: any;
   placeholder: string;
-  theme: string;
+  onUpdate: (params: { editor: any }) => void;
 }
 
-// Quill instance type
-export interface QuillInstance {
-  setContents: (delta: QuillDelta) => void;
-  getContents: () => QuillDelta;
+// Tiptap instance type
+export interface TiptapInstance {
+  getJSON: () => any;
+  setContent: (content: any) => void;
   on: (event: string, handler: () => void) => void;
   off: (event: string, handler: () => void) => void;
 }
+
+// Tiptap JSON structure
+export interface TiptapJson {
+  type: string;
+  content: Array<{
+    type: string;
+    content?: Array<{
+      type: string;
+      text?: string;
+      marks?: Array<{
+        type: string;
+        attrs?: Record<string, any>;
+      }>;
+    }>;
+    text?: string;
+    marks?: Array<{
+      type: string;
+      attrs?: Record<string, any>;
+    }>;
+  }>;
+}
+
+// Union type for Tiptap content - can be either TiptapJson object or PoemContentBlock array
+export type TiptapContent = TiptapJson | PoemContentBlock[];
 
 // Form submission state types
 export interface FormSubmissionState {

@@ -371,6 +371,47 @@ export { auth } from './auth' // server-only
 ### Testing
 - Мок конфигурации провайдера; контрактные тесты guards; smoke-тесты на страницы входа/выхода
 
+## Feature: Poem Creation (Tiptap Integration)
+
+### Purpose
+Обеспечить создание и редактирование стихотворений с использованием современного WYSIWYG редактора Tiptap. Заменяет устаревший react-quilljs для улучшения расширяемости и поддерживаемости.
+
+### Layer placement
+- `features/poem-creation/ui/PoemForm.tsx` – основной компонент формы с Tiptap редактором
+- `features/poem-creation/lib/hooks/useTiptapUtils.ts` – утилиты для работы с Tiptap
+- `features/poem-creation/lib/utils/tiptapUtils.ts` – конвертация между форматами контента
+- `features/poem-creation/model/types.ts` – типы для Tiptap JSON и PoemContentBlock
+- `features/poem-creation/server-actions/` – серверные действия для создания/обновления
+
+### Public API examples
+```ts
+// features/poem-creation/ui/index.ts
+export { PoemForm } from './PoemForm'
+
+// features/poem-creation/lib/hooks/index.ts
+export { usePoemForm } from './usePoemForm'
+
+// features/poem-creation/lib/utils/index.ts
+export { tiptapJsonToPoemContentBlocks, poemContentBlocksToTiptapJson } from './tiptapUtils'
+```
+
+### Tiptap Integration
+- Использует `@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-underline`
+- Поддерживает базовое форматирование (жирный, курсив, подчеркнутый)
+- Конвертирует между Tiptap JSON и PoemContentBlock форматами
+- Обеспечивает обратную совместимость с существующим контентом
+
+### Content Conversion
+- `tiptapJsonToPoemContentBlocks()` – конвертация Tiptap JSON в PoemContentBlock[]
+- `poemContentBlocksToTiptapJson()` – конвертация PoemContentBlock[] в Tiptap JSON
+- `htmlToTiptapJson()` – конвертация HTML в Tiptap JSON для обратной совместимости
+
+### Import rules
+- Tiptap зависимости импортируются в UI компонентах
+- Утилиты конвертации изолированы в lib/utils
+- Типы определены в model/types.ts
+- Серверные действия не зависят от Tiptap напрямую
+
 ---
 
 **Document Version:** 1.0  

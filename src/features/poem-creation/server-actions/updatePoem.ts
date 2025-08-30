@@ -8,26 +8,26 @@ import { ErrorMessages } from '@/shared/constants/ErrorMessages';
 import { getDefaultContentStatusForRole } from '@/shared/lib/utils/contentStatusUtils';
 import { canCreateContent, canModerateContent } from '@/shared/lib/utils/roleUtils';
 import { getRoutePath } from '@/shared/lib/utils/routeUtils';
-import { POEM_ERRORS, POEM_SUCCESS } from '../lib/constants';
+import { POEM_ERRORS, POEM_SUCCESS, FORM_FIELDS } from '../lib/constants';
 import { poemFormSchema } from '../model/schemas';
 import type { UpdatePoemResult } from '../model/types';
 
 /**
  * Server Action for updating an existing poem
  *
- * @param poemId - ID of the poem to update
+ * @param slug - Slug of the poem to update
  * @param formData - Form data containing updated poem information
  * @returns Promise with update result
  *
  * @example
  * ```typescript
- * const result = await updatePoem(poemId, formData);
+ * const result = await updatePoem(slug, formData);
  * if (result.success) {
  *   console.log('Poem updated:', result.data);
  * }
  * ```
  */
-export async function updatePoem(poemId: string, formData: FormData): Promise<UpdatePoemResult> {
+export async function updatePoem(slug: string, formData: FormData): Promise<UpdatePoemResult> {
   try {
     // 1. Authentication check
     const session = await auth();
@@ -40,8 +40,8 @@ export async function updatePoem(poemId: string, formData: FormData): Promise<Up
       throw new Error(POEM_ERRORS.INSUFFICIENT_PERMISSIONS);
     }
 
-    // 3. Get existing poem
-    const existingPoem = await poemRepository.findById(poemId);
+    // 3. Get existing poem by slug
+    const existingPoem = await poemRepository.getBySlug(slug);
     if (!existingPoem) {
       throw new Error(POEM_ERRORS.POEM_NOT_FOUND);
     }
@@ -53,9 +53,9 @@ export async function updatePoem(poemId: string, formData: FormData): Promise<Up
 
     // 5. Data parsing and validation
     const rawData = {
-      title: formData.get('title') as string,
-      categoryId: formData.get('categoryId') as string,
-      content: JSON.parse(formData.get('content') as string),
+      title: formData.get(FORM_FIELDS.TITLE) as string,
+      categoryId: formData.get(FORM_FIELDS.CATEGORY_ID) as string,
+      content: JSON.parse(formData.get(FORM_FIELDS.CONTENT) as string),
     };
 
     const validatedData = poemFormSchema.parse(rawData);
@@ -63,28 +63,22 @@ export async function updatePoem(poemId: string, formData: FormData): Promise<Up
     // 6. Content sanitization (basic XSS prevention)
     const sanitizedContent = validatedData.content.map(block => ({
       ...block,
-      content: block.content.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''),
+      content: block.content.map(textBlock => ({
+        ...textBlock,
+        text: textBlock.text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''),
+      })),
     }));
 
-    // 7. Generate slug from title
-    const slug = validatedData.title
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim();
-
-    // 8. Determine new status based on user role and current status
+    // 7. Determine new status based on user role and current status
     let newStatus = existingPoem.status;
     if (existingPoem.status === ContentApprovalStatus.PENDING) {
       // If poem was pending, set status based on user role
       newStatus = getDefaultContentStatusForRole(session.user.role);
     }
 
-    // 9. Update poem
-    const updatedPoem = await poemRepository.update(poemId, {
+    // 8. Update poem
+    const updatedPoem = await poemRepository.update(existingPoem.id, {
       title: validatedData.title,
-      slug,
       content: sanitizedContent,
       categoryId: validatedData.categoryId,
       status: newStatus,
