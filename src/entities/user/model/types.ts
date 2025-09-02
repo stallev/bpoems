@@ -9,6 +9,10 @@ export type UserUpdateInput = Prisma.UserUpdateInput;
 export type UserWhereInput = Prisma.UserWhereInput;
 export type UserOrderByWithRelationInput = Prisma.UserOrderByWithRelationInput;
 
+// Bio JSON types
+export type UserBioJson = Prisma.JsonValue;
+export type UserBioInput = Prisma.InputJsonValue;
+
 // Extended type for user with additional fields or relations
 export interface UserWithRelations extends PrismaUser {
   poems?: {

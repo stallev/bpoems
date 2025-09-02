@@ -1,91 +1,114 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { startTransition } from 'react';
-import { useForm } from 'react-hook-form';
+import { COMMENT_SECTION_LABELS } from '@/shared/constants/ui';
 import { Button } from '@/shared/ui/shadcnComponents/button';
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/shared/ui/shadcnComponents/form';
 import { Textarea } from '@/shared/ui/shadcnComponents/textarea';
-import { UIConstants } from '../constants/ui';
-import { CommentFormSchema, type CommentFormData } from '../model/schemas';
-import { createComment } from '../server-actions/createComment';
+import { useCommentForm } from '../lib/hooks/useCommentForm';
 
 interface CommentFormProps {
   poemId: string;
+  commentId?: string | null;
+  initialContent?: string;
+  isVisible: boolean;
+  isAuthenticated: boolean;
   onSuccess?: () => void;
   onCancel?: () => void;
+  onShowForm: () => void;
+  labels?: typeof COMMENT_SECTION_LABELS;
 }
 
-export function CommentForm({ poemId, onSuccess, onCancel }: CommentFormProps) {
-  const form = useForm<CommentFormData>({
-    resolver: zodResolver(CommentFormSchema),
-    defaultValues: {
-      content: '',
-      poemId,
-    },
+export function CommentForm({
+  poemId,
+  commentId,
+  initialContent = '',
+  isVisible,
+  isAuthenticated,
+  onSuccess,
+  onCancel,
+  onShowForm,
+  labels = COMMENT_SECTION_LABELS,
+}: CommentFormProps) {
+  const {
+    text,
+    form,
+    isSubmitting,
+    isEditing,
+    handleTextChange,
+    handleSubmit,
+    handleCancel,
+    canSubmit,
+  } = useCommentForm({
+    poemId,
+    commentId,
+    initialContent,
+    onSuccess,
+    onCancel,
   });
 
-  const onSubmit = async (data: CommentFormData) => {
-    const formData = new FormData();
-    formData.append('content', data.content);
-    formData.append('poemId', data.poemId);
+  if (!isAuthenticated) {
+    return (
+      <div className="text-center py-4">
+        <p className="text-muted-foreground mb-3">Войдите, чтобы оставить комментарий</p>
+        <Button onClick={onShowForm} variant="outline">
+          {labels.ADD_COMMENT}
+        </Button>
+      </div>
+    );
+  }
 
-    startTransition(async () => {
-      const result = await createComment(formData);
-      if (result.success) {
-        form.reset();
-        if (onSuccess) onSuccess();
-      }
-    });
-  };
+  if (!isVisible) {
+    return (
+      <div className="flex justify-center sm:justify-end">
+        <Button onClick={onShowForm} variant="outline" className="w-full sm:w-auto">
+          {labels.ADD_COMMENT}
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+        className="space-y-4"
+      >
         <FormField
           control={form.control}
           name="content"
           render={({ field }) => (
             <FormItem>
-              <FormLabel id="content-label">{UIConstants.COMMENT_CONTENT_LABEL}</FormLabel>
               <FormControl>
                 <Textarea
                   {...field}
-                  placeholder={UIConstants.COMMENT_CONTENT_PLACEHOLDER}
-                  aria-labelledby="content-label"
-                  aria-describedby="content-error"
-                  className="min-h-[100px]"
+                  value={text}
+                  onChange={e => handleTextChange(e.target.value)}
+                  placeholder={labels.COMMENT_PLACEHOLDER}
+                  className="min-h-[100px] resize-none"
+                  aria-label="Текст комментария"
+                  aria-describedby="comment-error"
+                  aria-invalid={!!form.formState.errors.content}
                 />
               </FormControl>
-              <FormMessage id="content-error" />
+              <FormMessage id="comment-error" />
             </FormItem>
           )}
         />
-        <div className="flex justify-end gap-3">
-          {onCancel && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                form.reset();
-                onCancel();
-              }}
-              disabled={form.formState.isSubmitting}
-            >
-              {UIConstants.CANCEL_BUTTON}
-            </Button>
-          )}
-          <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting
-              ? UIConstants.SUBMITTING_BUTTON
-              : UIConstants.SUBMIT_BUTTON}
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="outline" onClick={handleCancel}>
+            {labels.CANCEL_COMMENT}
+          </Button>
+          <Button type="submit" disabled={!canSubmit || isSubmitting}>
+            {isEditing ? labels.EDIT_COMMENT : labels.SUBMIT_COMMENT}
           </Button>
         </div>
       </form>

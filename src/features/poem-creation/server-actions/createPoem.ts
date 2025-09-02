@@ -51,13 +51,20 @@ export async function createPoem(formData: FormData): Promise<CreatePoemResult> 
     const validatedData = poemFormSchema.parse(rawData);
 
     // 4. Content sanitization (basic XSS prevention)
-    const sanitizedContent = validatedData.content.map(block => ({
-      ...block,
-      content: block.content.map(textBlock => ({
-        ...textBlock,
-        text: textBlock.text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''),
+    const sanitizedContent = {
+      ...validatedData.content,
+      content: validatedData.content.content.map(block => ({
+        ...block,
+        content:
+          block.content?.map(textBlock => ({
+            ...textBlock,
+            text:
+              textBlock.text?.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') ||
+              '',
+          })) || [],
+        text: block.text?.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') || '',
       })),
-    }));
+    };
 
     // 5. Generate unique slug from title
     const slug = await ensureUniqueSlug(validatedData.title, prisma);

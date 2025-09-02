@@ -1,14 +1,17 @@
+import { Prisma } from '@/generated/prisma';
 import { prisma } from '@/shared/api/database/prisma';
 import type {
-  Comment,
-  CommentCreateInput,
-  CommentUpdateInput,
   CommentOrderByWithRelationInput,
-  CommentWhereInput,
   CommentWithRelations,
   SimpleCommentCreateInput,
   SimpleCommentUpdateInput,
 } from '../model/types';
+
+// Используем типы из Prisma для работы с базой данных
+type Comment = Prisma.CommentGetPayload<Record<string, never>>;
+type CommentCreateInput = Prisma.CommentCreateInput;
+type CommentUpdateInput = Prisma.CommentUpdateInput;
+type CommentWhereInput = Prisma.CommentWhereInput;
 
 const defaultIncludes = {
   author: true,

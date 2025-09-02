@@ -78,10 +78,7 @@ model User {
 
   // Multilingual profile bio
   // Using separate fields for simplicity in MVP. Can be extended to a separate model later.
-  bio   String? // Bio in default language (EN)
-  bioRu String? // Bio in Russian
-  bioUa String? // Bio in Ukrainian
-
+  bio   Json? // Rich text content from WYSIWYG editor as JSON
   // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

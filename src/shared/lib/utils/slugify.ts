@@ -136,7 +136,10 @@ export const generateUniqueSlug = async (
 /**
  * Ensures a unique slug for a poem title using Prisma
  */
-export const ensureUniqueSlug = async (title: string, prisma: any): Promise<string> => {
+export const ensureUniqueSlug = async (
+  title: string,
+  prisma: { poem: { findUnique: (args: { where: { slug: string } }) => Promise<unknown> } }
+): Promise<string> => {
   const baseSlug = slugify(title);
 
   const checkExists = async (slug: string): Promise<boolean> => {
@@ -152,7 +155,10 @@ export const ensureUniqueSlug = async (title: string, prisma: any): Promise<stri
 /**
  * Ensures a unique slug for a category name using Prisma
  */
-export const ensureUniqueCategorySlug = async (name: string, prisma: any): Promise<string> => {
+export const ensureUniqueCategorySlug = async (
+  name: string,
+  prisma: { category: { findUnique: (args: { where: { slug: string } }) => Promise<unknown> } }
+): Promise<string> => {
   const baseSlug = slugify(name);
 
   const checkExists = async (slug: string): Promise<boolean> => {

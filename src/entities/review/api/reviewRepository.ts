@@ -1,14 +1,17 @@
+import { Prisma } from '@/generated/prisma';
 import { prisma } from '@/shared/api/database/prisma';
 import type {
-  Review,
-  ReviewCreateInput,
-  ReviewUpdateInput,
   ReviewOrderByWithRelationInput,
-  ReviewWhereInput,
   ReviewWithRelations,
   SimpleReviewCreateInput,
   SimpleReviewUpdateInput,
 } from '../model/types';
+
+// Используем типы из Prisma для работы с базой данных
+type Review = Prisma.ReviewGetPayload<Record<string, never>>;
+type ReviewCreateInput = Prisma.ReviewCreateInput;
+type ReviewUpdateInput = Prisma.ReviewUpdateInput;
+type ReviewWhereInput = Prisma.ReviewWhereInput;
 
 const defaultIncludes = {
   user: true,

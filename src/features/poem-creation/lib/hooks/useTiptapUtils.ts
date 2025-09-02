@@ -1,29 +1,12 @@
 'use client';
 
 import { useCallback } from 'react';
-import type { PoemContentBlock, PoemFormData, TiptapJson } from '../../model/types';
-import {
-  poemContentBlocksToTiptapJson,
-  tiptapJsonToPoemContentBlocks,
-  htmlToTiptapJson,
-} from '../utils/tiptapUtils';
+import type { PoemFormData, TiptapJson } from '../../model/types';
 
 export const useTiptapUtils = () => {
-  const getTiptapValue = useCallback((content: PoemContentBlock[] | string): TiptapJson => {
+  const getTiptapValue = useCallback((content: TiptapJson): TiptapJson => {
     try {
-      if (typeof content === 'string') {
-        // Try to parse as JSON first, then as HTML
-        try {
-          const json = JSON.parse(content) as TiptapJson;
-          return json;
-        } catch {
-          // If not JSON, treat as HTML
-          return htmlToTiptapJson(content);
-        }
-      } else {
-        // Convert PoemContentBlock[] to TiptapJson
-        return poemContentBlocksToTiptapJson(content);
-      }
+      return content;
     } catch {
       // Return empty Tiptap JSON if parsing fails
       return {
@@ -37,7 +20,8 @@ export const useTiptapUtils = () => {
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-        if (key === 'content' && Array.isArray(value)) {
+        if (key === 'content') {
+          // content теперь TiptapJson, поэтому просто сериализуем его
           formData.append(key, JSON.stringify(value));
         } else {
           formData.append(key, String(value));
@@ -47,13 +31,8 @@ export const useTiptapUtils = () => {
     return formData;
   }, []);
 
-  const convertTiptapJsonToContentBlocks = useCallback((json: TiptapJson): PoemContentBlock[] => {
-    return tiptapJsonToPoemContentBlocks(json);
-  }, []);
-
   return {
     getTiptapValue,
     prepareFormData,
-    convertTiptapJsonToContentBlocks,
   };
 };

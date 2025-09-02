@@ -366,9 +366,9 @@ The platform implements comprehensive multilingual support with the following la
    - Localized content and navigation
 
 ### User Profile Multilingual Support
-- Profile information is optional for each language
-- System displays profile information in user's preferred language
-- Fallback to English if preferred language is not available
+- Profile bio is stored as a single rich-text JSON field (`bio`) authored with the platform RichTextEditor
+- Interface localizations remain (EN default, RU MVP; UA future), but user bio itself is not multilingual
+- System displays the single bio unchanged for all locales
 
 ### Language Selection
 - Users can select their preferred interface language

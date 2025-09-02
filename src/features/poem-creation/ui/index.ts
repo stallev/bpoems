@@ -18,3 +18,4 @@
  * ```
  */
 export { PoemForm } from './PoemForm';
+export { PoemFormWrapper } from './PoemFormWrapper';

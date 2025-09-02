@@ -9,6 +9,7 @@ import type {
   SimpleUserCreateInput,
   SimpleUserUpdateInput,
   UserRole,
+  UserBioInput,
 } from '../model/types';
 
 export const userRepository = {
@@ -58,6 +59,21 @@ export const userRepository = {
       where: { id },
       data: data as UserUpdateInput,
     });
+  },
+
+  updateBio: async (id: string, bio: UserBioInput): Promise<User> => {
+    return prisma.user.update({
+      where: { id },
+      data: { bio },
+    });
+  },
+
+  getBio: async (id: string): Promise<User['bio'] | null> => {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: { bio: true },
+    });
+    return user?.bio ?? null;
   },
 
   delete: async (id: string): Promise<User> => {

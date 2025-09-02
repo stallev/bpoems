@@ -6,7 +6,7 @@ export interface PoemContentBlock {
     text: string;
     marks?: Array<{
       type: 'bold' | 'italic' | 'underline' | 'strike';
-      attrs?: Record<string, any>;
+      attrs?: Record<string, unknown>;
     }>;
   }>;
   order?: number; // Optional sequential order for backward compatibility
@@ -18,7 +18,7 @@ export interface PoemFormData {
   slug?: string; // Poem slug (for editing)
   title: string; // Poem title (1-255 characters)
   categoryId: string; // Selected category ID
-  content: PoemContentBlock[]; // Array of content blocks
+  content: TiptapJson; // Tiptap JSON content structure
 }
 
 // Category data structure for form display
@@ -27,7 +27,7 @@ export interface CategoryOption {
   translatedItems: Array<{
     id: string;
     type: string;
-    values: any;
+    values: Record<string, string>;
   }>;
 }
 
@@ -46,7 +46,7 @@ export interface SanitizedContentBlock extends PoemContentBlock {
     text: string; // Sanitized text content
     marks?: Array<{
       type: 'bold' | 'italic' | 'underline' | 'strike';
-      attrs?: Record<string, any>;
+      attrs?: Record<string, unknown>;
     }>;
   }>;
 }
@@ -81,16 +81,16 @@ export interface UsePoemFormParams {
 
 // Tiptap utility types
 export interface TiptapEditorConfig {
-  extensions: any[];
-  content: any;
+  extensions: unknown[];
+  content: unknown;
   placeholder: string;
-  onUpdate: (params: { editor: any }) => void;
+  onUpdate: (params: { editor: unknown }) => void;
 }
 
 // Tiptap instance type
 export interface TiptapInstance {
-  getJSON: () => any;
-  setContent: (content: any) => void;
+  getJSON: () => unknown;
+  setContent: (content: unknown) => void;
   on: (event: string, handler: () => void) => void;
   off: (event: string, handler: () => void) => void;
 }
@@ -105,13 +105,13 @@ export interface TiptapJson {
       text?: string;
       marks?: Array<{
         type: string;
-        attrs?: Record<string, any>;
+        attrs?: Record<string, unknown>;
       }>;
     }>;
     text?: string;
     marks?: Array<{
       type: string;
-      attrs?: Record<string, any>;
+      attrs?: Record<string, unknown>;
     }>;
   }>;
 }

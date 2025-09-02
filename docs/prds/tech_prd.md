@@ -297,6 +297,7 @@ The following operations MAY use API routes instead of server actions:
 - **Server Actions:** All form submissions must use Server Actions with proper error handling
 - **Validation:** Implement both client-side and server-side validation
 - **User Experience:** Provide immediate feedback, loading states, and clear error messages
+- **Form Visibility Management:** After successful form submission, forms should be hidden from the DOM and only reappear when explicitly triggered by user action (e.g., clicking "Add Comment" or "Add Review" buttons). This applies to comment forms, review forms, and other user-generated content forms to maintain clean UI and prevent accidental duplicate submissions
 - **Accessibility:** Ensure forms are accessible with proper labels, ARIA attributes, and keyboard navigation
 
 #### Hook Development Standards

@@ -1,40 +1,100 @@
-// Import types from generated Prisma Client
-import type { Comment as PrismaComment, Prisma } from '@/generated/prisma';
+// Базовые типы для репозитория
+export type Comment = {
+  id: string;
+  content: string;
+  poemId: string;
+  authorId: string;
+  status: string;
+  isApproved: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
-// Re-export base types from Prisma
-export type Comment = PrismaComment;
-export type CommentCreateInput = Prisma.CommentCreateInput;
-export type CommentUpdateInput = Prisma.CommentUpdateInput;
-export type CommentWhereInput = Prisma.CommentWhereInput;
-export type CommentOrderByWithRelationInput = Prisma.CommentOrderByWithRelationInput;
+export type CommentCreateInput = {
+  content: string;
+  poemId: string;
+  authorId: string;
+  status?: string;
+  isApproved?: boolean;
+};
 
-// Extended type for comment with included relations
-export interface CommentWithRelations extends PrismaComment {
-  author: {
-    id: string;
-    name: string | null;
-    image: string | null;
-  };
+export type CommentUpdateInput = {
+  content?: string;
+  status?: string;
+  isApproved?: boolean;
+};
+
+export type CommentOrderByWithRelationInput = {
+  [key: string]: 'asc' | 'desc';
+};
+
+export type CommentWhereInput = {
+  id?: string;
+  poemId?: string;
+  authorId?: string;
+  status?: string;
+  isApproved?: boolean;
+  [key: string]: string | boolean | undefined;
+};
+
+export type CommentWithRelations = Comment & {
   poem: {
     id: string;
     title: string;
     slug: string;
   };
+  author: {
+    id: string;
+    name: string | null;
+    image: string | null;
+  };
+};
+
+export type SimpleCommentCreateInput = {
+  content: string;
+  poemId: string;
+  authorId?: string;
+};
+
+export type SimpleCommentUpdateInput = {
+  content: string;
+};
+
+// Типы для UI компонентов
+export interface CommentSectionProps {
+  poemId: string;
+  comments: Array<{
+    id: string;
+    content: string;
+    poemId: string;
+    createdAt: Date;
+    author: {
+      id: string;
+      name: string;
+      image: string | null;
+    };
+  }>;
+  currentUserId?: string;
 }
 
-// Simplified types for more convenient use in the application
-export type SimpleCommentCreateInput = Omit<
-  Prisma.CommentUncheckedCreateInput,
-  'author' | 'poem'
-> & {
-  authorId: string;
-  poemId: string;
-};
+export interface CommentItemProps {
+  comment: CommentSectionProps['comments'][0];
+  currentUserId?: string;
+  onEditComment: (id: string) => void;
+  onDeleteComment: (id: string) => void;
+  onEditSuccess?: () => void;
+  onEditCancel?: () => void;
+  isEditing: boolean;
+  editingCommentId: string | null;
+}
 
-export type SimpleCommentUpdateInput = Omit<
-  Prisma.CommentUncheckedUpdateInput,
-  'author' | 'poem'
-> & {
-  authorId?: string;
-  poemId?: string;
-};
+export interface CommentsListProps {
+  comments: CommentSectionProps['comments'];
+  currentUserId?: string;
+  onEditComment: (id: string) => void;
+  onDeleteComment: (id: string) => void;
+  onEditSuccess?: () => void;
+  onEditCancel?: () => void;
+  isEditing: boolean;
+  editingCommentId: string | null;
+}

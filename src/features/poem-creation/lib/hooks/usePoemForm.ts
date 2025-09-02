@@ -7,18 +7,21 @@ import { useTiptapUtils } from './useTiptapUtils';
 import { poemFormSchema } from '../../model/schemas';
 import type { PoemFormData, UsePoemFormParams } from '../../model/types';
 
-export const usePoemForm = ({ defaultValues, onSuccess }: UsePoemFormParams = {}) => {
+export const usePoemForm = ({ defaultValues, onSuccess, onCancel }: UsePoemFormParams = {}) => {
   const form = useForm<PoemFormData>({
     resolver: zodResolver(poemFormSchema),
     defaultValues: {
       title: '',
       categoryId: '',
-      content: [],
+      content: {
+        type: 'doc',
+        content: [],
+      },
       ...defaultValues,
     },
   });
 
-  const { getTiptapValue, prepareFormData } = useTiptapUtils();
+  const { prepareFormData } = useTiptapUtils();
 
   const handleSubmit = useCallback(
     (data: PoemFormData) => {
@@ -30,6 +33,24 @@ export const usePoemForm = ({ defaultValues, onSuccess }: UsePoemFormParams = {}
     },
     [onSuccess, prepareFormData]
   );
+
+  const handleCancel = useCallback(() => {
+    // Reset form to default values
+    form.reset({
+      title: '',
+      categoryId: '',
+      content: {
+        type: 'doc',
+        content: [],
+      },
+      ...defaultValues,
+    });
+
+    // Call onCancel callback if provided
+    if (onCancel) {
+      onCancel();
+    }
+  }, [form, defaultValues, onCancel]);
 
   // Set default values if provided
   useEffect(() => {
@@ -43,6 +64,6 @@ export const usePoemForm = ({ defaultValues, onSuccess }: UsePoemFormParams = {}
   return {
     form,
     handleSubmit,
-    getTiptapValue,
+    handleCancel,
   };
 };

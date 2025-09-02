@@ -56,19 +56,30 @@ export const tiptapJsonToPoemContentBlocks = (json: TiptapContent): PoemContentB
           text: string;
           marks?: Array<{
             type: 'bold' | 'italic' | 'underline' | 'strike';
-            attrs?: Record<string, any>;
+            attrs?: Record<string, unknown>;
           }>;
         }> = [];
 
         // Process content recursively for nested lists
-        const processContent = (content: any[]): void => {
+        const processContent = (
+          content: Array<{
+            type: string;
+            text?: string;
+            marks?: Array<{ type: string; attrs?: Record<string, unknown> }>;
+            content?: Array<{
+              type: string;
+              text?: string;
+              marks?: Array<{ type: string; attrs?: Record<string, unknown> }>;
+            }>;
+          }>
+        ): void => {
           console.log('processContent', content);
           for (const textNode of content) {
             if (textNode.type === 'text' && textNode.text !== undefined) {
               contentBlocks.push({
                 type: 'text',
                 text: textNode.text,
-                marks: textNode.marks?.map((mark: any) => ({
+                marks: textNode.marks?.map(mark => ({
                   type: mark.type as 'bold' | 'italic' | 'underline' | 'strike',
                   attrs: mark.attrs,
                 })),
@@ -197,7 +208,7 @@ export const htmlToTiptapJson = (html: string): TiptapJson => {
   const content = paragraphs.map(paragraph => {
     // Extract text and formatting from HTML
     const text = paragraph.replace(/<[^>]*>/g, '');
-    const marks: Array<{ type: string; attrs?: Record<string, any> }> = [];
+    const marks: Array<{ type: string; attrs?: Record<string, unknown> }> = [];
 
     if (paragraph.includes('<strong>') || paragraph.includes('<b>')) {
       marks.push({ type: 'bold' });

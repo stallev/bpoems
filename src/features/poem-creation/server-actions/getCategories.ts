@@ -5,6 +5,7 @@ import type { CategoryWithRelations } from '@/entities/category/model/types';
 import { auth } from '@/shared/api/auth/auth';
 import { ErrorMessages } from '@/shared/constants/ErrorMessages';
 import { canCreateContent } from '@/shared/lib/utils/roleUtils';
+
 import { POEM_ERRORS } from '../lib/constants';
 
 type GetCategoriesResult =

@@ -24,7 +24,7 @@ import {
 } from '@/shared/ui/shadcnComponents/select';
 import { POEM_FORM_LABELS } from '../lib/constants';
 import { usePoemForm } from '../lib/hooks/usePoemForm';
-import { tiptapJsonToPoemContentBlocks } from '../lib/utils/tiptapUtils';
+// import { tiptapJsonToPoemContentBlocks } from '../lib/utils/tiptapUtils';
 import type { PoemFormProps, PoemFormData, FormState, TiptapJson } from '../model/types';
 import { createPoem, updatePoem } from '../server-actions';
 
@@ -58,7 +58,7 @@ export const PoemForm = ({ defaultValues, categories, onSuccess, onCancel }: Poe
   console.log('editstate', isEditing);
   console.log('defaultValues', defaultValues);
 
-  const { form, handleSubmit, getTiptapValue } = usePoemForm({
+  const { form, handleSubmit, handleCancel } = usePoemForm({
     defaultValues,
     onSuccess,
     onCancel,
@@ -82,16 +82,15 @@ export const PoemForm = ({ defaultValues, categories, onSuccess, onCancel }: Poe
     }
   }, [state.success, state.data, state.message, onSuccess, router]);
 
-  const onSubmit = (data: any) => {
-    const formData = handleSubmit(data as PoemFormData);
+  const onSubmit = (data: PoemFormData) => {
+    const formData = handleSubmit(data);
     startTransition(() => {
       formAction(formData);
     });
   };
 
   const handleContentChange = (content: TiptapJson) => {
-    const contentBlocks = tiptapJsonToPoemContentBlocks(content);
-    form.setValue('content', contentBlocks);
+    form.setValue('content', content);
   };
 
   return (
@@ -173,9 +172,7 @@ export const PoemForm = ({ defaultValues, categories, onSuccess, onCancel }: Poe
               <FormLabel id="content-label">{POEM_FORM_LABELS.RU.CONTENT}</FormLabel>
               <FormControl>
                 <RichTextEditor
-                  content={
-                    defaultValues?.content ? getTiptapValue(defaultValues.content) : undefined
-                  }
+                  content={defaultValues?.content ? defaultValues.content : undefined}
                   onChange={handleContentChange}
                   placeholder={POEM_FORM_LABELS.RU.CONTENT_PLACEHOLDER}
                   minHeight="200px"
@@ -213,7 +210,7 @@ export const PoemForm = ({ defaultValues, categories, onSuccess, onCancel }: Poe
             <Button
               type="button"
               variant="outline"
-              onClick={onCancel}
+              onClick={handleCancel}
               className="bg-background border-input text-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer"
             >
               {POEM_FORM_LABELS.RU.CANCEL}

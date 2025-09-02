@@ -51,9 +51,9 @@ export const applyTextMarks = (
  */
 export const renderContentBlock = (block: {
   type: string;
-  content: Array<{
+  content?: Array<{
     type: string;
-    text: string;
+    text?: string;
     marks?: Array<{
       type: string;
       attrs?: Record<string, unknown>;
@@ -78,21 +78,21 @@ export const renderContentBlock = (block: {
  * @returns Rendered HTML string
  */
 const renderParagraphBlock = (block: {
-  content: Array<{
+  content?: Array<{
     type: string;
-    text: string;
+    text?: string;
     marks?: Array<{
       type: string;
       attrs?: Record<string, unknown>;
     }>;
   }>;
 }): string => {
-  const content = block.content
+  const content = (block.content ?? [])
     .map(textBlock => {
       if (textBlock.type === 'text') {
-        return applyTextMarks(textBlock.text, textBlock.marks);
+        return applyTextMarks(textBlock.text || '', textBlock.marks);
       }
-      return textBlock.text;
+      return textBlock.text || '';
     })
     .join('');
 
@@ -106,23 +106,23 @@ const renderParagraphBlock = (block: {
  * @returns Rendered HTML string
  */
 const renderHeadingBlock = (block: {
-  content: Array<{
+  content?: Array<{
     type: string;
-    text: string;
+    text?: string;
     marks?: Array<{
       type: string;
       attrs?: Record<string, unknown>;
     }>;
   }>;
 }): string => {
-  const content = block.content
+  const content = (block.content ?? [])
     .map(textBlock => {
       if (textBlock.type === 'text') {
-        return applyTextMarks(textBlock.text, textBlock.marks);
+        return applyTextMarks(textBlock.text || '', textBlock.marks);
       }
-      return textBlock.text;
+      return textBlock.text || '';
     })
     .join('');
 
-  return `<h3>${content}</h3>`; // Default to h3 for headings
+  return `<h2>${content}</h2>`;
 };

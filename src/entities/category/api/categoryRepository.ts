@@ -1,3 +1,4 @@
+import type { TranslationItemType } from '@/generated/prisma';
 import { prisma } from '@/shared/api/database/prisma';
 import { CONTENT_TYPES } from '@/shared/constants/ContentTypes';
 import type {
@@ -7,6 +8,7 @@ import type {
   CategoryWithRelations,
   CategoryStats,
   CategoryWhereInput,
+  Category,
 } from '../model/types';
 
 export const categoryRepository = {
@@ -33,7 +35,7 @@ export const categoryRepository = {
   findAll: async (params?: {
     skip?: number;
     take?: number;
-    orderBy?: any; // CategoryOrderByWithRelationInput; // This type is not imported
+    orderBy?: Record<string, 'asc' | 'desc'>;
     where?: CategoryWhereInput;
   }): Promise<CategoryWithRelations[]> => {
     const { skip, take, orderBy, where } = params || {};
@@ -50,22 +52,20 @@ export const categoryRepository = {
     }) as unknown as Promise<CategoryWithRelations[]>;
   },
 
-  create: async (data: CategoryCreateInput): Promise<any> => {
+  create: async (data: CategoryCreateInput): Promise<Category> => {
     return prisma.category.create({
       data,
     });
   },
 
-  update: async (id: string, data: CategoryUpdateInput): Promise<any> => {
-    // Category; // This type is not imported
+  update: async (id: string, data: CategoryUpdateInput): Promise<Category> => {
     return prisma.category.update({
       where: { id },
       data,
     });
   },
 
-  delete: async (id: string): Promise<any> => {
-    // Category; // This type is not imported
+  delete: async (id: string): Promise<Category> => {
     return prisma.category.delete({
       where: { id },
     });
@@ -85,7 +85,7 @@ export const categoryRepository = {
       where: {
         translatedItems: {
           some: {
-            type: type as any,
+            type: type as TranslationItemType,
           },
         },
       },

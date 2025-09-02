@@ -11,6 +11,7 @@ import { ReviewFormSchema } from '../model/schemas';
 export async function createReview(formData: FormData) {
   try {
     const session = await auth();
+    console.log('session user', session?.user);
     if (!session?.user) {
       throw new Error(ErrorMessages.UNAUTHORIZED);
     }
@@ -37,6 +38,7 @@ export async function createReview(formData: FormData) {
       userId: session.user.id,
       poemId: validatedData.poemId,
       rating: validatedData.rating,
+      title: validatedData.title,
     });
 
     revalidatePath(`/poems/${review.poemId}`);

@@ -104,18 +104,7 @@ export interface ReviewSectionProps {
  * PoemContentRenderer component props
  */
 export interface PoemContentRendererProps {
-  content: Array<{
-    type: string;
-    content: Array<{
-      type: string;
-      text: string;
-      marks?: Array<{
-        type: string;
-        attrs?: Record<string, unknown>;
-      }>;
-    }>;
-    order?: number;
-  }>;
+  content?: TiptapJson | null;
   className?: string;
 }
 

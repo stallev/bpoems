@@ -34,6 +34,7 @@ export const COMMENT_SECTION_LABELS = {
   COMMENT_PLACEHOLDER: 'Напишите ваш комментарий...',
   SUBMIT_COMMENT: 'Отправить',
   CANCEL_COMMENT: 'Отмена',
+  EDIT_COMMENT: 'Изменить',
 } as const;
 
 export const REVIEW_SECTION_LABELS = {
@@ -44,6 +45,7 @@ export const REVIEW_SECTION_LABELS = {
   RATING_LABEL: 'Оценка:',
   SUBMIT_REVIEW: 'Отправить',
   CANCEL_REVIEW: 'Отмена',
+  EDIT_REVIEW: 'Изменить',
 } as const;
 
 export const POEMS_HEADER_LABELS = {

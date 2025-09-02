@@ -1,8 +1,8 @@
 import { redirect, notFound } from 'next/navigation';
 import { poemRepository } from '@/entities/poem';
-import { PoemForm } from '@/features/poem-creation';
+import { PoemFormWrapper } from '@/features/poem-creation';
 import { POEM_FORM_LABELS } from '@/features/poem-creation/lib/constants';
-import type { PoemContentBlock } from '@/features/poem-creation/model/types';
+import type { TiptapJson } from '@/features/poem-creation/model/types';
 import { getCategories } from '@/features/poem-creation/server-actions/getCategories';
 import { auth } from '@/shared/api/auth/auth';
 import { canCreateContent, canModerateContent } from '@/shared/lib/utils/roleUtils';
@@ -48,8 +48,9 @@ export default async function EditPoemPage({ params }: EditPoemPageProps) {
   const defaultValues = {
     id: poem.id,
     title: poem.title,
+    slug: poem.slug,
     categoryId: poem.categoryId || '',
-    content: poem.content as unknown as PoemContentBlock[],
+    content: poem.content as unknown as TiptapJson | undefined,
   };
 
   return (
@@ -65,7 +66,7 @@ export default async function EditPoemPage({ params }: EditPoemPageProps) {
         </div>
 
         <div className="bg-card rounded-lg border p-6">
-          <PoemForm defaultValues={defaultValues} categories={categoriesResult.data} />
+          <PoemFormWrapper defaultValues={defaultValues} categories={categoriesResult.data} />
         </div>
       </div>
     </div>

@@ -49,7 +49,14 @@ export async function createClaimReport(formData: FormData) {
     const isPrivilegedUser = ['AUTHOR', 'MODERATOR', 'ADMIN'].includes(session.user.role);
 
     // Create data object based on resource type
-    const claimData: any = {
+    const claimData: {
+      resourceType: ClaimResourceType;
+      message: string;
+      reporterId: string;
+      poemId?: string;
+      commentId?: string;
+      reviewId?: string;
+    } = {
       resourceType: validatedData.resourceType,
       message: validatedData.message,
       reporterId: session.user.id,

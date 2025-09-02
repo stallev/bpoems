@@ -1,5 +1,5 @@
 // UI Components
-export { PoemForm } from './ui';
+export { PoemForm, PoemFormWrapper } from './ui';
 
 // Server Actions
 export { createPoem, updatePoem, getCategories } from './server-actions';

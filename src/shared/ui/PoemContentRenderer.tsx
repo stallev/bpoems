@@ -27,7 +27,7 @@ export const PoemContentRenderer = ({ content, className }: PoemContentRendererP
     NO_CONTENT_MESSAGE: POEM_CONTENT_LABELS.NO_CONTENT,
   } as const;
 
-  if (!content || content.length === 0) {
+  if (!content || !Array.isArray(content.content) || content.content.length === 0) {
     return (
       <div className={cn('text-center text-muted-foreground py-8', className)}>
         {UI_CONSTANTS.NO_CONTENT_MESSAGE}
@@ -37,7 +37,7 @@ export const PoemContentRenderer = ({ content, className }: PoemContentRendererP
 
   return (
     <div className={cn('prose prose-lg max-w-none', className)}>
-      {content.map((block, index) => (
+      {content.content.map((block, index) => (
         <ContentBlock key={`${block.type}-${index}`} block={block} />
       ))}
     </div>
@@ -47,8 +47,26 @@ export const PoemContentRenderer = ({ content, className }: PoemContentRendererP
 /**
  * ContentBlock component for rendering individual content blocks
  */
-const ContentBlock = ({ block }: { block: PoemContentRendererProps['content'][0] }) => {
+const ContentBlock = ({
+  block,
+}: {
+  block: {
+    type: string;
+    content?: {
+      type: string;
+      text?: string;
+      marks?: { type: string; attrs?: Record<string, unknown> }[];
+    }[];
+    text?: string;
+    marks?: { type: string; attrs?: Record<string, unknown> }[];
+  };
+}) => {
   const renderedContent = renderContentBlock(block);
 
-  return <div dangerouslySetInnerHTML={{ __html: renderedContent }} className="mb-4 last:mb-0" />;
+  return (
+    <div
+      dangerouslySetInnerHTML={{ __html: renderedContent }}
+      className="mb-1 last:mb-0 min-h-[1rem]"
+    />
+  );
 };

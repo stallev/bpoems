@@ -20,26 +20,30 @@ export const hasRoleOrHigher = (userRole: string, requiredRole: UserRole): boole
  * Helper function to check if a user can create content
  */
 export const canCreateContent = (userRole: string): boolean => {
-  return CONTENT_CREATION_ROLES.includes(userRole as any);
+  return CONTENT_CREATION_ROLES.includes(
+    userRole as UserRole.SUBSCRIBER | UserRole.AUTHOR | UserRole.MODERATOR | UserRole.ADMIN
+  );
 };
 
 /**
  * Helper function to check if a user can publish content immediately
  */
 export const canPublishImmediately = (userRole: string): boolean => {
-  return IMMEDIATE_PUBLISH_ROLES.includes(userRole as any);
+  return IMMEDIATE_PUBLISH_ROLES.includes(
+    userRole as UserRole.AUTHOR | UserRole.MODERATOR | UserRole.ADMIN
+  );
 };
 
 /**
  * Helper function to check if a user can moderate content
  */
 export const canModerateContent = (userRole: string): boolean => {
-  return MODERATION_ROLES.includes(userRole as any);
+  return MODERATION_ROLES.includes(userRole as UserRole.MODERATOR | UserRole.ADMIN);
 };
 
 /**
  * Helper function to check if a user has administrative privileges
  */
 export const hasAdministrativePrivileges = (userRole: string): boolean => {
-  return ADMINISTRATION_ROLES.includes(userRole as any);
+  return ADMINISTRATION_ROLES.includes(userRole as UserRole.ADMIN);
 };

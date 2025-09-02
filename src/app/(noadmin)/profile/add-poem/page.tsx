@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { PoemForm } from '@/features/poem-creation';
+import { PoemFormWrapper } from '@/features/poem-creation';
 import { POEM_FORM_LABELS } from '@/features/poem-creation/lib/constants';
 import { getCategories } from '@/features/poem-creation/server-actions/getCategories';
 import { auth } from '@/shared/api/auth/auth';
@@ -38,7 +38,7 @@ export default async function AddPoemPage() {
         </div>
 
         <div className="bg-card rounded-lg border p-6">
-          <PoemForm categories={categoriesResult.data} />
+          <PoemFormWrapper categories={categoriesResult.data} />
         </div>
       </div>
     </div>

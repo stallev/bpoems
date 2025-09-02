@@ -11,7 +11,7 @@
  * ```tsx
  * import { usePoemForm } from '@/features/poem-creation/lib/hooks';
  *
- * const { form, handleSubmit, resetForm, getTiptapValue } = usePoemForm({
+ * const { form, handleSubmit, resetForm } = usePoemForm({
  *   defaultValues: { title: 'My Poem' },
  *   onSuccess: (data) => router.push(`/poems/${data.slug}`)
  * });

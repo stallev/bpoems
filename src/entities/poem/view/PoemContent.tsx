@@ -1,13 +1,13 @@
 'use client';
 
+import { CommentSection } from '@/entities/comment/ui/CommentSection';
 import { PoemWithRelations } from '@/entities/poem/model/types';
+import { ReviewSection } from '@/entities/review/ui/ReviewSection';
 import { User } from '@/entities/user/model/types';
 import { useDeletePoem } from '@/features/poem/lib/hooks/useDeletePoem';
-import type { PoemContentBlock } from '@/features/poem-creation/model/types';
+import type { TiptapJson } from '@/features/poem-creation/model/types';
 import { AuthorInfoContainer } from '@/shared/ui/AuthorInfoContainer';
-import { CommentSection } from '@/shared/ui/CommentSection';
 import { PoemContentRenderer } from '@/shared/ui/PoemContentRenderer';
-import { ReviewSection } from '@/shared/ui/ReviewSection';
 import { UIConstants } from '../constants/ui';
 
 interface PoemContentProps {
@@ -23,7 +23,7 @@ export function PoemContent({ poem, author, currentUserId }: PoemContentProps) {
   const { deletePoem } = useDeletePoem();
 
   // Transform poem content to the expected format
-  const contentBlocks = (poem.content as unknown as PoemContentBlock[]) || [];
+  const content = (poem.content as unknown as TiptapJson) || null;
 
   // Check if current user is the author
   const isAuthor = currentUserId === author.id;
@@ -64,7 +64,7 @@ export function PoemContent({ poem, author, currentUserId }: PoemContentProps) {
         onDelete={handleDelete}
       />
 
-      <PoemContentSection contentBlocks={contentBlocks} tags={poem.tags} />
+      <PoemContentSection content={content} tags={poem.tags} />
 
       <ReviewSection
         poemId={poem.id}
@@ -97,14 +97,14 @@ const PoemHeader = ({ title }: { title: string }) => (
  * Component for poem content section with tags
  */
 const PoemContentSection = ({
-  contentBlocks,
+  content,
   tags,
 }: {
-  contentBlocks: PoemContentBlock[];
+  content: TiptapJson | null;
   tags: Array<{ id: string; name: string }>;
 }) => (
   <section className="bg-background rounded-lg p-4 sm:p-6 border shadow-sm">
-    <PoemContentRenderer content={contentBlocks} />
+    <PoemContentRenderer content={content} />
 
     {tags.length > 0 && (
       <div className="mt-6 pt-6 border-t">
