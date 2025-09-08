@@ -13,9 +13,8 @@ export const useCreateComment = ({ onSuccess }: UseCreateCommentProps = {}) => {
       try {
         const formData = new FormData();
         formData.append('content', content.trim());
-        formData.append('poemId', poemId);
 
-        const result = await createComment(formData);
+        const result = await createComment(poemId, formData);
 
         if (result.success) {
           toast.success(result.message || UIConstants.COMMENT_SUCCESS_MESSAGE);

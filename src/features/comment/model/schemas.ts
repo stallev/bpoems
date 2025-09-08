@@ -5,7 +5,6 @@ export const CommentFormSchema = z.object({
     .string()
     .min(1, 'Comment cannot be empty')
     .max(1000, 'Comment cannot exceed 1000 characters'),
-  poemId: z.string().min(1, 'Poem ID is required'),
 });
 
 export const CommentUpdateSchema = z.object({

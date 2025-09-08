@@ -84,6 +84,7 @@ export interface ReviewSectionProps {
   }>;
   currentUserId?: string;
   poemAuthorId?: string;
+  hasUserReview?: boolean;
 }
 
 export interface ReviewItemProps {

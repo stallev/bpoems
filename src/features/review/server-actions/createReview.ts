@@ -8,10 +8,9 @@ import { ErrorMessages } from '@/shared/constants/ErrorMessages';
 import { UIConstants } from '../constants/ui';
 import { ReviewFormSchema } from '../model/schemas';
 
-export async function createReview(formData: FormData) {
+export async function createReview(poemId: string, formData: FormData) {
   try {
     const session = await auth();
-    console.log('session user', session?.user);
     if (!session?.user) {
       throw new Error(ErrorMessages.UNAUTHORIZED);
     }
@@ -22,8 +21,8 @@ export async function createReview(formData: FormData) {
 
     const rawData = {
       content: formData.get('content') as string,
-      poemId: formData.get('poemId') as string,
       ...(formData.has('rating') && { rating: Number(formData.get('rating')) }),
+      ...(formData.has('title') && { title: formData.get('title') as string }),
     };
 
     const validatedData = ReviewFormSchema.parse(rawData);
@@ -36,10 +35,11 @@ export async function createReview(formData: FormData) {
     const review = await reviewRepository.create({
       content: sanitizedContent,
       userId: session.user.id,
-      poemId: validatedData.poemId,
+      poemId: poemId,
       rating: validatedData.rating,
       title: validatedData.title,
     });
+    console.log('review', review);
 
     revalidatePath(`/poems/${review.poemId}`);
 

@@ -13,8 +13,6 @@ async function loadPoemData(slug: string) {
     poemRepository.getPoemBySlugWithReviewsAndComments(slug),
   ]);
 
-  console.log('poem', poem);
-
   if (!poem) {
     notFound();
   }

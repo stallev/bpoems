@@ -1,7 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useCreateComment } from './useCreateComment';
-import { useDeleteComment } from './useDeleteComment';
-import { useUpdateComment } from './useUpdateComment';
 
 export interface UseCommentSectionResult {
   isAdding: boolean;
@@ -23,23 +21,33 @@ export const useCommentSection = (poemId: string): UseCommentSectionResult => {
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [text, setText] = useState('');
 
+  // Реф для предотвращения множественных вызовов
+  const isSubmittingRef = useRef(false);
+
   const { createComment } = useCreateComment();
-  const { updateComment } = useUpdateComment();
-  const { deleteComment: handleDeleteComment } = useDeleteComment();
 
   const startAdding = useCallback(() => {
+    // Если форма уже открыта, не делаем ничего
+    if (isAdding) return;
+
     setIsAdding(true);
     setIsEditing(false);
     setEditingCommentId(null);
     setText('');
-  }, []);
+  }, [isAdding]);
 
-  const startEditing = useCallback((commentId: string, content: string) => {
-    setIsEditing(true);
-    setIsAdding(false);
-    setEditingCommentId(commentId);
-    setText(content);
-  }, []);
+  const startEditing = useCallback(
+    (commentId: string, content: string) => {
+      // Если редактируем тот же комментарий, не делаем ничего
+      if (editingCommentId === commentId) return;
+
+      setIsEditing(true);
+      setIsAdding(false);
+      setEditingCommentId(commentId);
+      setText(content);
+    },
+    [editingCommentId]
+  );
 
   const cancel = useCallback(() => {
     setText('');
@@ -49,33 +57,34 @@ export const useCommentSection = (poemId: string): UseCommentSectionResult => {
   }, []);
 
   const submit = useCallback(async () => {
-    if (!text.trim()) return;
+    // Предотвращаем множественную отправку
+    if (isSubmittingRef.current) return;
 
-    if (isEditing && editingCommentId) {
-      // Update existing comment
-      const result = await updateComment(editingCommentId, text.trim());
-      if (result.success) {
-        setText('');
-        setIsEditing(false);
-        setEditingCommentId(null);
+    const trimmedText = text.trim();
+    if (!trimmedText) return;
+
+    try {
+      isSubmittingRef.current = true;
+
+      if (isEditing && editingCommentId) {
+        // Редактирование обрабатывается в форме
+        return;
+      } else {
+        const result = await createComment(poemId, trimmedText);
+
+        if (result.success) {
+          setText('');
+          setIsAdding(false);
+        }
       }
-    } else {
-      // Create new comment
-      const result = await createComment(poemId, text.trim());
-      if (result.success) {
-        setText('');
-        // Скрываем форму после добавления комментария
-        setIsAdding(false);
-      }
+    } finally {
+      isSubmittingRef.current = false;
     }
-  }, [text, poemId, isEditing, editingCommentId, updateComment, createComment]);
+  }, [text, poemId, isEditing, editingCommentId, createComment]);
 
-  const deleteCommentHandler = useCallback(
-    async (commentId: string) => {
-      await handleDeleteComment(commentId);
-    },
-    [handleDeleteComment]
-  );
+  const deleteCommentHandler = useCallback(async () => {
+    // Заглушка для совместимости
+  }, []);
 
   return {
     isAdding,

@@ -1,7 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useCreateReview } from './useCreateReview';
-import { useDeleteReview } from './useDeleteReview';
-import { useUpdateReview } from './useUpdateReview';
 
 export interface ReviewData {
   title: string;
@@ -30,23 +28,33 @@ export const useReviewSection = (poemId: string): UseReviewSectionResult => {
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
   const [data, setDataState] = useState<ReviewData>({ title: '', content: '', rating: 5 });
 
+  // Реф для предотвращения множественных вызовов
+  const isSubmittingRef = useRef(false);
+
   const { createReview } = useCreateReview();
-  const { updateReview } = useUpdateReview();
-  const { deleteReview: handleDeleteReview } = useDeleteReview();
 
   const startAdding = useCallback(() => {
+    // Если форма уже открыта, не делаем ничего
+    if (isAdding) return;
+
     setIsAdding(true);
     setIsEditing(false);
     setEditingReviewId(null);
     setDataState({ title: '', content: '', rating: 5 });
-  }, []);
+  }, [isAdding]);
 
-  const startEditing = useCallback((reviewId: string, reviewData: ReviewData) => {
-    setIsEditing(true);
-    setIsAdding(false);
-    setEditingReviewId(reviewId);
-    setDataState(reviewData);
-  }, []);
+  const startEditing = useCallback(
+    (reviewId: string, reviewData: ReviewData) => {
+      // Если редактируем тот же отзыв, не делаем ничего
+      if (editingReviewId === reviewId) return;
+
+      setIsEditing(true);
+      setIsAdding(false);
+      setEditingReviewId(reviewId);
+      setDataState(reviewData);
+    },
+    [editingReviewId]
+  );
 
   const cancel = useCallback(() => {
     setDataState({ title: '', content: '', rating: 5 });
@@ -62,32 +70,34 @@ export const useReviewSection = (poemId: string): UseReviewSectionResult => {
   const setRating = useCallback((rating: number) => setData({ rating }), [setData]);
 
   const submit = useCallback(async () => {
-    if (!data.content.trim()) return;
+    // Предотвращаем множественную отправку
+    if (isSubmittingRef.current) return;
 
-    if (isEditing && editingReviewId) {
-      // Update existing review
-      const result = await updateReview(editingReviewId, data);
-      if (result.success) {
-        setDataState({ title: '', content: '', rating: 5 });
-        setIsEditing(false);
-        setEditingReviewId(null);
+    const trimmedContent = data.content.trim();
+    if (!trimmedContent) return;
+
+    try {
+      isSubmittingRef.current = true;
+
+      if (isEditing && editingReviewId) {
+        // Редактирование обрабатывается в форме
+        return;
+      } else {
+        const result = await createReview(poemId, data);
+
+        if (result.success) {
+          setDataState({ title: '', content: '', rating: 5 });
+          setIsAdding(false);
+        }
       }
-    } else {
-      // Create new review
-      const result = await createReview(poemId, data);
-      if (result.success) {
-        setDataState({ title: '', content: '', rating: 5 });
-        setIsAdding(false);
-      }
+    } finally {
+      isSubmittingRef.current = false;
     }
-  }, [data, poemId, isEditing, editingReviewId, updateReview, createReview]);
+  }, [data, poemId, isEditing, editingReviewId, createReview]);
 
-  const deleteReviewHandler = useCallback(
-    async (reviewId: string) => {
-      await handleDeleteReview(reviewId);
-    },
-    [handleDeleteReview]
-  );
+  const deleteReviewHandler = useCallback(async () => {
+    // Заглушка для совместимости
+  }, []);
 
   return {
     isAdding,

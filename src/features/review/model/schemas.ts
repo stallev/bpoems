@@ -11,7 +11,6 @@ export const ReviewFormSchema = z.object({
     .min(1, 'Rating must be between 1 and 5')
     .max(5, 'Rating must be between 1 and 5')
     .optional(),
-  poemId: z.string().min(1, 'Poem ID is required'),
 });
 
 export const ReviewUpdateSchema = z.object({

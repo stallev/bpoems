@@ -19,13 +19,12 @@ export const useCreateReview = ({ onSuccess }: UseCreateReviewProps = {}) => {
       try {
         const formData = new FormData();
         formData.append('content', data.content.trim());
-        formData.append('poemId', poemId);
         formData.append('rating', data.rating.toString());
         if (data.title.trim()) {
           formData.append('title', data.title.trim());
         }
 
-        const result = await createReview(formData);
+        const result = await createReview(poemId, formData);
 
         if (result.success) {
           toast.success(result.message || UIConstants.REVIEW_SUCCESS_MESSAGE);
@@ -36,7 +35,7 @@ export const useCreateReview = ({ onSuccess }: UseCreateReviewProps = {}) => {
           return { success: false, error: result.message };
         }
       } catch (error) {
-        console.error('Error creating review:', error);
+        console.error('Error creating comment:', error);
         toast.error(UIConstants.REVIEW_SUBMIT_ERROR_MESSAGE);
         return { success: false, error: 'Произошла ошибка при создании отзыва' };
       }

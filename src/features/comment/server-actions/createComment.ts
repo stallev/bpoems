@@ -8,7 +8,7 @@ import { ErrorMessages } from '@/shared/constants/ErrorMessages';
 import { UIConstants } from '../constants/ui';
 import { CommentFormSchema } from '../model/schemas';
 
-export async function createComment(formData: FormData) {
+export async function createComment(poemId: string, formData: FormData) {
   try {
     const session = await auth();
     if (!session?.user) {
@@ -21,7 +21,6 @@ export async function createComment(formData: FormData) {
 
     const rawData = {
       content: formData.get('content') as string,
-      poemId: formData.get('poemId') as string,
     };
 
     const validatedData = CommentFormSchema.parse(rawData);
@@ -34,7 +33,7 @@ export async function createComment(formData: FormData) {
     const comment = await commentRepository.create({
       content: sanitizedContent,
       authorId: session.user.id,
-      poemId: validatedData.poemId,
+      poemId: poemId,
     });
 
     revalidatePath(`/poems/${comment.poemId}`);

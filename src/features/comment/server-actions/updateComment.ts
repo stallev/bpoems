@@ -47,7 +47,6 @@ export async function updateComment(commentId: string, formData: FormData) {
     const comment = await commentRepository.update(commentId, {
       content: sanitizedContent,
     });
-    console.log('comment', comment);
 
     revalidatePath(`/poems/${existingComment.poemId}`);
 
