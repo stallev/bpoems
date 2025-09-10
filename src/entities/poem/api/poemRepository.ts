@@ -8,6 +8,7 @@ import type {
   PoemWithRelations,
   SimplePoemCreateInput,
   SimplePoemUpdateInput,
+  PoemWithReviewsAndCommentsFromDB,
 } from '../model/types';
 
 export const poemRepository = {
@@ -34,11 +35,61 @@ export const poemRepository = {
       },
     }) as Promise<PoemWithRelations | null>;
   },
-  getPoemBySlugWithReviewsAndComments: async (slug: string): Promise<PoemWithRelations | null> => {
+  getPoemBySlugWithReviewsAndComments: async (
+    slug: string
+  ): Promise<PoemWithReviewsAndCommentsFromDB | null> => {
     return prisma.poem.findUnique({
       where: { slug },
       include: {
-        author: true,
+        author: {
+          select: { id: true, name: true, image: true },
+        },
+        category: { include: { translatedItems: true } },
+        tags: true,
+        statistics: true,
+        comments: {
+          select: {
+            id: true,
+            content: true,
+            createdAt: true,
+            updatedAt: true,
+            isApproved: true,
+            status: true,
+            author: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 20,
+        },
+        reviews: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        },
+      },
+    }) as Promise<PoemWithReviewsAndCommentsFromDB | null>;
+  },
+
+  getPoemBySlugWithAllRelations: async (slug: string): Promise<PoemWithRelations | null> => {
+    return prisma.poem.findUnique({
+      where: { slug },
+      include: {
+        author: {
+          select: { id: true, name: true, image: true },
+        },
         category: { include: { translatedItems: true } },
         tags: true,
         statistics: true,
@@ -51,25 +102,17 @@ export const poemRepository = {
             isApproved: true,
             status: true,
             claimReports: true,
-            author: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
+            author: { select: { id: true, name: true } },
           },
           orderBy: { createdAt: 'desc' },
+          take: 20,
         },
         reviews: {
           include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
+            user: { select: { id: true, name: true } },
           },
           orderBy: { createdAt: 'desc' },
+          take: 10,
         },
       },
     }) as Promise<PoemWithRelations | null>;

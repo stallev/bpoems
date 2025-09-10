@@ -12,6 +12,7 @@ export default async function PoemPage({ params }: DynamicPagePathProps) {
     const { poem, author } = await loadPoemData(slug);
     const session = await auth();
     const currentUserId = session?.user?.id;
+    console.log('fetched poemRepository', JSON.stringify(poem, null, 2));
 
     return (
       <div className="container mx-auto px-4 py-8">

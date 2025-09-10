@@ -3,7 +3,7 @@
 import { Flag } from 'lucide-react';
 import { ClaimResourceType } from '@/features/moderation/model/types';
 import { useClaimReportStore } from '@/shared/lib/store/claimReportStore';
-import { Button } from './shadcnComponents/button';
+import { Button } from '../shadcnComponents/button';
 
 // UI Constants for PostClaimButton component
 const UI_CONSTANTS = {

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useActionState, startTransition, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import { toast } from 'sonner';
+import type { RichTextContentType } from '@/shared/model/SimpleTypes';
 import { RichTextEditor } from '@/shared/ui/RichTextEditor';
 import { Button } from '@/shared/ui/shadcnComponents/button';
 import {
@@ -25,7 +26,7 @@ import {
 import { POEM_FORM_LABELS } from '../lib/constants';
 import { usePoemForm } from '../lib/hooks/usePoemForm';
 // import { tiptapJsonToPoemContentBlocks } from '../lib/utils/tiptapUtils';
-import type { PoemFormProps, PoemFormData, FormState, TiptapJson } from '../model/types';
+import type { PoemFormProps, PoemFormData, FormState } from '../model/types';
 import { createPoem, updatePoem } from '../server-actions';
 
 /**
@@ -89,7 +90,7 @@ export const PoemForm = ({ defaultValues, categories, onSuccess, onCancel }: Poe
     });
   };
 
-  const handleContentChange = (content: TiptapJson) => {
+  const handleContentChange = (content: RichTextContentType) => {
     form.setValue('content', content);
   };
 

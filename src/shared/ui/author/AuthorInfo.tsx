@@ -2,9 +2,9 @@
 
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import type { AuthorInfoProps } from './types';
-import { AUTHOR_INFO_LABELS } from '../constants/ui';
-import { cn } from '../lib/utils';
+import { AUTHOR_INFO_LABELS } from '@/shared/constants/ui';
+import { cn } from '@/shared/lib/utils';
+import type { AuthorInfoProps } from '@/shared/ui/types';
 
 /**
  * AuthorInfo component for displaying author information

@@ -2,11 +2,11 @@ import { redirect, notFound } from 'next/navigation';
 import { poemRepository } from '@/entities/poem';
 import { PoemFormWrapper } from '@/features/poem-creation';
 import { POEM_FORM_LABELS } from '@/features/poem-creation/lib/constants';
-import type { TiptapJson } from '@/features/poem-creation/model/types';
 import { getCategories } from '@/features/poem-creation/server-actions/getCategories';
 import { auth } from '@/shared/api/auth/auth';
 import { canCreateContent, canModerateContent } from '@/shared/lib/utils/roleUtils';
 import { getRoutePath } from '@/shared/lib/utils/routeUtils';
+import { RichTextContentType } from '@/shared/model/SimpleTypes';
 
 interface EditPoemPageProps {
   params: Promise<{
@@ -50,7 +50,7 @@ export default async function EditPoemPage({ params }: EditPoemPageProps) {
     title: poem.title,
     slug: poem.slug,
     categoryId: poem.categoryId || '',
-    content: poem.content as unknown as TiptapJson | undefined,
+    content: poem.content as unknown as RichTextContentType | undefined,
   };
 
   return (

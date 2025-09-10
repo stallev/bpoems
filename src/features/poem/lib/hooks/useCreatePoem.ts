@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { UIConstants } from '@/features/poem-creation/constants/ui';
-import type { TiptapJson } from '@/features/poem-creation/model/types';
 import { createPoem } from '@/features/poem-creation/server-actions/createPoem';
+import type { RichTextContentType } from '@/shared/model/SimpleTypes';
 
 interface PoemData {
   title: string;
-  content: TiptapJson;
+  content: RichTextContentType;
   categoryId: string;
 }
 

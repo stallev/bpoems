@@ -1,4 +1,5 @@
-import type { PoemContentBlock, TiptapJson, TiptapContent } from '../../model/types';
+import type { RichTextContentType } from '@/shared/model/SimpleTypes';
+import type { PoemContentBlock, TiptapContent } from '../../model/types';
 
 /**
  * Converts Tiptap JSON or PoemContentBlock array to poem content blocks
@@ -115,7 +116,7 @@ export const tiptapJsonToPoemContentBlocks = (json: TiptapContent): PoemContentB
 /**
  * Converts poem content blocks to Tiptap JSON
  */
-export const poemContentBlocksToTiptapJson = (blocks: PoemContentBlock[]): TiptapJson => {
+export const poemContentBlocksToTiptapJson = (blocks: PoemContentBlock[]): RichTextContentType => {
   const content = blocks.map(block => ({
     type: 'paragraph',
     content:
@@ -201,7 +202,7 @@ export const sanitizeContent = (content: string): string => {
 /**
  * Converts HTML string to Tiptap JSON (for backward compatibility)
  */
-export const htmlToTiptapJson = (html: string): TiptapJson => {
+export const htmlToTiptapJson = (html: string): RichTextContentType => {
   // Simple HTML to Tiptap JSON conversion
   const paragraphs = html.split(/<\/?p[^>]*>/).filter(p => p.trim().length > 0);
 
@@ -244,7 +245,7 @@ export const htmlToTiptapJson = (html: string): TiptapJson => {
 /**
  * Converts Tiptap JSON to HTML string (for backward compatibility)
  */
-export const tiptapJsonToHtml = (json: TiptapJson): string => {
+export const tiptapJsonToHtml = (json: RichTextContentType): string => {
   if (!json.content || !Array.isArray(json.content)) {
     return '';
   }

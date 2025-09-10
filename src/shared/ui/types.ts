@@ -1,12 +1,12 @@
-import type { User } from '@/entities/user/model/types';
-import type { TiptapJson } from '@/features/poem-creation/model/types';
+import type { ShortUserDataFromDB, User } from '@/entities/user/model/types';
+import type { RichTextContentType } from '@/shared/model/SimpleTypes';
 
 /**
  * RichTextEditor component props
  */
 export interface RichTextEditorProps {
-  content?: TiptapJson | string;
-  onChange: (content: TiptapJson) => void;
+  content?: RichTextContentType | string;
+  onChange: (content: RichTextContentType) => void;
   placeholder?: string;
   className?: string;
   minHeight?: string;
@@ -18,7 +18,7 @@ export interface RichTextEditorProps {
  * AuthorInfo component props
  */
 export interface AuthorInfoProps {
-  author: User;
+  author: ShortUserDataFromDB;
   createdAt: Date;
   className?: string;
 }
@@ -104,7 +104,7 @@ export interface ReviewSectionProps {
  * PoemContentRenderer component props
  */
 export interface PoemContentRendererProps {
-  content?: TiptapJson | null;
+  content?: RichTextContentType | null;
   className?: string;
 }
 

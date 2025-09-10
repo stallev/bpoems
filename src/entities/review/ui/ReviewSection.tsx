@@ -21,7 +21,7 @@ export function ReviewSection({
   const { isEditing, editingReviewId, data, startAdding, startEditing, cancel, submit } =
     useReviewSection(poemId);
 
-  const { deleteReview: handleDeleteReview, optimisticReviews } = useDeleteReview({ reviews });
+  const { deleteReview: handleDeleteReview } = useDeleteReview({ reviews });
 
   const handleStartAdding = useCallback(() => {
     startAdding();
@@ -38,7 +38,7 @@ export function ReviewSection({
       <SectionHeader title="Отзывы" count={reviews.length} />
 
       <ReviewsList
-        reviews={(optimisticReviews || reviews).map(review => ({
+        reviews={reviews.map(review => ({
           ...review,
           poemId: poemId,
         }))}

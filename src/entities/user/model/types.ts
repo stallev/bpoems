@@ -1,5 +1,6 @@
 // Import types from generated Prisma Client
 import type { User as PrismaUser, Role, Prisma } from '@/generated/prisma';
+import type { ImageDataType } from '@/shared/model/SimpleTypes';
 
 // Re-export base types from Prisma
 export type User = PrismaUser;
@@ -40,4 +41,10 @@ export type SimpleUserUpdateInput = Omit<
   'poems' | 'comments' | 'accounts' | 'sessions'
 > & {
   password?: string | null;
+};
+
+export type ShortUserDataFromDB = {
+  id: string;
+  name: string | null;
+  image: ImageDataType | null;
 };

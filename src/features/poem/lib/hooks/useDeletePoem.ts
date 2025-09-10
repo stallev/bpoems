@@ -1,7 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useState, useOptimistic } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { UIConstants } from '@/features/poem-creation/constants/ui';
 import { deletePoem } from '../../server-actions';
@@ -9,22 +8,10 @@ import { deletePoem } from '../../server-actions';
 interface UseDeletePoemResult {
   isDeleting: boolean;
   deletePoem: (poemId: string) => Promise<void>;
-  optimisticPoems?: Array<{ id: string; title: string; slug: string }>;
 }
 
-/**
- * Custom hook for deleting poems
- * Handles the delete operation with loading state and navigation
- */
-export const useDeletePoem = (
-  poems: Array<{ id: string; title: string; slug: string }> = []
-): UseDeletePoemResult => {
+export const useDeletePoem = (): UseDeletePoemResult => {
   const [isDeleting, setIsDeleting] = useState(false);
-  const router = useRouter();
-
-  const [optimisticPoems, addOptimisticPoem] = useOptimistic(poems, (state, poemId: string) =>
-    state.filter(poem => poem.id !== poemId)
-  );
 
   const handleDeletePoem = async (poemId: string) => {
     if (isDeleting) return;
@@ -32,14 +19,11 @@ export const useDeletePoem = (
     setIsDeleting(true);
 
     try {
-      // Оптимистичное обновление
-      addOptimisticPoem(poemId);
-
       const result = await deletePoem(poemId);
 
       if (result.success) {
+        window.location.href = '/profile';
         toast.success(result.message);
-        router.push('/profile');
       } else {
         toast.error(result.message);
       }
@@ -54,6 +38,5 @@ export const useDeletePoem = (
   return {
     isDeleting,
     deletePoem: handleDeletePoem,
-    optimisticPoems,
   };
 };

@@ -1,7 +1,7 @@
 import { Underline } from '@tiptap/extension-underline';
 import { useEditor, Editor } from '@tiptap/react';
 import { StarterKit } from '@tiptap/starter-kit';
-import type { TiptapJson } from '@/features/poem-creation/model/types';
+import type { RichTextContentType } from '@/shared/model/SimpleTypes';
 import type { RichTextEditorProps } from '../types';
 
 /**
@@ -48,7 +48,7 @@ export const useRichTextEditor = ({
       },
     },
     onUpdate: ({ editor }) => {
-      const json = editor.getJSON() as TiptapJson;
+      const json = editor.getJSON() as RichTextContentType;
       onChange(json);
     },
   });

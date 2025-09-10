@@ -1,4 +1,4 @@
-import { ClaimReport } from '@/shared/ui/ClaimReport';
+import { ClaimReport } from '@/shared/ui/claim/ClaimReport';
 import Footer from '@/widgets/footer/ui/Footer';
 import { Header } from '@/widgets/header/ui/Header';
 

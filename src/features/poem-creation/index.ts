@@ -5,13 +5,7 @@ export { PoemForm, PoemFormWrapper } from './ui';
 export { createPoem, updatePoem, getCategories } from './server-actions';
 
 // Models and Types
-export type {
-  PoemContentBlock,
-  PoemFormData,
-  CategoryOption,
-  PoemFormProps,
-  TiptapJson,
-} from './model';
+export type { PoemContentBlock, PoemFormData, CategoryOption, PoemFormProps } from './model';
 
 export { poemFormSchema } from './model';
 

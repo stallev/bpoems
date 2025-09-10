@@ -1,3 +1,6 @@
+import type { ShortPoemData } from '@/entities/poem/model/types';
+import type { ShortUserDataFromDB } from '@/entities/user/model/types';
+
 // Базовые типы для репозитория
 export type Review = {
   id: string;
@@ -9,6 +12,33 @@ export type Review = {
   status: string;
   createdAt: Date;
   updatedAt: Date;
+};
+
+export type ReviewFromDB = {
+  id: string;
+  title?: string | null;
+  content: string;
+  rating?: number | null;
+  poemId: string;
+  userId: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  user: ShortUserDataFromDB;
+};
+
+export type ReviewRenderDataType = {
+  id: string;
+  title: string;
+  content: string;
+  rating: number;
+  poemId: string;
+  userId: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  user: ShortUserDataFromDB;
+  poem: ShortPoemData;
 };
 
 export type ReviewCreateInput = {
@@ -71,14 +101,14 @@ export interface ReviewSectionProps {
   poemId: string;
   reviews: Array<{
     id: string;
-    title?: string;
+    title?: string | null;
     content: string;
     rating: number;
     poemId: string;
     createdAt: Date;
     user: {
       id: string;
-      name: string;
+      name: string | null;
       image: string | null;
     };
   }>;

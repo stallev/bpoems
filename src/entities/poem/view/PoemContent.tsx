@@ -1,17 +1,14 @@
-'use client';
-
-import { CommentSection } from '@/entities/comment/ui/CommentSection';
-import { PoemWithRelations } from '@/entities/poem/model/types';
+// import { CommentSection } from '@/entities/comment/ui/CommentSection';
+import { PoemRenderDataType } from '@/entities/poem/model/types';
 import { ReviewSection } from '@/entities/review/ui/ReviewSection';
 import { User } from '@/entities/user/model/types';
-import { useDeletePoem } from '@/features/poem/lib/hooks/useDeletePoem';
-import type { TiptapJson } from '@/features/poem-creation/model/types';
-import { AuthorInfoContainer } from '@/shared/ui/AuthorInfoContainer';
+import type { RichTextContentType } from '@/shared/model/SimpleTypes';
+import { AuthorInfoContainer } from '@/shared/ui/author/AuthorInfoContainer';
 import { PoemContentRenderer } from '@/shared/ui/PoemContentRenderer';
 import { UIConstants } from '../constants/ui';
 
 interface PoemContentProps {
-  poem: PoemWithRelations;
+  poem: PoemRenderDataType;
   author: User;
   currentUserId?: string;
 }
@@ -20,64 +17,33 @@ interface PoemContentProps {
  * Main component for displaying poem content with all related sections
  */
 export function PoemContent({ poem, author, currentUserId }: PoemContentProps) {
-  const { deletePoem } = useDeletePoem();
-
-  // Transform poem content to the expected format
-  const content = (poem.content as unknown as TiptapJson) || null;
-
-  // Check if current user is the author
-  const isAuthor = currentUserId === author.id;
-
-  // Transform reviews data to match component interface
-  const transformedReviews = transformReviewsData(poem).map(review => ({
-    ...review,
-    title: review.title || '',
-    user: {
-      ...review.user,
-      name: review.user.name || '',
-    },
-  }));
-
-  // Transform comments data to match component interface
-  const transformedComments = transformCommentsData(poem).map(comment => ({
-    ...comment,
-    author: {
-      ...comment.author,
-      name: comment.author.name || '',
-    },
-  }));
-
-  const handleDelete = async () => {
-    if (!isAuthor) return;
-    await deletePoem(poem.id);
-  };
+  const content = (poem.content as unknown as RichTextContentType) || null;
 
   return (
     <article className="max-w-4xl mx-auto space-y-6 sm:space-y-8 px-4 sm:px-6 lg:px-8">
-      <PoemHeader title={poem.title} />
+      {poem.title && <PoemHeader title={poem.title} />}
 
       <AuthorInfoContainer
-        author={author}
-        createdAt={poem.createdAt}
+        author={poem.author}
+        createdAt={new Date(poem.createdAt)}
         poemSlug={poem.slug}
-        isAuthor={isAuthor}
-        onDelete={handleDelete}
+        poemId={poem.id}
       />
 
       <PoemContentSection content={content} tags={poem.tags} />
 
       <ReviewSection
         poemId={poem.id}
-        reviews={transformedReviews}
+        reviews={!!poem.reviews ? poem.reviews : []}
         currentUserId={currentUserId}
         poemAuthorId={author.id}
       />
 
-      <CommentSection
+      {/* <CommentSection
         poemId={poem.id}
-        comments={transformedComments}
+        comments={!!poem.comments ? poem.comments : []}
         currentUserId={currentUserId}
-      />
+      /> */}
     </article>
   );
 }
@@ -100,7 +66,7 @@ const PoemContentSection = ({
   content,
   tags,
 }: {
-  content: TiptapJson | null;
+  content: RichTextContentType | null;
   tags: Array<{ id: string; name: string }>;
 }) => (
   <section className="bg-background rounded-lg p-4 sm:p-6 border shadow-sm">
@@ -123,56 +89,3 @@ const PoemContentSection = ({
     )}
   </section>
 );
-
-/**
- * Transform reviews data to match ReviewWithRelations interface
- */
-const transformReviewsData = (poem: PoemWithRelations) => {
-  return (poem.reviews || []).map(review => ({
-    id: review.id,
-    title: review.title,
-    content: review.content,
-    createdAt: review.createdAt,
-    updatedAt: review.createdAt, // Using createdAt as fallback
-    status: 'APPROVED' as const,
-    rating: 5, // Default rating
-    userId: review.user.id,
-    poemId: poem.id,
-    user: {
-      id: review.user.id,
-      name: review.user.name,
-      image: null,
-    },
-    poem: {
-      id: poem.id,
-      title: poem.title,
-      slug: poem.slug,
-    },
-  }));
-};
-
-/**
- * Transform comments data to match CommentWithRelations interface
- */
-const transformCommentsData = (poem: PoemWithRelations) => {
-  return (poem.comments || []).map(comment => ({
-    id: comment.id,
-    content: comment.content,
-    createdAt: comment.createdAt,
-    updatedAt: comment.createdAt, // Using createdAt as fallback
-    status: 'APPROVED' as const,
-    authorId: comment.author.id,
-    poemId: poem.id,
-    isApproved: true,
-    author: {
-      id: comment.author.id,
-      name: comment.author.name,
-      image: null,
-    },
-    poem: {
-      id: poem.id,
-      title: poem.title,
-      slug: poem.slug,
-    },
-  }));
-};

@@ -1,4 +1,5 @@
-// Базовые типы для репозитория
+import { ShortPoemData } from '@/entities/poem/model/types';
+import type { ShortUserDataFromDB } from '@/entities/user/model/types';
 export type Comment = {
   id: string;
   content: string;
@@ -98,3 +99,25 @@ export interface CommentsListProps {
   isEditing: boolean;
   editingCommentId: string | null;
 }
+
+export type CommentPoemDataFromDB = {
+  id: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  isApproved: boolean;
+  status: string;
+  claimReports: unknown[];
+  author: ShortUserDataFromDB;
+};
+
+export type CommentRenderDataType = {
+  id: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+  status: string;
+  isApproved: boolean;
+  author: ShortUserDataFromDB;
+  poem: ShortPoemData;
+};

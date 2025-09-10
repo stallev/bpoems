@@ -1,5 +1,11 @@
 // Import types from generated Prisma Client
+import { ShortCategoryFromDB } from '@/entities/category/model/types';
+import { CommentPoemDataFromDB, CommentRenderDataType } from '@/entities/comment/model/types';
+import { ReviewFromDB, ReviewRenderDataType } from '@/entities/review/model/types';
+import type { StatisticsFromDB } from '@/entities/statistics/model/types';
+import type { ShortUserDataFromDB } from '@/entities/user/model/types';
 import type { Poem as PrismaPoem, Prisma, Tag, Statistics } from '@/generated/prisma';
+import { RichTextContentType } from '@/shared/model/SimpleTypes';
 
 // Re-export base types from Prisma
 export type Poem = PrismaPoem;
@@ -38,6 +44,9 @@ export interface PoemWithRelations extends PrismaPoem {
     title: string | null;
     content: string;
     createdAt: Date;
+    rating: number;
+    userId: string;
+    poemId: string;
     user: {
       id: string;
       name: string | null;
@@ -80,3 +89,55 @@ export type SimplePoemUpdateInput = Omit<
     update?: { views?: number; edits?: number; likes?: number; shares?: number };
   };
 };
+
+export interface PoemFrom {
+  poem: PoemWithRelations;
+  author: ShortUserDataFromDB;
+  currentUserId?: string;
+}
+
+export interface PoemWithReviewsAndCommentsFromDB {
+  id: string;
+  slug: string;
+  title: string | null;
+  content: RichTextContentType;
+  description: string | null;
+  authorId: string;
+  status: string;
+  categoryId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string | null;
+  author: ShortUserDataFromDB;
+  reviews: ReviewFromDB[] | [];
+  category: ShortCategoryFromDB | null;
+  tags: Tag[];
+  statistics: StatisticsFromDB | null;
+  comments: CommentPoemDataFromDB[] | [];
+}
+
+export interface PoemRenderDataType {
+  id: string;
+  slug: string;
+  title: string;
+  content: RichTextContentType;
+  description: string | null;
+  authorId: string;
+  status: string;
+  categoryId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date;
+  author: ShortUserDataFromDB;
+  reviews: ReviewRenderDataType[] | [];
+  category: ShortCategoryFromDB;
+  tags: Tag[];
+  statistics: StatisticsFromDB;
+  comments: CommentRenderDataType[] | [];
+}
+
+export interface ShortPoemData {
+  id: string;
+  slug: string;
+  title: string;
+}

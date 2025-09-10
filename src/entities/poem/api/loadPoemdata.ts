@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { commentRepository } from '@/entities/comment';
 import { poemRepository } from '@/entities/poem';
+import { transformPoemFetchedToRenderData } from '@/entities/poem/api/utils';
 import { reviewRepository } from '@/entities/review';
 import { userRepository } from '@/entities/user';
 import { auth } from '@/shared/api/auth/auth';
@@ -29,7 +30,7 @@ async function loadPoemData(slug: string) {
 
   return {
     session,
-    poem,
+    poem: transformPoemFetchedToRenderData(poem),
     author,
     reviews,
     comments,

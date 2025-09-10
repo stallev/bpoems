@@ -1,10 +1,11 @@
 'use client';
 
 import { useCallback } from 'react';
-import type { PoemFormData, TiptapJson } from '../../model/types';
+import type { RichTextContentType } from '@/shared/model/SimpleTypes';
+import type { PoemFormData } from '../../model/types';
 
 export const useTiptapUtils = () => {
-  const getTiptapValue = useCallback((content: TiptapJson): TiptapJson => {
+  const getTiptapValue = useCallback((content: RichTextContentType): RichTextContentType => {
     try {
       return content;
     } catch {

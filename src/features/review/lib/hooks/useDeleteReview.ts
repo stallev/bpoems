@@ -7,11 +7,11 @@ interface UseDeleteReviewProps {
   onSuccess?: () => void;
   reviews?: Array<{
     id: string;
-    title?: string;
+    title?: string | null;
     content: string;
     rating: number;
     createdAt: Date;
-    user: { id: string; name: string; image: string | null };
+    user: { id: string; name: string | null; image: string | null };
   }>;
 }
 

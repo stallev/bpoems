@@ -91,3 +91,13 @@ export interface CategoryStats {
   categoriesWithPoems: number;
   averagePoemsPerCategory: number;
 }
+
+export type ShortCategoryFromDB = {
+  id: string;
+  slug: string;
+  isActive: boolean;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+  translatedItems: TranslatedItem[];
+};
